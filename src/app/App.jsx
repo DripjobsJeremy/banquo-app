@@ -200,6 +200,12 @@ function App() {
   const currentView = getViewFromPath(location.pathname);
 
   useEffect(() => {
+    if (window.initializeSampleData) {
+      window.initializeSampleData();
+    }
+  }, []);
+
+  useEffect(() => {
     const loadData = () => {
       const contacts = JSON.parse(localStorage.getItem('showsuite_contacts') || '[]');
       const donations = JSON.parse(localStorage.getItem('showsuite_donations') || '[]');
