@@ -245,32 +245,29 @@ function SetDesignView({ production, onSave }) {
   const handleAddPiece = (actIndex, sceneIndex) => {
     const newPiece = {
       id: 'set_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-      name: '',
-      description: '',
-      type: '',
-      dimensions: '',
-      materials: '',
-      weight: '',
-      buildStatus: 'Design Phase',
-      priority: 'Normal',
-      cost: '',
-      laborHours: '',
-      laborLog: '',
-      dueDate: '',
-      assignedTo: '',
-      constructionNotes: '',
-      riggingNotes: '',
-      safetyNotes: '',
-      imageUrl: '',
-      createdAt: new Date().toISOString()
+      name: '', description: '', type: '', dimensions: '', materials: '',
+      weight: '', buildStatus: 'Design Phase', priority: 'Normal',
+      cost: '', laborHours: '', laborLog: '', dueDate: '', assignedTo: '',
+      constructionNotes: '', riggingNotes: '', safetyNotes: '',
+      imageUrl: '', createdAt: new Date().toISOString()
     };
-    
-    const updatedActs = [...production.acts];
-    if (!updatedActs[actIndex].scenes[sceneIndex].set?.pieces) {
-      updatedActs[actIndex].scenes[sceneIndex].set = { pieces: [], notes: '' };
-    }
-    updatedActs[actIndex].scenes[sceneIndex].set.pieces.push(newPiece);
-    
+    const updatedActs = production.acts.map((act, aIdx) => {
+      if (aIdx !== actIndex) return act;
+      return {
+        ...act,
+        scenes: act.scenes.map((scene, sIdx) => {
+          if (sIdx !== sceneIndex) return scene;
+          const existingPieces = Array.isArray(scene.set?.pieces) ? scene.set.pieces : [];
+          return {
+            ...scene,
+            set: {
+              ...(scene.set || {}),
+              pieces: [...existingPieces, newPiece]
+            }
+          };
+        })
+      };
+    });
     if (window.productionsService?.updateProduction) {
       window.productionsService.updateProduction(production.id, { acts: updatedActs });
     }
