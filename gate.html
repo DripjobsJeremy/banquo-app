@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pamela's Sweater</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: #1a1a1a;
+      color: #f5f0e8;
+      font-family: Georgia, 'Times New Roman', serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background-color: #242424;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: normal;
+      letter-spacing: 0.04em;
+      color: #f5f0e8;
+      margin-bottom: 32px;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      background: #1a1a1a;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: #f5f0e8;
+      font-size: 1rem;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 12px;
+    }
+
+    input[type="password"]::placeholder {
+      color: #666;
+    }
+
+    input[type="password"]:focus {
+      border-color: #888;
+    }
+
+    button {
+      width: 100%;
+      background: #3a3026;
+      border: 1px solid #5a4a38;
+      border-radius: 6px;
+      color: #f5f0e8;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.06em;
+      padding: 12px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    button:hover {
+      background: #4a3c2e;
+      border-color: #7a6a50;
+    }
+
+    .error {
+      color: #c47a5a;
+      font-size: 0.85rem;
+      margin-top: 14px;
+      min-height: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Pamela's Sweater</h1>
+    <input type="password" id="code" placeholder="Access Code" autofocus>
+    <button onclick="tryEnter()">Enter</button>
+    <div class="error" id="err"></div>
+  </div>
+
+  <script>
+    if (localStorage.getItem('pams_sweater_auth') === 'granted') {
+      window.location.replace('index.html');
+    }
+
+    document.getElementById('code').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') tryEnter();
+    });
+
+    function tryEnter() {
+      var val = document.getElementById('code').value;
+      if (val === 'Jason13!') {
+        localStorage.setItem('pams_sweater_auth', 'granted');
+        window.location.replace('index.html');
+      } else {
+        document.getElementById('err').textContent = "That's not right. Try again.";
+        document.getElementById('code').value = '';
+        document.getElementById('code').focus();
+      }
+    }
+  </script>
+</body>
+</html>
