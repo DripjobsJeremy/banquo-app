@@ -592,7 +592,6 @@ function PropsView({ production, onSave, onUpdateScene }) {
   };
 
   const handleAddProp = (actIndex, sceneIndex) => {
-    console.log('handleAddProp called', { actIndex, sceneIndex, production, acts: production.acts, scenes: production.scenes });
     const newProp = {
       id: Date.now(),
       name: '',
