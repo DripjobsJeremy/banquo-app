@@ -99,8 +99,8 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
     let count = 0;
     (production.acts || []).forEach(act => {
       (act.scenes || []).forEach(scene => {
-        if (scene.wardrobe?.length) {
-          count += scene.wardrobe.length;
+        if (scene.wardrobe?.items?.length) {
+          count += scene.wardrobe.items.length;
         }
       });
     });
@@ -112,8 +112,8 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
     const allKeys = [];
     (production.acts || []).forEach((act, actIndex) => {
       (act.scenes || []).forEach((scene, sceneIndex) => {
-        if (scene.wardrobe?.length) {
-          scene.wardrobe.forEach(costume => {
+        if (scene.wardrobe?.items?.length) {
+          scene.wardrobe.items.forEach(costume => {
             allKeys.push(`${actIndex}:${sceneIndex}:${costume.id}`);
           });
         }
@@ -191,8 +191,8 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
     const values = new Set();
     (production.acts || []).forEach(act => {
       (act.scenes || []).forEach(scene => {
-        if (scene.wardrobe?.length) {
-          scene.wardrobe.forEach(costume => {
+        if (scene.wardrobe?.items?.length) {
+          scene.wardrobe.items.forEach(costume => {
             if (costume[field]) values.add(costume[field]);
           });
         }
@@ -222,8 +222,8 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
     
     (production.acts || []).forEach(act => {
       (act.scenes || []).forEach(scene => {
-        if (scene.wardrobe?.length) {
-          scene.wardrobe.forEach(costume => {
+        if (scene.wardrobe?.items?.length) {
+          scene.wardrobe.items.forEach(costume => {
             totalCostumes++;
             if (costume.cost && !isNaN(parseFloat(costume.cost))) {
               totalCost += parseFloat(costume.cost);
@@ -599,34 +599,38 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
       category: '',
       status: 'To Source'
     };
-    
-    const updatedActs = [...production.acts];
-    if (!updatedActs[actIndex].scenes[sceneIndex].wardrobe || !Array.isArray(updatedActs[actIndex].scenes[sceneIndex].wardrobe)) {
-      updatedActs[actIndex].scenes[sceneIndex].wardrobe = { items: [], notes: '' };
+    const updatedActs = production.acts.map((act, aIdx) => {
+      if (aIdx !== actIndex) return act;
+      return {
+        ...act,
+        scenes: act.scenes.map((scene, sIdx) => {
+          if (sIdx !== sceneIndex) return scene;
+          const existingItems = Array.isArray(scene.wardrobe?.items) ? scene.wardrobe.items : [];
+          return {
+            ...scene,
+            wardrobe: {
+              ...(scene.wardrobe || {}),
+              items: [...existingItems, newCostume]
+            }
+          };
+        })
+      };
+    });
+    if (window.productionsService?.updateProduction) {
+      window.productionsService.updateProduction(production.id, { acts: updatedActs });
     }
-    if (!Array.isArray(updatedActs[actIndex].scenes[sceneIndex].wardrobe.items)) {
-      updatedActs[actIndex].scenes[sceneIndex].wardrobe.items = [];
-    }
-    updatedActs[actIndex].scenes[sceneIndex].wardrobe.items.push(newCostume);
-    
-    window.productionsService?.updateProduction?.(production.id, { acts: updatedActs });
     onSave({ ...production, acts: updatedActs });
   };
 
   // Immediate update for React state (doesn't save to DB)
   const handleUpdateCostumeImmediate = (actIndex, sceneIndex, costumeId, field, value) => {
-    console.log('handleUpdateCostumeImmediate:', { actIndex, sceneIndex, costumeId, field, value });
-    
     const updatedActs = [...production.acts];
-    const wardrobe = updatedActs[actIndex].scenes[sceneIndex].wardrobe || [];
-    const costumeIndex = wardrobe.findIndex(c => c.id === costumeId);
-    
+    const wardrobeObj = updatedActs[actIndex].scenes[sceneIndex].wardrobe || { items: [], notes: '' };
+    const items = Array.isArray(wardrobeObj.items) ? [...wardrobeObj.items] : [];
+    const costumeIndex = items.findIndex(c => c.id === costumeId);
     if (costumeIndex >= 0) {
-      wardrobe[costumeIndex] = { ...wardrobe[costumeIndex], [field]: value };
-      updatedActs[actIndex].scenes[sceneIndex].wardrobe = wardrobe;
-      
-      // Update production object in parent component's state without DB save
-      // This allows React to re-render with the new value while typing
+      items[costumeIndex] = { ...items[costumeIndex], [field]: value };
+      updatedActs[actIndex].scenes[sceneIndex].wardrobe = { ...wardrobeObj, items };
       if (typeof onUpdateScene === 'function') {
         onUpdateScene(actIndex, { ...production.acts[actIndex], scenes: updatedActs[actIndex].scenes });
       }
@@ -635,41 +639,31 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
 
   // Full update that saves to productionsService (for blur/final save)
   const handleUpdateCostumeAndSave = (actIndex, sceneIndex, costumeId, field, value) => {
-    console.log('handleUpdateCostumeAndSave:', { actIndex, sceneIndex, costumeId, field, value });
-    
     const updatedActs = [...production.acts];
-    const wardrobe = updatedActs[actIndex].scenes[sceneIndex].wardrobe || [];
-    const costumeIndex = wardrobe.findIndex(c => c.id === costumeId);
-    
+    const wardrobeObj = updatedActs[actIndex].scenes[sceneIndex].wardrobe || { items: [], notes: '' };
+    const items = Array.isArray(wardrobeObj.items) ? [...wardrobeObj.items] : [];
+    const costumeIndex = items.findIndex(c => c.id === costumeId);
     if (costumeIndex >= 0) {
-      wardrobe[costumeIndex] = { ...wardrobe[costumeIndex], [field]: value };
-      updatedActs[actIndex].scenes[sceneIndex].wardrobe = wardrobe;
-      
-      // Save to productionsService (persists to backend)
+      items[costumeIndex] = { ...items[costumeIndex], [field]: value };
+      updatedActs[actIndex].scenes[sceneIndex].wardrobe = { ...wardrobeObj, items };
       if (window.productionsService?.updateProduction) {
         window.productionsService.updateProduction(production.id, { acts: updatedActs });
-        console.log('Production saved to productionsService');
-      } else {
-        console.error('productionsService not available!');
       }
-      
-      // Also update parent component's state
-      if (typeof onUpdateScene === 'function') {
-        onUpdateScene(actIndex, { ...production.acts[actIndex], scenes: updatedActs[actIndex].scenes });
-      }
-    } else {
-      console.error('Costume not found:', costumeId);
+      onSave({ ...production, acts: updatedActs });
     }
   };
 
   const handleDeleteCostume = (actIndex, sceneIndex, costumeId) => {
     if (!confirm('Delete this costume?')) return;
-    
+
     const updatedActs = [...production.acts];
-    const wardrobe = updatedActs[actIndex].scenes[sceneIndex].wardrobe || [];
-    updatedActs[actIndex].scenes[sceneIndex].wardrobe = wardrobe.filter(c => c.id !== costumeId);
-    
-    window.productionsService?.updateProduction?.(production.id, { acts: updatedActs });
+    const wardrobeObj = updatedActs[actIndex].scenes[sceneIndex].wardrobe || { items: [], notes: '' };
+    const items = Array.isArray(wardrobeObj.items) ? wardrobeObj.items.filter(c => c.id !== costumeId) : [];
+    updatedActs[actIndex].scenes[sceneIndex].wardrobe = { ...wardrobeObj, items };
+    if (window.productionsService?.updateProduction) {
+      window.productionsService.updateProduction(production.id, { acts: updatedActs });
+    }
+    onSave({ ...production, acts: updatedActs });
   };
 
   // Checklist functions
@@ -702,8 +696,8 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
     
     production.acts.forEach((act, actIndex) => {
       act.scenes.forEach((scene, sceneIndex) => {
-        if (scene.wardrobe && Array.isArray(scene.wardrobe)) {
-          scene.wardrobe.forEach(costume => {
+        if (scene.wardrobe && Array.isArray(scene.wardrobe.items)) {
+          scene.wardrobe.items.forEach(costume => {
             // Apply current filters if any are active
             const matchesFilters = 
               (!searchQuery || 
@@ -889,7 +883,7 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
               'tbody',
               null,
               allScenes.flatMap((scene, sceneIdx) => {
-                const filteredWardrobe = scene.wardrobe ? filterWardrobe(scene.wardrobe, scene.act) : [];
+                const filteredWardrobe = scene.wardrobe?.items ? filterWardrobe(scene.wardrobe.items, scene.act) : [];
                 return filteredWardrobe.map((costume, costumeIdx) =>
                   React.createElement(
                     'tr',
@@ -1229,15 +1223,15 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
           React.createElement(
             'div',
             { className: 'flex items-center gap-3' },
-            scene.wardrobe && scene.wardrobe.length > 0 && React.createElement(
+            scene.wardrobe?.items && scene.wardrobe.items.length > 0 && React.createElement(
               'span',
               { className: 'text-sm text-gray-600' },
-              `${filterWardrobe(scene.wardrobe, scene.act).length} costume${filterWardrobe(scene.wardrobe, scene.act).length !== 1 ? 's' : ''}`
+              `${filterWardrobe(scene.wardrobe.items, scene.act).length} costume${filterWardrobe(scene.wardrobe.items, scene.act).length !== 1 ? 's' : ''}`
             ),
-            scene.wardrobe && calculateSceneCost(scene.wardrobe) > 0 && React.createElement(
+            scene.wardrobe?.items && calculateSceneCost(scene.wardrobe.items) > 0 && React.createElement(
               'span',
               { className: 'px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm font-medium' },
-              `$${calculateSceneCost(scene.wardrobe).toFixed(2)}`
+              `$${calculateSceneCost(scene.wardrobe.items).toFixed(2)}`
             ),
             React.createElement(
               'button',
@@ -1251,16 +1245,16 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
         ),
         
         // Costumes list
-        (!scene.wardrobe || scene.wardrobe.length === 0) && React.createElement(
+        (!scene.wardrobe?.items || scene.wardrobe.items.length === 0) && React.createElement(
           'p',
           { className: 'text-gray-500 text-sm italic' },
           'No costumes for this scene yet.'
         ),
-        
-        scene.wardrobe && scene.wardrobe.length > 0 && React.createElement(
+
+        scene.wardrobe?.items && scene.wardrobe.items.length > 0 && React.createElement(
           'div',
           { className: 'space-y-2' },
-          filterWardrobe(scene.wardrobe, scene.act).map(costume =>
+          filterWardrobe(scene.wardrobe.items, scene.act).map(costume =>
             React.createElement(
               'div',
               { key: costume.id, className: 'relative flex items-start gap-3 p-3 bg-gray-50 rounded border border-gray-200' },
@@ -1467,7 +1461,7 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
         ),
         
         // No results message when filters are active
-        scene.wardrobe && scene.wardrobe.length > 0 && filterWardrobe(scene.wardrobe, scene.act).length === 0 && React.createElement(
+        scene.wardrobe?.items && scene.wardrobe.items.length > 0 && filterWardrobe(scene.wardrobe.items, scene.act).length === 0 && React.createElement(
           'div',
           { className: 'p-4 text-center text-gray-500 bg-gray-50 rounded border border-gray-200' },
           'No costumes match the current filters'
