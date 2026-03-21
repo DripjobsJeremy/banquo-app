@@ -592,6 +592,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
   };
 
   const handleAddProp = (actIndex, sceneIndex) => {
+    console.log('handleAddProp called', { actIndex, sceneIndex, production, acts: production.acts, scenes: production.scenes });
     const newProp = {
       id: Date.now(),
       name: '',
@@ -599,17 +600,26 @@ function PropsView({ production, onSave, onUpdateScene }) {
       category: '',
       status: 'To Source'
     };
-    
-    const updatedActs = [...production.acts];
-    if (!updatedActs[actIndex].scenes[sceneIndex].props || !Array.isArray(updatedActs[actIndex].scenes[sceneIndex].props)) {
-      updatedActs[actIndex].scenes[sceneIndex].props = { items: [], notes: '' };
+    const updatedActs = production.acts.map((act, aIdx) => {
+      if (aIdx !== actIndex) return act;
+      return {
+        ...act,
+        scenes: act.scenes.map((scene, sIdx) => {
+          if (sIdx !== sceneIndex) return scene;
+          const existingItems = Array.isArray(scene.props?.items) ? scene.props.items : [];
+          return {
+            ...scene,
+            props: {
+              ...(scene.props || {}),
+              items: [...existingItems, newProp]
+            }
+          };
+        })
+      };
+    });
+    if (window.productionsService?.updateProduction) {
+      window.productionsService.updateProduction(production.id, { acts: updatedActs });
     }
-    if (!Array.isArray(updatedActs[actIndex].scenes[sceneIndex].props.items)) {
-      updatedActs[actIndex].scenes[sceneIndex].props.items = [];
-    }
-    updatedActs[actIndex].scenes[sceneIndex].props.items.push(newProp);
-    
-    window.productionsService?.updateProduction?.(production.id, { acts: updatedActs });
     onSave({ ...production, acts: updatedActs });
   };
 
