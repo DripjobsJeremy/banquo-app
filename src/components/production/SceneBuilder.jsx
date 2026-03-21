@@ -900,6 +900,7 @@ function SceneBuilder({ productionId: propId }) {
     activeTab === 'wardrobe' && (
       typeof WardrobeView !== 'undefined' ? React.createElement(WardrobeView, {
         production: production,
+        onSave: saveProduction,
         onUpdateScene: (actIndex, sceneIndex, field, value) => {
           handleUpdateScene(actIndex, sceneIndex, field, value);
         }
@@ -912,6 +913,7 @@ function SceneBuilder({ productionId: propId }) {
     ),
     activeTab === 'props' && React.createElement(PropsView, {
       production: production,
+      onSave: saveProduction,
       onUpdateScene: (actIndex, sceneIndex, field, value) => {
         handleUpdateScene(actIndex, sceneIndex, field, value);
       }
