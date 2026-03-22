@@ -102,3 +102,12 @@
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgb(0 0 0 / 0));
 }
 .bg-violet-50 { background-color: color-mix(in srgb, var(--brand-primary) 8%, white) !important; }
+
+/* ── Mobile utilities ──────────────────────────────────────────────────────── */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

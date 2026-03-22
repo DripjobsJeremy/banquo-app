@@ -2140,7 +2140,7 @@ function SetDesignView({ production, onSave }) {
                           // Grid of fields - Type, Build Status, Priority, Dimensions
                           React.createElement(
                             'div',
-                            { className: 'grid grid-cols-4 gap-2' },
+                            { className: 'grid grid-cols-2 gap-2' },
                             React.createElement('select', {
                               value: piece.type || '',
                               onChange: (e) => {
@@ -2192,7 +2192,7 @@ function SetDesignView({ production, onSave }) {
                           // Materials, Weight, Cost, Labor Hours
                           React.createElement(
                             'div',
-                            { className: 'grid grid-cols-4 gap-2' },
+                            { className: 'grid grid-cols-2 gap-2' },
                             React.createElement('input', {
                               type: 'text',
                               placeholder: 'Materials',
@@ -2249,7 +2249,7 @@ function SetDesignView({ production, onSave }) {
                           // Assigned To, Due Date
                           React.createElement(
                             'div',
-                            { className: 'grid grid-cols-3 gap-2' },
+                            { className: 'grid grid-cols-2 gap-2' },
                             React.createElement('input', {
                               type: 'text',
                               placeholder: 'Assigned to',

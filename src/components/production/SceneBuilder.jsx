@@ -229,7 +229,7 @@ function SceneBuilder({ productionId: propId }) {
   // Header with back button
   const header = React.createElement(
     'div',
-    { className: 'flex items-center justify-between mb-6' },
+    { className: 'flex items-center justify-between mb-6 flex-wrap gap-2' },
     React.createElement(
       'div',
       { className: 'flex items-center gap-4' },
@@ -285,7 +285,7 @@ function SceneBuilder({ productionId: propId }) {
 
   const tabNavigation = React.createElement(
     'div',
-    { className: 'flex items-center gap-1 border-b border-gray-200 mb-6' },
+    { className: 'flex items-center gap-1 border-b border-gray-200 mb-6 overflow-x-auto scrollbar-hide' },
     visibleTabs.map(tab =>
       React.createElement(
         'button',

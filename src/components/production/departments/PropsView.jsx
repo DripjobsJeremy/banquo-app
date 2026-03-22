@@ -1303,7 +1303,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
                 // Category, Character, Status, Cost
                 React.createElement(
                   'div',
-                  { className: 'grid grid-cols-4 gap-2' },
+                  { className: 'grid grid-cols-2 gap-2' },
                   React.createElement('input', {
                     type: 'text',
                     value: prop.category || '',
