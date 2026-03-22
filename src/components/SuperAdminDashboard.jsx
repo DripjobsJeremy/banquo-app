@@ -130,7 +130,10 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
 
       {/* Key Metrics */}
       <div key={`metrics-${refreshKey}`} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg shadow-lg p-6 text-white">
+        <div
+          className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg shadow-lg p-6 text-white cursor-pointer hover:ring-2 hover:ring-violet-400 hover:shadow-xl transition-all duration-150"
+          onClick={() => { window.location.hash = '#/productions'; }}
+        >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium opacity-90">Active Productions</h3>
             <span className="text-3xl">🎭</span>
@@ -139,7 +142,10 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
           <p className="text-sm opacity-75">{productions.length} total productions</p>
         </div>
 
-        <div className="bg-gradient-to-br from-green-500 to-green-700 rounded-lg shadow-lg p-6 text-white">
+        <div
+          className="bg-gradient-to-br from-green-500 to-green-700 rounded-lg shadow-lg p-6 text-white cursor-pointer hover:ring-2 hover:ring-green-300 hover:shadow-xl transition-all duration-150"
+          onClick={() => { window.location.hash = '#/financial?view=donations'; }}
+        >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium opacity-90">Donations (YTD)</h3>
             <span className="text-3xl">💰</span>
@@ -148,7 +154,10 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
           <p className="text-sm opacity-75">{metrics.donationsThisYear.length} donations this year</p>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg shadow-lg p-6 text-white">
+        <div
+          className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg shadow-lg p-6 text-white cursor-pointer hover:ring-2 hover:ring-blue-300 hover:shadow-xl transition-all duration-150"
+          onClick={() => { window.location.hash = '#/financial?view=donors'; }}
+        >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium opacity-90">Active Donors</h3>
             <span className="text-3xl">👥</span>
@@ -157,13 +166,20 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
           <p className="text-sm opacity-75">Total lifetime: ${metrics.totalDonations.toLocaleString()}</p>
         </div>
 
-        <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-lg shadow-lg p-6 text-white">
+        <div
+          className="bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-lg shadow-lg p-6 text-white cursor-pointer hover:ring-2 hover:ring-indigo-300 hover:shadow-xl transition-all duration-150"
+          onClick={() => { window.location.hash = '#/actors'; }}
+        >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium opacity-90">Actor Roster</h3>
             <span className="text-3xl">🎬</span>
           </div>
           <div className="text-3xl font-bold mb-1">{metrics.approvedActors.length}</div>
-          <p className="text-sm opacity-75">{metrics.pendingActors.length} pending approval</p>
+          {metrics.pendingActors.length > 0 ? (
+            <p className="text-sm font-semibold text-amber-300">{metrics.pendingActors.length} pending approval</p>
+          ) : (
+            <p className="text-sm opacity-75">0 pending approval</p>
+          )}
         </div>
       </div>
 
