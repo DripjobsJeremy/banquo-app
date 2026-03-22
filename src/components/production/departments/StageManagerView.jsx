@@ -122,6 +122,9 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
     )
   );
 
+  // Helper: detect empty/unset department values
+  const isEmpty = (val) => !val || val === 'Not set' || val === 'None assigned' || (Array.isArray(val) && val.length === 0);
+
   // Run Sheet Section
   const runSheetContent = React.createElement(
     'div',
@@ -234,43 +237,59 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                       'div',
                       { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-3' },
                       // Characters
-                      React.createElement(
-                        'div',
-                        { className: 'p-2 bg-violet-50 rounded' },
-                        React.createElement('p', { className: 'text-xs font-medium text-violet-700 mb-1' }, '🎭 Characters'),
-                        React.createElement('p', { className: 'text-xs text-violet-600' }, 
-                          scene.characterIds?.length > 0
-                            ? scene.characterIds.map(id => getCharacterName(id)).join(', ')
-                            : 'None assigned'
-                        )
-                      ),
+                      (() => {
+                        const charVal = scene.characterIds?.length > 0
+                          ? scene.characterIds.map(id => getCharacterName(id)).join(', ')
+                          : null;
+                        const charEmpty = isEmpty(charVal);
+                        return React.createElement(
+                          'div',
+                          { className: charEmpty ? 'p-2 rounded border-2 border-dashed border-gray-300 bg-gray-50 opacity-70' : 'p-2 bg-violet-50 rounded' },
+                          React.createElement('p', { className: 'text-xs font-medium text-violet-700 mb-1' }, '🎭 Characters'),
+                          charEmpty
+                            ? React.createElement('span', { className: 'italic text-gray-400 text-xs' }, '⚠ None assigned')
+                            : React.createElement('p', { className: 'text-xs text-violet-600' }, charVal)
+                        );
+                      })(),
                       // Lighting
-                      React.createElement(
-                        'div',
-                        { className: 'p-2 bg-yellow-50 rounded' },
-                        React.createElement('p', { className: 'text-xs font-medium text-yellow-700 mb-1' }, '💡 Lighting'),
-                        React.createElement('p', { className: 'text-xs text-yellow-600' }, 
-                          [scene.lightingCue, scene.lightingMood, scene.lightingColor].filter(Boolean).join(' • ') || 'Not set'
-                        )
-                      ),
+                      (() => {
+                        const lightVal = [scene.lightingCue, scene.lightingMood, scene.lightingColor].filter(Boolean).join(' • ') || null;
+                        const lightEmpty = isEmpty(lightVal);
+                        return React.createElement(
+                          'div',
+                          { className: lightEmpty ? 'p-2 rounded border-2 border-dashed border-gray-300 bg-gray-50 opacity-70' : 'p-2 bg-yellow-50 rounded' },
+                          React.createElement('p', { className: 'text-xs font-medium text-yellow-700 mb-1' }, '💡 Lighting'),
+                          lightEmpty
+                            ? React.createElement('span', { className: 'italic text-gray-400 text-xs' }, '⚠ Not set')
+                            : React.createElement('p', { className: 'text-xs text-yellow-600' }, lightVal)
+                        );
+                      })(),
                       // Sound
-                      React.createElement(
-                        'div',
-                        { className: 'p-2 bg-green-50 rounded' },
-                        React.createElement('p', { className: 'text-xs font-medium text-green-700 mb-1' }, '🔊 Sound'),
-                        React.createElement('p', { className: 'text-xs text-green-600' }, 
-                          [scene.soundSong, scene.soundArtist, scene.soundType].filter(Boolean).join(' • ') || 'Not set'
-                        )
-                      ),
+                      (() => {
+                        const soundVal = [scene.soundSong, scene.soundArtist, scene.soundType].filter(Boolean).join(' • ') || null;
+                        const soundEmpty = isEmpty(soundVal);
+                        return React.createElement(
+                          'div',
+                          { className: soundEmpty ? 'p-2 rounded border-2 border-dashed border-gray-300 bg-gray-50 opacity-70' : 'p-2 bg-green-50 rounded' },
+                          React.createElement('p', { className: 'text-xs font-medium text-green-700 mb-1' }, '🔊 Sound'),
+                          soundEmpty
+                            ? React.createElement('span', { className: 'italic text-gray-400 text-xs' }, '⚠ Not set')
+                            : React.createElement('p', { className: 'text-xs text-green-600' }, soundVal)
+                        );
+                      })(),
                       // Location/Time
-                      React.createElement(
-                        'div',
-                        { className: 'p-2 bg-gray-100 rounded' },
-                        React.createElement('p', { className: 'text-xs font-medium text-gray-700 mb-1' }, '📍 Setting'),
-                        React.createElement('p', { className: 'text-xs text-gray-600' }, 
-                          [scene.location, scene.time].filter(Boolean).join(' — ') || 'Not set'
-                        )
-                      )
+                      (() => {
+                        const settingVal = [scene.location, scene.time].filter(Boolean).join(' — ') || null;
+                        const settingEmpty = isEmpty(settingVal);
+                        return React.createElement(
+                          'div',
+                          { className: settingEmpty ? 'p-2 rounded border-2 border-dashed border-gray-300 bg-gray-50 opacity-70' : 'p-2 bg-gray-100 rounded' },
+                          React.createElement('p', { className: 'text-xs font-medium text-gray-700 mb-1' }, '📍 Setting'),
+                          settingEmpty
+                            ? React.createElement('span', { className: 'italic text-gray-400 text-xs' }, '⚠ Not set')
+                            : React.createElement('p', { className: 'text-xs text-gray-600' }, settingVal)
+                        );
+                      })()
                     ),
                     // SM Cue Notes (editable)
                     React.createElement(
