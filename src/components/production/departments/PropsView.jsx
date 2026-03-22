@@ -81,7 +81,13 @@ function PropsView({ production, onSave, onUpdateScene }) {
   const [filterAct, setFilterAct] = useState('');
   const [checklistMode, setChecklistMode] = React.useState(false);
   const [checklistStatus, setChecklistStatus] = React.useState({});
-  
+  const [lastSaved, setLastSaved] = useState(null);
+
+  const showSaved = () => {
+    setLastSaved(new Date());
+    if (window.showToast) window.showToast('Changes saved', 'success', 2500);
+  };
+
   const fileInputRef = useRef(null);
 
   // Toggle selection for a single prop
@@ -620,6 +626,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
       window.productionsService.updateProduction(production.id, { acts: updatedActs });
     }
     onSave({ ...production, acts: updatedActs });
+    showSaved();
   };
 
   // Immediate update for React state (doesn't save to DB)
@@ -650,6 +657,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
         window.productionsService.updateProduction(production.id, { acts: updatedActs });
       }
       onSave({ ...production, acts: updatedActs });
+      showSaved();
     }
   };
 
@@ -664,6 +672,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
       window.productionsService.updateProduction(production.id, { acts: updatedActs });
     }
     onSave({ ...production, acts: updatedActs });
+    showSaved();
   };
 
   // Checklist functions
@@ -790,7 +799,12 @@ function PropsView({ production, onSave, onUpdateScene }) {
     React.createElement(
       'div',
       { className: 'flex items-center justify-between mb-4' },
-      React.createElement('h3', { className: 'text-lg font-semibold text-gray-900' }, '🎭 Props Manager'),
+      React.createElement('div', { className: 'flex items-baseline gap-2' },
+        React.createElement('h3', { className: 'text-lg font-semibold text-gray-900' }, '🎭 Props Manager'),
+        lastSaved && React.createElement('span', { className: 'text-xs text-gray-500 font-normal' },
+          'Last saved: ' + lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        )
+      ),
       React.createElement(
         'div',
         { className: 'flex gap-2' },
