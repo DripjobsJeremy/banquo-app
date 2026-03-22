@@ -2087,45 +2087,41 @@ function SetDesignView({ production, onSave }) {
                     ) : scenePieces.map((piece) =>
                       React.createElement(
                         'div',
-                        { key: piece.id, className: 'relative flex items-start gap-3 p-3 bg-gray-50 rounded border border-gray-200 mb-2' },
+                        { key: piece.id, className: 'flex flex-col gap-2 p-3 bg-gray-50 rounded border border-gray-200 mb-2' },
 
-                        // Checkbox
+                        // Top row: checkbox, name, delete
                         React.createElement(
                           'div',
-                          { className: 'absolute top-3 left-3' },
+                          { className: 'flex items-center gap-2' },
                           React.createElement('input', {
                             type: 'checkbox',
                             checked: selectedPieces.includes(`${actIndex}:${sceneIndex}:${piece.id}`),
                             onChange: () => togglePieceSelection(actIndex, sceneIndex, piece.id),
-                            className: 'w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500',
+                            className: 'w-5 h-5 flex-shrink-0 text-blue-600 rounded border-gray-300 focus:ring-blue-500',
                             title: 'Select for bulk delete'
-                          })
-                        ),
-
-                        // Delete button
-                        React.createElement(
-                          'button',
-                          {
-                            onClick: () => handleDeletePiece(actIndex, sceneIndex, piece.id),
-                            className: 'absolute top-3 right-3 text-gray-400 hover:text-red-600 transition-colors p-0'
-                          },
-                          '🗑️'
-                        ),
-
-                        // Content
-                        React.createElement(
-                          'div',
-                          { className: 'flex-1 space-y-2 ml-6' },
-
-                          // Piece Name
+                          }),
                           React.createElement('input', {
                             type: 'text',
                             value: piece.name || '',
                             onChange: (e) => handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'name', e.target.value),
                             onBlur: (e) => handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'name', e.target.value),
-                            className: 'w-full px-2 py-1 border border-gray-300 rounded text-sm font-medium',
+                            className: 'flex-1 min-w-0 px-2 py-1 border border-gray-300 rounded text-sm font-medium',
                             placeholder: 'Set piece name'
                           }),
+                          React.createElement(
+                            'button',
+                            {
+                              onClick: () => handleDeletePiece(actIndex, sceneIndex, piece.id),
+                              className: 'flex-shrink-0 text-gray-400 hover:text-red-600 transition-colors p-0'
+                            },
+                            '🗑️'
+                          )
+                        ),
+
+                        // Content
+                        React.createElement(
+                          'div',
+                          { className: 'space-y-2' },
 
                           // Description
                           React.createElement('textarea', {

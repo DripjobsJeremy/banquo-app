@@ -1257,42 +1257,53 @@ function PropsView({ production, onSave, onUpdateScene }) {
           filterProps(scene.props.items, scene.act).map(prop =>
             React.createElement(
               'div',
-              { key: prop.id, className: 'relative flex items-start gap-3 p-3 bg-gray-50 rounded border border-gray-200' },
-              // Checkbox for bulk selection
+              { key: prop.id, className: 'flex flex-col gap-2 p-3 bg-gray-50 rounded border border-gray-200' },
+              // Top row: checkbox, name, cost badge, delete
               React.createElement(
                 'div',
-                { className: 'absolute top-3 left-3' },
+                { className: 'flex items-center gap-2' },
                 React.createElement('input', {
                   type: 'checkbox',
                   checked: selectedProps.includes(`${scene.actIndex}:${scene.sceneIndex}:${prop.id}`),
                   onChange: () => togglePropSelection(scene.actIndex, scene.sceneIndex, prop.id),
-                  className: 'w-5 h-5 text-purple-600 rounded border-gray-300 focus:ring-purple-500',
+                  className: 'w-5 h-5 flex-shrink-0 text-purple-600 rounded border-gray-300 focus:ring-purple-500',
                   title: 'Select for bulk delete'
-                })
-              ),
-              // Cost Badge
-              prop.cost && !isNaN(parseFloat(prop.cost)) && React.createElement(
-                'div',
-                { 
-                  className: `absolute top-3 right-10 px-2 py-1 rounded text-xs font-medium ${
-                    parseFloat(prop.cost) > 50 
-                      ? 'bg-red-100 text-red-700 border border-red-300' 
-                      : 'bg-gray-100 text-gray-700'
-                  }`
-                },
-                `$${parseFloat(prop.cost).toFixed(2)}`
-              ),
-              React.createElement(
-                'div',
-                { className: 'flex-1 space-y-2 ml-6' },
-                // Name and description
+                }),
                 React.createElement('input', {
                   type: 'text',
                   value: prop.name || '',
                   onChange: (e) => handleUpdatePropAndSave(scene.actIndex, scene.sceneIndex, prop.id, 'name', e.target.value),
-                  className: 'w-full px-2 py-1 border border-gray-300 rounded text-sm font-medium',
+                  className: 'flex-1 min-w-0 px-2 py-1 border border-gray-300 rounded text-sm font-medium',
                   placeholder: 'Prop name'
                 }),
+                prop.cost && !isNaN(parseFloat(prop.cost)) && React.createElement(
+                  'span',
+                  {
+                    className: `flex-shrink-0 px-2 py-1 rounded text-xs font-medium ${
+                      parseFloat(prop.cost) > 50
+                        ? 'bg-red-100 text-red-700 border border-red-300'
+                        : 'bg-gray-100 text-gray-700'
+                    }`
+                  },
+                  `$${parseFloat(prop.cost).toFixed(2)}`
+                ),
+                React.createElement(
+                  'button',
+                  {
+                    onClick: (e) => {
+                      e.stopPropagation();
+                      handleDeleteProp(scene.actIndex, scene.sceneIndex, prop.id);
+                    },
+                    className: 'flex-shrink-0 text-gray-400 hover:text-red-600 transition-colors p-0'
+                  },
+                  '🗑️'
+                )
+              ),
+              // Remaining fields
+              React.createElement(
+                'div',
+                { className: 'space-y-2' },
+                // Description
                 React.createElement('input', {
                   type: 'text',
                   value: prop.description || '',
@@ -1443,23 +1454,11 @@ function PropsView({ production, onSave, onUpdateScene }) {
                     })
                   )
                 )
-              ),
-              // Delete button
-              React.createElement(
-                'button',
-                {
-                  onClick: (e) => {
-                    e.stopPropagation();
-                    handleDeleteProp(scene.actIndex, scene.sceneIndex, prop.id);
-                  },
-                  className: 'absolute top-3 right-3 text-gray-400 hover:text-red-600 transition-colors p-0'
-                },
-                '🗑️'
               )
             )
           )
         ),
-        
+
         // No results message when filters are active
         scene.props?.items && scene.props.items.length > 0 && filterProps(scene.props.items, scene.act).length === 0 && React.createElement(
           'div',

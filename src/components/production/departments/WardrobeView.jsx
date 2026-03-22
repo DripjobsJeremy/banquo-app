@@ -1257,42 +1257,52 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
           filterWardrobe(scene.wardrobe.items, scene.act).map(costume =>
             React.createElement(
               'div',
-              { key: costume.id, className: 'relative flex items-start gap-3 p-3 bg-gray-50 rounded border border-gray-200' },
-              // Checkbox for bulk selection
+              { key: costume.id, className: 'flex flex-col gap-2 p-3 bg-gray-50 rounded border border-gray-200' },
+              // Top row: checkbox, description, cost badge, delete
               React.createElement(
                 'div',
-                { className: 'absolute top-3 left-3' },
+                { className: 'flex items-center gap-2' },
                 React.createElement('input', {
                   type: 'checkbox',
                   checked: selectedWardrobe.includes(`${scene.actIndex}:${scene.sceneIndex}:${costume.id}`),
                   onChange: () => toggleCostumeSelection(scene.actIndex, scene.sceneIndex, costume.id),
-                  className: 'w-5 h-5 text-rose-600 rounded border-gray-300 focus:ring-rose-500',
+                  className: 'w-5 h-5 flex-shrink-0 text-rose-600 rounded border-gray-300 focus:ring-rose-500',
                   title: 'Select for bulk delete'
-                })
-              ),
-              // Cost Badge
-              costume.cost && !isNaN(parseFloat(costume.cost)) && React.createElement(
-                'div',
-                { 
-                  className: `absolute top-3 right-10 px-2 py-1 rounded text-xs font-medium ${
-                    parseFloat(costume.cost) > 50 
-                      ? 'bg-red-100 text-red-700 border border-red-300' 
-                      : 'bg-gray-100 text-gray-700'
-                  }`
-                },
-                `$${parseFloat(costume.cost).toFixed(2)}`
-              ),
-              React.createElement(
-                'div',
-                { className: 'flex-1 space-y-2 ml-6' },
-                // Description and pieces
+                }),
                 React.createElement('input', {
                   type: 'text',
                   value: costume.description || '',
                   onChange: (e) => handleUpdateCostumeAndSave(scene.actIndex, scene.sceneIndex, costume.id, 'description', e.target.value),
-                  className: 'w-full px-2 py-1 border border-gray-300 rounded text-sm font-medium',
+                  className: 'flex-1 min-w-0 px-2 py-1 border border-gray-300 rounded text-sm font-medium',
                   placeholder: 'Costume description'
                 }),
+                costume.cost && !isNaN(parseFloat(costume.cost)) && React.createElement(
+                  'span',
+                  {
+                    className: `flex-shrink-0 px-2 py-1 rounded text-xs font-medium ${
+                      parseFloat(costume.cost) > 50
+                        ? 'bg-red-100 text-red-700 border border-red-300'
+                        : 'bg-gray-100 text-gray-700'
+                    }`
+                  },
+                  `$${parseFloat(costume.cost).toFixed(2)}`
+                ),
+                React.createElement(
+                  'button',
+                  {
+                    onClick: (e) => {
+                      e.stopPropagation();
+                      handleDeleteCostume(scene.actIndex, scene.sceneIndex, costume.id);
+                    },
+                    className: 'flex-shrink-0 text-gray-400 hover:text-red-600 transition-colors p-0'
+                  },
+                  '🗑️'
+                )
+              ),
+              // Remaining fields
+              React.createElement(
+                'div',
+                { className: 'space-y-2' },
                 React.createElement('input', {
                   type: 'text',
                   value: costume.pieces || '',
@@ -1443,23 +1453,11 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
                     })
                   )
                 )
-              ),
-              // Delete button
-              React.createElement(
-                'button',
-                {
-                  onClick: (e) => {
-                    e.stopPropagation();
-                    handleDeleteCostume(scene.actIndex, scene.sceneIndex, costume.id);
-                  },
-                  className: 'absolute top-3 right-3 text-gray-400 hover:text-red-600 transition-colors p-0'
-                },
-                '🗑️'
               )
             )
           )
         ),
-        
+
         // No results message when filters are active
         scene.wardrobe?.items && scene.wardrobe.items.length > 0 && filterWardrobe(scene.wardrobe.items, scene.act).length === 0 && React.createElement(
           'div',
