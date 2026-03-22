@@ -257,6 +257,7 @@ function App() {
     }
   }, []); // mount only
 
+  const [staffContactId, setStaffContactId] = useState(() => localStorage.getItem('showsuite_staff_contact_id') || '');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -275,7 +276,13 @@ function App() {
     setUserRole(newRole);
     localStorage.setItem('showsuite_user_role', newRole);
 
+    // Super admin roles clear any staff-scoped contact association
     const SUPER_ROLES = ['super_admin', 'venue_manager', 'admin', 'client_admin'];
+    if (SUPER_ROLES.includes(newRole)) {
+      setStaffContactId('');
+      localStorage.removeItem('showsuite_staff_contact_id');
+    }
+
     let newPath = '/';
     if (SUPER_ROLES.includes(newRole)) newPath = '/';
     else if (newRole === 'actor') newPath = '/actor-portal';
@@ -548,6 +555,7 @@ function App() {
                     <option value="venue_manager">Venue Manager (Super Admin)</option>
                     <option value="board_member">Board Member</option>
                     <option value="accounting_manager">Accounting Manager</option>
+                    <option value="director">Director</option>
                     <option value="lighting">Lighting Designer</option>
                     <option value="sound">Sound Designer</option>
                     <option value="wardrobe">Wardrobe Designer</option>
@@ -557,6 +565,43 @@ function App() {
                     <option value="actor">Actor</option>
                     <option value="volunteer">Volunteer</option>
                   </select>
+
+                  {/* Staff contact picker — only for director/dept roles */}
+                  {['director','wardrobe','lighting','sound','props','set','stage_manager'].includes(userRole) && (() => {
+                    const ROLE_LABEL_MAP = {
+                      director: 'Director', wardrobe: 'Wardrobe Designer', lighting: 'Lighting Designer',
+                      sound: 'Sound Designer', props: 'Props Master', set: 'Scenic Designer', stage_manager: 'Stage Manager',
+                    };
+                    const matchingStaff = (window.contactsService?.getStaffContacts?.() || [])
+                      .filter(c => (c.staffProfile?.roles || []).includes(ROLE_LABEL_MAP[userRole]));
+                    return (
+                      <div className="mt-3">
+                        <label className="block text-xs font-medium text-amber-800 mb-1">Viewing as (staff member)</label>
+                        <select
+                          title="Viewing as staff member"
+                          value={staffContactId}
+                          onChange={e => {
+                            const id = e.target.value;
+                            setStaffContactId(id);
+                            if (id) localStorage.setItem('showsuite_staff_contact_id', id);
+                            else localStorage.removeItem('showsuite_staff_contact_id');
+                          }}
+                          className="w-full px-3 py-2 border border-amber-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-400"
+                        >
+                          <option value="">— All productions (admin view) —</option>
+                          {matchingStaff.map(c => (
+                            <option key={c.id} value={c.id}>
+                              {`${c.firstName || ''} ${c.lastName || ''}`.trim() || c.email}
+                            </option>
+                          ))}
+                        </select>
+                        {matchingStaff.length === 0 && (
+                          <p className="text-xs text-amber-600 mt-1">No staff with the {ROLE_LABEL_MAP[userRole]} role. Add them in Contacts → Staff & Crew.</p>
+                        )}
+                      </div>
+                    );
+                  })()}
+
                   <p className="text-xs text-amber-700 mt-2">Switch roles to preview different navigation menus. Selection persists on reload.</p>
                 </div>
 

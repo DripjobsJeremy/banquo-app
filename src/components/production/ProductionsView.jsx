@@ -48,6 +48,8 @@ const ProductionsView = () => {
   const [showBudgetManager, setShowBudgetManager] = useState(false);
   const [budgetProduction, setBudgetProduction] = useState(null);
 
+  const [staffContactId, setStaffContactId] = useState(() => localStorage.getItem('showsuite_staff_contact_id') || '');
+
   const loadProductions = () => {
     const allProductions = window.productionsService.getAll();
     setProductions(allProductions);
@@ -56,6 +58,12 @@ const ProductionsView = () => {
 
   useEffect(() => {
     loadProductions();
+    const onFocus = () => {
+      const id = localStorage.getItem('showsuite_staff_contact_id') || '';
+      setStaffContactId(id);
+    };
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
   }, []);
 
   const handleSetActive = (productionId) => {
@@ -133,6 +141,33 @@ const ProductionsView = () => {
 
   
 
+  const getVisibleProductions = () => {
+    if (!staffContactId) return productions;
+    const contact = window.contactsService?.getContactById?.(staffContactId);
+    if (!contact) return productions;
+    const assignedIds = new Set((contact.staffProfile?.productions || []).map(p => p.productionId));
+    return productions.filter(p => assignedIds.has(p.id));
+  };
+
+  const visibleProductions = getVisibleProductions();
+
+  const staffContact = staffContactId
+    ? window.contactsService?.getContactById?.(staffContactId)
+    : null;
+
+  const staffBanner = staffContact
+    ? React.createElement(
+        'div',
+        { className: 'mb-4 px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800 flex items-center gap-2' },
+        React.createElement('span', { className: 'text-base' }, '👤'),
+        React.createElement('span', null,
+          'Viewing as ',
+          React.createElement('strong', null, `${staffContact.firstName || ''} ${staffContact.lastName || ''}`.trim() || staffContact.email),
+          ` — showing ${visibleProductions.length} assigned production${visibleProductions.length !== 1 ? 's' : ''}`
+        )
+      )
+    : null;
+
   const emptyState = React.createElement(
     'div',
     { className: 'text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300' },
@@ -155,10 +190,17 @@ const ProductionsView = () => {
     WebkitBoxOrient: 'vertical'
   };
 
+  const noAssignmentState = React.createElement(
+    'div',
+    { className: 'text-center py-12 bg-amber-50 rounded-lg border-2 border-dashed border-amber-200' },
+    React.createElement('p', { className: 'text-amber-700 mb-2 text-lg font-medium' }, 'No productions assigned'),
+    React.createElement('p', { className: 'text-amber-600 text-sm' }, 'You have no productions assigned to this staff member yet. Add assignments in Contacts → Staff & Crew.')
+  );
+
   const grid = React.createElement(
     'div',
     { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' },
-    productions.map((production) => {
+    visibleProductions.map((production) => {
       const isActive = production.id === activeProductionId;
 
       const title = React.createElement(
@@ -324,7 +366,11 @@ const ProductionsView = () => {
       })
     : null;
 
-  return React.createElement('div', { className: 'p-6' }, header, productions.length === 0 ? emptyState : grid, createModal, editModal, budgetManagerModal);
+  const mainContent = productions.length === 0
+    ? emptyState
+    : (staffContactId && visibleProductions.length === 0 ? noAssignmentState : grid);
+
+  return React.createElement('div', { className: 'p-6' }, header, staffBanner, mainContent, createModal, editModal, budgetManagerModal);
 };
 
 window.ProductionsView = ProductionsView;
