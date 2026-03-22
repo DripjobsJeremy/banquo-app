@@ -139,6 +139,7 @@ function getNavigationTabs(userRole) {
     return [
       { id: 'department-portal', label: `${deptLabels[userRole]} Portal`, icon: '🎨', path: '/department-portal' },
       { id: 'productions',       label: 'Productions',                    icon: '🎬', path: '/productions' },
+      { id: 'dept-calendar',     label: 'My Calendar',                    icon: '📅', path: '/dept-calendar' },
     ];
   }
 
@@ -189,7 +190,7 @@ function App() {
     const validViews = [
       'dashboard', 'financial', 'donors', 'actors', 'productions', 'calendar',
       'volunteers', 'settings', 'actor-portal',
-      'department-portal', 'volunteer-portal', 'donor-portal', 'donor-login'
+      'department-portal', 'dept-calendar', 'volunteer-portal', 'donor-portal', 'donor-login'
     ];
     return validViews.includes(path) ? path : 'dashboard';
   };
@@ -562,6 +563,16 @@ function App() {
                   <div className="text-center py-20 text-gray-400">
                     <div className="text-5xl mb-4">🎨</div>
                     <p>Department portal not available for this role.</p>
+                  </div>
+                )}
+              </div>
+            </Route>
+
+            <Route path="/dept-calendar">
+              <div className="max-w-7xl mx-auto">
+                {window.DepartmentCalendar ? <window.DepartmentCalendar /> : (
+                  <div className="p-6 text-center py-20 text-gray-400">
+                    <p>Calendar component not loaded.</p>
                   </div>
                 )}
               </div>
