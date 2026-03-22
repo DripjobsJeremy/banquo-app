@@ -228,7 +228,7 @@ const ProductionsView = () => {
         {
           to: '/productions/' + production.id,
           onClick: (e) => e.stopPropagation(),
-          className: 'flex-1 px-3 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 block text-center'
+          className: 'flex-1 px-3 py-2 bg-violet-600 text-white text-sm rounded hover:bg-violet-700 block text-center'
         },
         'Edit Scenes'
       );
@@ -259,7 +259,7 @@ const ProductionsView = () => {
             setShowBudgetManager(true);
             console.log('🔘 State should be updated');
           },
-          className: 'px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-colors'
+          className: 'px-3 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm rounded transition-colors'
         },
         '💰 Budget'
       );
