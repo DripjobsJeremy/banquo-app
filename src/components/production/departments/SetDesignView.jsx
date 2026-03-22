@@ -2054,7 +2054,7 @@ function SetDesignView({ production, onSave }) {
                     // Scene header
                     React.createElement(
                       'div',
-                      { className: 'flex items-center justify-between mb-3' },
+                      { className: 'flex flex-wrap items-start justify-between gap-2 mb-3' },
                       React.createElement(
                         'h4',
                         { className: 'font-semibold text-gray-900' },
@@ -2062,7 +2062,7 @@ function SetDesignView({ production, onSave }) {
                       ),
                       React.createElement(
                         'div',
-                        { className: 'flex items-center gap-2' },
+                        { className: 'flex items-center gap-2 flex-shrink-0' },
                         scenePieces.length > 0 && React.createElement(
                           'span',
                           { className: 'text-sm text-gray-600' },
