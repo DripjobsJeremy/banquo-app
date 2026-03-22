@@ -513,7 +513,8 @@
       // Filters panel (always visible beneath tabs)
       React.createElement(global.FinancialFilters || 'div', {
         onFilterChange: setAppliedFilters,
-        initialFilters: appliedFilters
+        initialFilters: appliedFilters,
+        activeView: activeView
       }),
 
       // Loading State or Views

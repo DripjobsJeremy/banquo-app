@@ -3,13 +3,16 @@
 
   const { React } = global;
 
-  const FinancialFilters = ({ onFilterChange, initialFilters }) => {
+  const FinancialFilters = ({ onFilterChange, initialFilters, activeView }) => {
+    const showDonationFilters = ['overview', 'donations', 'donors'].includes(activeView || 'overview');
+    const showCampaignFilters = activeView === 'campaigns';
     const [filters, setFilters] = React.useState(initialFilters || {
       dateRange: 'fiscal-year',
       customStartDate: '',
       customEndDate: '',
       donationType: 'all',
       recurringType: 'all',
+      campaignStatus: 'all',
       campaigns: [],
       donorLevels: [],
       amountMin: '',
@@ -62,6 +65,7 @@
         customEndDate: '',
         donationType: 'all',
         recurringType: 'all',
+        campaignStatus: 'all',
         campaigns: [],
         donorLevels: [],
         amountMin: '',
@@ -93,6 +97,7 @@
       if ((filters.acknowledgmentStatus || 'all') !== 'all') count++;
       if ((filters.donationType || 'all') !== 'all') count++;
       if ((filters.recurringType || 'all') !== 'all') count++;
+      if ((filters.campaignStatus || 'all') !== 'all') count++;
       if (filters.dateRange === 'custom' && (filters.customStartDate || filters.customEndDate)) count++;
       return count;
     };
@@ -159,6 +164,13 @@
           key: 'recurringType',
           label: `Frequency: ${filters.recurringType}`,
           onRemove: () => handleFilterChange('recurringType', 'all')
+        }));
+      }
+      if ((filters.campaignStatus || 'all') !== 'all') {
+        tags.push(React.createElement(FilterTag, {
+          key: 'campaignStatus',
+          label: `Campaign Status: ${filters.campaignStatus}`,
+          onRemove: () => handleFilterChange('campaignStatus', 'all')
         }));
       }
       if (filters.dateRange === 'custom' && (filters.customStartDate || filters.customEndDate)) {
@@ -236,7 +248,7 @@
             })
           )
         ),
-        React.createElement(
+        showDonationFilters && React.createElement(
           'div',
           null,
           React.createElement('label', { className: 'block text-xs font-medium mb-1 text-gray-700' }, 'Donation Type'),
@@ -252,7 +264,7 @@
             React.createElement('option', { value: 'in-kind' }, 'In-Kind')
           )
         ),
-        React.createElement(
+        showDonationFilters && React.createElement(
           'div',
           null,
           React.createElement('label', { className: 'block text-xs font-medium mb-1 text-gray-700' }, 'Gift Frequency'),
@@ -268,6 +280,24 @@
             React.createElement('option', { value: 'Monthly' }, 'Monthly'),
             React.createElement('option', { value: 'Quarterly' }, 'Quarterly'),
             React.createElement('option', { value: 'Annual' }, 'Annual')
+          )
+        ),
+        showCampaignFilters && React.createElement(
+          'div',
+          null,
+          React.createElement('label', { className: 'block text-xs font-medium mb-1 text-gray-700' }, 'Campaign Status'),
+          React.createElement(
+            'select',
+            {
+              value: filters.campaignStatus || 'all',
+              onChange: (e) => handleFilterChange('campaignStatus', e.target.value),
+              className: 'w-full border border-gray-300 rounded px-2 py-1.5 text-sm bg-white text-gray-900'
+            },
+            React.createElement('option', { value: 'all' }, 'All Statuses'),
+            React.createElement('option', { value: 'active' }, 'Active'),
+            React.createElement('option', { value: 'completed' }, 'Completed'),
+            React.createElement('option', { value: 'draft' }, 'Draft'),
+            React.createElement('option', { value: 'paused' }, 'Paused')
           )
         )
       ),
