@@ -12,6 +12,7 @@
     const [viewMode, setViewMode] = React.useState('directory'); // directory, table
     const [searchTerm, setSearchTerm] = React.useState('');
     const [sortBy, setSortBy] = React.useState('name'); // name, totalGiven, lastGift, frequency
+    const [showSegmentInfo, setShowSegmentInfo] = React.useState(false);
     const [showAddDonationModal, setShowAddDonationModal] = React.useState(false);
 
     const donorsAll = React.useMemo(() => (data?.contacts || []).filter((c) => c.isDonor), [data]);
@@ -162,6 +163,19 @@
       return 'Needs Attention';
     };
 
+    // Tooltip descriptions keyed to getRFMSegment output — criteria match rfmScore() thresholds above
+    const SEGMENT_TOOLTIPS = {
+      'Champions':           'RFM score ≥ 13 — top donors across recency, frequency, and amount',
+      'Loyal Donors':        'Donated within 6 months (R≥4) and given $1,000+ (M≥4)',
+      'Potential Loyalists': 'Donated within a year (R≥3) and donated 3+ times (F≥3)',
+      'Recent Donors':       'Donated within the last 6 months (R≥4)',
+      'Frequent Donors':     'Donated 6 or more times (F≥4)',
+      'Big Spenders':        'Lifetime giving of $1,000+ (M≥4)',
+      'At Risk':             'No gift in 1–2 years but previously donated 3+ times',
+      'Lost':                'No gift in over 2 years',
+      'Needs Attention':     'Low activity across recency, frequency, and amount',
+    };
+
     // Retention rate
     const calculateRetentionRate = () => {
       const currentYear = new Date().getFullYear();
@@ -225,7 +239,7 @@
           { className: 'flex flex-wrap items-center justify-between gap-4 mb-4' },
           React.createElement(
             'div',
-            { className: 'flex gap-2 items-center' },
+            { className: 'relative flex gap-2 items-center' },
             React.createElement('label', { className: 'text-sm font-medium text-gray-700' }, 'Segment By:'),
             React.createElement(
               'select',
@@ -234,6 +248,22 @@
               React.createElement('option', { value: 'recency' }, 'Recency'),
               React.createElement('option', { value: 'frequency' }, 'Frequency'),
               React.createElement('option', { value: 'amount' }, 'Total Given')
+            ),
+            React.createElement('button', {
+              onClick: () => setShowSegmentInfo(s => !s),
+              title: 'What do these segments mean?',
+              className: 'ml-1 text-gray-400 hover:text-violet-600 text-sm leading-none'
+            }, 'ⓘ'),
+            showSegmentInfo && React.createElement(
+              'div',
+              { className: 'absolute top-full left-0 mt-1 z-20 w-80 p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-xs text-gray-700 space-y-1.5' },
+              React.createElement('p', { className: 'font-semibold text-gray-900 mb-2' }, 'RFM Segment Criteria'),
+              ...Object.entries(SEGMENT_TOOLTIPS).map(([label, desc]) =>
+                React.createElement('div', { key: label },
+                  React.createElement('span', { className: 'font-medium text-gray-900' }, label + ': '),
+                  desc
+                )
+              )
             )
           ),
           React.createElement(
@@ -293,7 +323,10 @@
               ? React.createElement(
                   'div',
                   { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' },
-                  donors.map((donor) => React.createElement(DonorCard, { key: donor.id, donor: donor, rfm: getRFMSegment(rfmScore(donor)) }))
+                  donors.map((donor) => {
+                    const rfmLabel = getRFMSegment(rfmScore(donor));
+                    return React.createElement(DonorCard, { key: donor.id, donor: donor, rfm: rfmLabel, rfmTooltip: SEGMENT_TOOLTIPS[rfmLabel] || rfmLabel });
+                  })
                 )
               : React.createElement(DonorTable, { donors: donors })
           )
@@ -350,7 +383,7 @@
     );
   };
 
-  const DonorCard = ({ donor, rfm }) => {
+  const DonorCard = ({ donor, rfm, rfmTooltip }) => {
     return React.createElement(
       'div',
       { className: 'donor-card border border-gray-300 rounded-lg p-4 hover:shadow-lg transition cursor-pointer bg-white' },
@@ -362,7 +395,8 @@
           donor.organization && React.createElement('p', { className: 'text-xs text-gray-600 truncate' }, donor.organization)
         ),
         React.createElement('span', {
-          className: 'px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-900 border border-purple-300'
+          className: 'px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-900 border border-purple-300 cursor-help',
+          title: rfmTooltip || rfm
         }, rfm)
       ),
       React.createElement(
