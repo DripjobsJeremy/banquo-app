@@ -158,12 +158,25 @@ function CalendarView({ production, onSave, userRole }) {
     'build': { label: 'Build Day', color: 'bg-indigo-500', textColor: 'text-indigo-700', bgLight: 'bg-indigo-50', border: 'border-indigo-300' }
   };
   
+  // Normalize both short-form ('wardrobe') and long-form ('wardrobe_designer') role IDs
+  const normalizeRole = (role) => {
+    const map = {
+      lighting:     'lighting_designer',
+      sound:        'sound_designer',
+      wardrobe:     'wardrobe_designer',
+      props:        'props_master',
+      set:          'scenic_designer',
+    };
+    return map[role] || role;
+  };
+  const effectiveRole = normalizeRole(userRole);
+
   // Roles that can schedule rehearsals, shows, and tech events
   const FULL_ACCESS_ROLES = ['admin', 'director', 'stage_manager'];
 
   // Role-based event type filtering — dept roles never see Rehearsal/Tech/Performance
   const allowedEventTypesForRole = () => {
-    if (!userRole || FULL_ACCESS_ROLES.includes(userRole)) return eventTypes;
+    if (!effectiveRole || FULL_ACCESS_ROLES.includes(effectiveRole)) return eventTypes;
     const deptAllowed = {
       lighting_designer: ['deadline', 'meeting'],
       sound_designer:    ['deadline', 'meeting'],
@@ -171,14 +184,14 @@ function CalendarView({ production, onSave, userRole }) {
       props_master:      ['deadline', 'meeting'],
       scenic_designer:   ['build', 'deadline', 'meeting'],
     };
-    const allowed = deptAllowed[userRole] || ['deadline', 'meeting'];
+    const allowed = deptAllowed[effectiveRole] || ['deadline', 'meeting'];
     return Object.fromEntries(Object.entries(eventTypes).filter(([key]) => allowed.includes(key)));
   };
 
   const canEditEvent = (event) => {
     if (!event) return false;
-    if (!userRole || userRole === 'admin' || userRole === 'director') return true;
-    return event.createdByRole === userRole || event.createdByRole === undefined;
+    if (!effectiveRole || FULL_ACCESS_ROLES.includes(effectiveRole)) return true;
+    return event.createdByRole === effectiveRole || event.createdByRole === userRole || event.createdByRole === undefined;
   };
 
   // Rehearsal type subtypes
@@ -1249,7 +1262,7 @@ function CalendarView({ production, onSave, userRole }) {
             onClick: handleAddEvent,
             className: 'px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm whitespace-nowrap flex items-center gap-1'
           }, '+ Add Event'),
-          FULL_ACCESS_ROLES.includes(userRole) && React.createElement('button', {
+          FULL_ACCESS_ROLES.includes(effectiveRole) && React.createElement('button', {
             onClick: generateTechWeek,
             className: 'px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium text-sm whitespace-nowrap flex items-center gap-1'
           }, '🎭 Tech Week'),
