@@ -2156,7 +2156,7 @@ function CalendarView({ production, onSave, userRole }) {
           ),
           
           // Subtype selector (conditional based on type)
-          editingEvent?.type === 'rehearsal' && React.createElement(
+          editingEvent?.type === 'rehearsal' && FULL_ACCESS_ROLES.includes(effectiveRole) && React.createElement(
             'div',
             null,
             React.createElement('label', { className: 'block text-sm font-medium mb-1' }, 'Rehearsal Type'),
@@ -2204,8 +2204,8 @@ function CalendarView({ production, onSave, userRole }) {
             )
           ),
           
-          // Rehearsal Quick Select (only for rehearsal type)
-          editingEvent?.type === 'rehearsal' && React.createElement(
+          // Rehearsal Quick Select (only for rehearsal type, full-access roles only)
+          editingEvent?.type === 'rehearsal' && FULL_ACCESS_ROLES.includes(effectiveRole) && React.createElement(
             'div',
             { className: 'p-4 bg-blue-50 border border-blue-200 rounded-lg' },
             React.createElement('label', { className: 'block text-sm font-medium text-blue-900 mb-2' }, 'Quick Select - Rehearsal Scope'),
