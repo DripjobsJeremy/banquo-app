@@ -162,12 +162,12 @@ function CalendarView({ production, onSave, userRole }) {
   const allowedEventTypesForRole = () => {
     if (!userRole || userRole === 'admin' || userRole === 'director') return eventTypes;
     const deptAllowed = {
-      lighting:      ['rehearsal', 'tech', 'meeting', 'deadline'],
-      sound:         ['rehearsal', 'tech', 'meeting', 'deadline'],
-      wardrobe:      ['costume-fitting', 'deadline', 'meeting'],
-      props:         ['deadline', 'meeting'],
-      set:           ['build', 'deadline', 'meeting'],
-      stage_manager: Object.keys(eventTypes),
+      lighting_designer:  ['rehearsal', 'tech', 'meeting', 'deadline'],
+      sound_designer:     ['rehearsal', 'tech', 'meeting', 'deadline'],
+      wardrobe_designer:  ['costume-fitting', 'deadline', 'meeting'],
+      props_master:       ['deadline', 'meeting'],
+      scenic_designer:    ['build', 'deadline', 'meeting'],
+      stage_manager:      Object.keys(eventTypes),
     };
     const allowed = deptAllowed[userRole] || ['meeting', 'deadline'];
     return Object.fromEntries(Object.entries(eventTypes).filter(([key]) => allowed.includes(key)));

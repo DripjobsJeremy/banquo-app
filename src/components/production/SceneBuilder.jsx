@@ -23,7 +23,24 @@ function SceneBuilder({ productionId: propId }) {
     } catch {}
     return localStorage.getItem('showsuite_active_department_tab') || 'scenes';
   });
-  const [currentRole, setCurrentRole] = useState(window.getCurrentRole?.() || { id: 'admin', departments: 'all' });
+  const [currentRole, setCurrentRole] = useState(() => {
+    // If the app-level role is a dept role, map it to the workspace long-form ID
+    const APP_ROLE_MAP = {
+      lighting:      'lighting_designer',
+      sound:         'sound_designer',
+      wardrobe:      'wardrobe_designer',
+      props:         'props_master',
+      set:           'scenic_designer',
+      stage_manager: 'stage_manager',
+    };
+    const appRole = localStorage.getItem('showsuite_user_role') || '';
+    const mappedId = APP_ROLE_MAP[appRole];
+    if (mappedId) {
+      const mapped = window.USER_ROLES?.find(r => r.id === mappedId);
+      if (mapped) return mapped;
+    }
+    return window.getCurrentRole?.() || { id: 'admin', departments: 'all' };
+  });
   
   // Get ID from React Router params (defined globally via routerGlobals.js)
   const params = typeof useParams === 'function' ? useParams() : null;
