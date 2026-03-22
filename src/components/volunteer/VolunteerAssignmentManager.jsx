@@ -6,7 +6,10 @@
 const { useState, useEffect } = React;
 
 const VolunteerAssignmentManager = ({ shiftId, onClose = () => {}, userRole='Admin', onUpdated=()=>{} }) => {
-  const allowedRoles = new Set(['Admin','Board Admin','Stage Manager']);
+  const allowedRoles = new Set([
+    'Admin', 'admin', 'super_admin', 'venue_manager', 'client_admin',
+    'Board Admin', 'board_member', 'Stage Manager', 'stage_manager', 'director',
+  ]);
   if (!allowedRoles.has(userRole)) return null;
 
   const storage = window.volunteerStorageService;
