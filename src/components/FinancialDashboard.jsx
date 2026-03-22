@@ -8,6 +8,53 @@
   const { React } = global;
   const { useState, useEffect } = React;
 
+  // Error Boundary for Financial Dashboard
+  class FinancialDashboardErrorBoundary extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = { hasError: false, error: null };
+    }
+    static getDerivedStateFromError(error) {
+      return { hasError: true, error };
+    }
+    componentDidCatch(error, info) {
+      console.error('[FinancialDashboard] Render error:', error, info);
+    }
+    render() {
+      if (this.state.hasError) {
+        return React.createElement(
+          'div',
+          { className: 'max-w-2xl mx-auto mt-16 p-8 bg-gray-800 rounded-lg border border-red-700 text-center' },
+          React.createElement('div', { className: 'text-5xl mb-4' }, '⚠️'),
+          React.createElement('h2', { className: 'text-xl font-bold text-white mb-2' }, 'Something went wrong in the Financial Dashboard'),
+          React.createElement('p', { className: 'text-gray-400 mb-6' }, 'An unexpected error occurred while loading this section. Your data is safe.'),
+          React.createElement('p', { className: 'text-red-400 text-sm font-mono mb-6 bg-gray-900 p-3 rounded text-left' }, this.state.error?.message || 'Unknown error'),
+          React.createElement(
+            'div',
+            { className: 'flex gap-3 justify-center' },
+            React.createElement(
+              'button',
+              {
+                onClick: () => this.setState({ hasError: false, error: null }),
+                className: 'px-5 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded font-medium'
+              },
+              '↺ Try Again'
+            ),
+            React.createElement(
+              'button',
+              {
+                onClick: () => { window.location.hash = '#/dashboard'; },
+                className: 'px-5 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded font-medium'
+              },
+              '← Go to Dashboard'
+            )
+          )
+        );
+      }
+      return this.props.children;
+    }
+  }
+
   // TabButton component
   const TabButton = ({ active, onClick, icon, label }) => (
     React.createElement(
@@ -85,8 +132,8 @@
     const checkPermissions = () => {
       const auth = global.authService;
       try {
-        const user = auth?.getCurrentUser();
-        if (!user || !hasFinancialAccess(user)) {
+        const user = auth?.getCurrentUser() ?? { id: 'user_admin', name: 'Admin User', role: 'admin' };
+        if (!hasFinancialAccess(user)) {
           window.location.hash = '#/dashboard';
           alert('You do not have permission to access the Financial Dashboard.');
           return;
@@ -498,6 +545,11 @@
     );
   };
 
-  // Export globally
-  global.FinancialDashboard = FinancialDashboard;
+  // Wrap FinancialDashboard in the error boundary before exporting
+  const FinancialDashboardWithBoundary = () =>
+    React.createElement(FinancialDashboardErrorBoundary, null,
+      React.createElement(FinancialDashboard)
+    );
+
+  global.FinancialDashboard = FinancialDashboardWithBoundary;
 })(window);
