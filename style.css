@@ -367,6 +367,107 @@
   --tw-gradient-to: var(--color-primary-dark);
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   LIGHT/DARK MODE — GRAY SCALE REMAPPING
+   Remaps hardcoded Tailwind gray/white/black classes to CSS custom
+   properties so every component responds to data-theme switching without
+   per-file edits.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Text colors ──────────────────────────────────────────────────────────── */
+.text-white  { color: var(--color-text-primary)   !important; }
+.text-black  { color: var(--color-text-primary)   !important; }
+.text-gray-100 { color: var(--color-text-primary)   !important; }
+.text-gray-200 { color: var(--color-text-secondary) !important; }
+.text-gray-300 { color: var(--color-text-secondary) !important; }
+.text-gray-400 { color: var(--color-text-muted)     !important; }
+.text-gray-500 { color: var(--color-text-muted)     !important; }
+.text-gray-600 { color: var(--color-text-secondary) !important; }
+.text-gray-700 { color: var(--color-text-secondary) !important; }
+.text-gray-800 { color: var(--color-text-primary)   !important; }
+.text-gray-900 { color: var(--color-text-primary)   !important; }
+
+/* ── Background colors ────────────────────────────────────────────────────── */
+.bg-white    { background-color: var(--color-bg-surface)  !important; }
+.bg-gray-50  { background-color: var(--color-bg-base)     !important; }
+.bg-gray-100 { background-color: var(--color-bg-elevated) !important; }
+.bg-gray-200 { background-color: var(--color-bg-elevated) !important; }
+.bg-gray-600 { background-color: var(--color-bg-overlay)  !important; }
+.bg-gray-700 { background-color: var(--color-bg-elevated) !important; }
+.bg-gray-750 { background-color: var(--color-bg-surface)  !important; }
+.bg-gray-800 { background-color: var(--color-bg-surface)  !important; }
+.bg-gray-900 { background-color: var(--color-bg-base)     !important; }
+
+/* ── Border colors ────────────────────────────────────────────────────────── */
+.border-white   { border-color: var(--color-border)        !important; }
+.border-gray-200 { border-color: var(--color-border)       !important; }
+.border-gray-300 { border-color: var(--color-border)       !important; }
+.border-gray-400 { border-color: var(--color-border-strong) !important; }
+.border-gray-500 { border-color: var(--color-border-strong) !important; }
+.border-gray-600 { border-color: var(--color-border)       !important; }
+.border-gray-700 { border-color: var(--color-border)       !important; }
+.border-gray-800 { border-color: var(--color-border-subtle) !important; }
+
+/* ── Hover states ─────────────────────────────────────────────────────────── */
+.hover\:bg-white:hover    { background-color: var(--color-bg-surface)  !important; }
+.hover\:bg-gray-50:hover  { background-color: var(--color-bg-base)     !important; }
+.hover\:bg-gray-100:hover { background-color: var(--color-bg-elevated) !important; }
+.hover\:bg-gray-200:hover { background-color: var(--color-bg-elevated) !important; }
+.hover\:bg-gray-600:hover { background-color: var(--color-bg-overlay)  !important; }
+.hover\:bg-gray-700:hover { background-color: var(--color-bg-elevated) !important; }
+.hover\:bg-gray-800:hover { background-color: var(--color-bg-surface)  !important; }
+.hover\:text-gray-900:hover { color: var(--color-text-primary)   !important; }
+.hover\:text-white:hover    { color: var(--color-text-primary)   !important; }
+
+/* ── Placeholder text ─────────────────────────────────────────────────────── */
+.placeholder-gray-400::placeholder { color: var(--color-text-muted) !important; }
+.placeholder-gray-500::placeholder { color: var(--color-text-muted) !important; }
+::placeholder { color: var(--color-text-muted); }
+
+/* ── Form inputs — global fallback (class overrides above take precedence) ── */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+textarea,
+select {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EXCEPTIONS — elements that must stay white regardless of theme
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Sidebar always has a dark gradient background — preserve its white text */
+.sidebar-gradient .text-white,
+.sidebar-gradient .text-gray-100,
+.sidebar-gradient .text-gray-200,
+.sidebar-gradient .text-gray-300 { color: var(--color-sidebar-text)   !important; }
+.sidebar-gradient .hover\:text-white:hover { color: #FFFFFF !important; }
+.sidebar-gradient .hover\:bg-white:hover   { background-color: rgba(255, 255, 255, 0.2) !important; }
+
+/* Colored action buttons — always white text on colored bg */
+.btn-primary { color: #FFFFFF !important; }
+.bg-green-500, .bg-green-600, .bg-green-700 { color: #FFFFFF !important; }
+.bg-red-500,   .bg-red-600,   .bg-red-700   { color: #FFFFFF !important; }
+.bg-amber-500, .bg-amber-600, .bg-amber-700 { color: #FFFFFF !important; }
+.bg-blue-500,  .bg-blue-600,  .bg-blue-700  { color: #FFFFFF !important; }
+.bg-emerald-500, .bg-emerald-600 { color: #FFFFFF !important; }
+
+/* Status badges with colored backgrounds — keep white text */
+.bg-success, .bg-warning, .bg-danger, .bg-info { color: var(--color-text-primary) !important; }
+
+/* ── Print — always black on white ──────────────────────────────────────── */
+@media print {
+  * { background-color: white !important; color: black !important; }
+  .sidebar-gradient { display: none !important; }
+}
+
 /* ── Mobile utilities ──────────────────────────────────────────────────────── */
 .scrollbar-hide {
   -ms-overflow-style: none;
