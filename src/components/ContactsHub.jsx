@@ -256,8 +256,12 @@ function ContactsHub({ data, userRole }) {
   const donations   = data?.donations   || [];
   const donorLevels = data?.donorLevels || [];
 
+  const isDirector = userRole === 'director';
+
   const [activeTab, setActiveTab] = React.useState(() => {
-    return localStorage.getItem('scenestave_contacts_tab') || 'all';
+    const saved = localStorage.getItem('scenestave_contacts_tab') || 'all';
+    if (isDirector && !['staff', 'actors'].includes(saved)) return 'staff';
+    return saved;
   });
 
   const setTab = (tab) => {
@@ -266,13 +270,13 @@ function ContactsHub({ data, userRole }) {
   };
 
   const tabs = [
-    { id: 'all',        label: '👥 All Contacts' },
-    { id: 'donors',     label: '💛 Donors' },
-    { id: 'staff',      label: '🎭 Staff & Crew' },
-    { id: 'actors',     label: '🎬 Actors' },
-    { id: 'volunteers', label: '🤝 Volunteers' },
-    { id: 'board',      label: '🏛 Board' },
-  ];
+    { id: 'all',        label: '👥 All Contacts', show: !isDirector },
+    { id: 'donors',     label: '💛 Donors',        show: !isDirector },
+    { id: 'staff',      label: '🎭 Staff & Crew',  show: true },
+    { id: 'actors',     label: '🎬 Actors',         show: true },
+    { id: 'volunteers', label: '🤝 Volunteers',     show: !isDirector },
+    { id: 'board',      label: '🏛 Board',           show: !isDirector },
+  ].filter(t => t.show);
 
   return (
     <div className="max-w-[1400px] mx-auto">
@@ -339,6 +343,13 @@ function ContactsHub({ data, userRole }) {
 
       {activeTab === 'board' && (
         <BoardMembersView contacts={contacts} userRole={userRole} />
+      )}
+
+      {isDirector && (
+        <div className="mt-6 px-4 py-3 bg-gray-800 border border-gray-700 rounded text-sm text-gray-500 flex items-center gap-2">
+          <span>✉️</span>
+          <span>Email communication and internal team messaging coming in a future update</span>
+        </div>
       )}
     </div>
   );

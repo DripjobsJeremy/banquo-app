@@ -97,6 +97,12 @@ function TabRedirect({ tab }) {
   return null;
 }
 
+// Redirects old /department-portal URL to the new /dept-dashboard
+function PortalRedirect() {
+  React.useEffect(() => { window.location.hash = '/dept-dashboard'; }, []);
+  return null;
+}
+
 // Returns role-specific nav items (Settings always rendered separately at bottom)
 function getNavigationTabs(userRole) {
   // venue_manager = Super Admin (full access, same as admin/super_admin)
@@ -142,10 +148,9 @@ function getNavigationTabs(userRole) {
       stage_manager: 'Stage Manager'
     };
     return [
-      { id: 'dept-dashboard',    label: 'Dashboard',                      icon: '📊', path: '/dept-dashboard' },
-      { id: 'department-portal', label: `${deptLabels[userRole]} Portal`, icon: '🎨', path: '/department-portal' },
-      { id: 'productions',       label: 'Productions',                    icon: '🎬', path: '/productions' },
-      { id: 'dept-calendar',     label: 'My Calendar',                    icon: '📅', path: '/dept-calendar' },
+      { id: 'dept-dashboard', label: 'Dashboard',   icon: '📊', path: '/dept-dashboard' },
+      { id: 'productions',    label: 'Productions', icon: '🎬', path: '/productions' },
+      { id: 'dept-calendar',  label: 'Calendar',    icon: '📅', path: '/dept-calendar' },
     ];
   }
 
@@ -203,7 +208,7 @@ function App() {
     const validViews = [
       'dashboard', 'financial', 'contacts', 'donors', 'actors', 'productions', 'calendar',
       'volunteers', 'settings', 'actor-portal',
-      'dept-dashboard', 'department-portal', 'dept-calendar', 'volunteer-portal', 'donor-portal', 'donor-login'
+      'dept-dashboard', 'dept-calendar', 'volunteer-portal', 'donor-portal', 'donor-login'
     ];
     return validViews.includes(path) ? path : 'dashboard';
   };
@@ -526,20 +531,7 @@ function App() {
             </Route>
 
             <Route path="/department-portal">
-              <div className="p-6 max-w-7xl mx-auto">
-                {userRole === 'lighting' && window.LightingDesigner && <window.LightingDesigner userRole={userRole} />}
-                {userRole === 'sound' && window.SoundDesigner && <window.SoundDesigner userRole={userRole} />}
-                {userRole === 'wardrobe' && window.WardrobeDesigner && <window.WardrobeDesigner userRole={userRole} />}
-                {userRole === 'props' && window.PropsManager && <window.PropsManager userRole={userRole} />}
-                {userRole === 'set' && window.SetDesigner && <window.SetDesigner userRole={userRole} />}
-                {userRole === 'stage_manager' && window.StageManager && <window.StageManager userRole={userRole} />}
-                {!['lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager'].includes(userRole) && (
-                  <div className="text-center py-20 text-gray-400">
-                    <div className="text-5xl mb-4">🎨</div>
-                    <p>Department portal not available for this role.</p>
-                  </div>
-                )}
-              </div>
+              <PortalRedirect />
             </Route>
 
             <Route path="/dept-calendar">
