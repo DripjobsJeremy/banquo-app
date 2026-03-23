@@ -48,7 +48,8 @@ const BoardDashboard = () => {
     { label: 'Board Members',       value: boardMembers.length,  icon: '👥' },
   ];
 
-  return React.createElement('div', { className: 'max-w-[1400px] mx-auto p-6 space-y-6' },
+  return React.createElement('div', { className: 'bg-gray-900 min-h-screen' },
+  React.createElement('div', { className: 'max-w-[1400px] mx-auto p-6 space-y-6' },
 
     // Header
     React.createElement('div', { className: 'mb-2' },
@@ -198,7 +199,7 @@ const BoardDashboard = () => {
             )
       )
     )
-  );
+  ));
 };
 
 window.BoardDashboard = BoardDashboard;

@@ -508,7 +508,7 @@ function App() {
             </Route>
 
             <Route path="/calendar">
-              <div className="bg-gray-900 min-h-full">
+              <div className="bg-gray-900 min-h-screen">
                 {window.GlobalCalendar && <window.GlobalCalendar />}
               </div>
             </Route>
@@ -573,7 +573,7 @@ function App() {
             </Route>
 
             <Route path="/dept-calendar">
-              <div className="max-w-7xl mx-auto">
+              <div className="bg-gray-900 min-h-screen">
                 {window.DepartmentCalendar ? <window.DepartmentCalendar /> : (
                   <div className="p-6 text-center py-20 text-gray-400">
                     <p>Calendar component not loaded.</p>

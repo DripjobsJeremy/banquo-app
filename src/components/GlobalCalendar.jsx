@@ -156,6 +156,7 @@ function GlobalCalendar() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
+    <div className="bg-gray-900 min-h-screen">
     <div className="max-w-screen-xl mx-auto p-6">
 
       {/* Header */}
@@ -418,6 +419,7 @@ function GlobalCalendar() {
         </div>
       )}
 
+    </div>
     </div>
   );
 }
