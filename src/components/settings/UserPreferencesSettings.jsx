@@ -6,6 +6,15 @@
  */
 
 const UserPreferencesSettings = () => {
+  const [themeMode, setThemeMode] = React.useState(
+    () => window.organizationService?.loadThemeMode?.() || 'dark'
+  );
+
+  const handleThemeToggle = (mode) => {
+    setThemeMode(mode);
+    window.organizationService?.saveThemeMode?.(mode);
+  };
+
   const [preferences, setPreferences] = React.useState({
     display: {
       theme: 'dark',
@@ -228,28 +237,47 @@ const UserPreferencesSettings = () => {
       'div',
       { className: 'section mb-6 p-4 bg-white border border-gray-200 rounded-lg' },
       React.createElement('h3', { className: 'text-lg font-semibold mb-4 text-gray-900' }, '🎨 Display Settings'),
-      
+
+      // Appearance toggle — outside the 2-col grid so it spans full width
+      React.createElement(
+        'div',
+        { className: 'mb-6' },
+        React.createElement('label', { className: 'block text-sm font-medium mb-3 text-gray-900' }, 'Appearance'),
+        React.createElement(
+          'div',
+          {
+            className: 'flex gap-1 p-1 rounded-lg w-fit',
+            style: { backgroundColor: 'var(--color-bg-elevated)' }
+          },
+          ...[
+            { value: 'dark',  label: '🌙 Dark'  },
+            { value: 'light', label: '☀️ Light' },
+          ].map(opt =>
+            React.createElement(
+              'button',
+              {
+                key: opt.value,
+                type: 'button',
+                onClick: () => handleThemeToggle(opt.value),
+                className: 'px-4 py-2 rounded-md text-sm font-medium transition-all duration-150',
+                style: themeMode === opt.value
+                  ? { backgroundColor: 'var(--color-primary)', color: '#FFFFFF' }
+                  : { color: 'var(--color-text-secondary)', backgroundColor: 'transparent' }
+              },
+              opt.label
+            )
+          )
+        ),
+        React.createElement(
+          'p',
+          { className: 'text-xs mt-2 text-gray-500' },
+          'Changes take effect immediately across the entire app'
+        )
+      ),
+
       React.createElement(
         'div',
         { className: 'grid grid-cols-2 gap-4' },
-        
-        // Theme
-        React.createElement(
-          'div',
-          null,
-          React.createElement('label', { className: 'block text-sm font-medium mb-2 text-gray-900' }, 'Theme'),
-          React.createElement(
-            'select',
-            {
-              value: preferences.display.theme,
-              onChange: (e) => handleDisplayChange('theme', e.target.value),
-              className: 'w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900'
-            },
-            React.createElement('option', { value: 'dark' }, 'Dark'),
-            React.createElement('option', { value: 'light' }, 'Light (Coming Soon)'),
-            React.createElement('option', { value: 'auto' }, 'Auto (System)')
-          )
-        ),
         
         // Date Format
         React.createElement(

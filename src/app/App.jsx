@@ -242,7 +242,7 @@ function App() {
     return () => window.removeEventListener('focus', loadData);
   }, []);
 
-  // On initial mount: apply saved branding, then redirect based on role
+  // On initial mount: apply saved branding + theme mode, then redirect based on role
   useEffect(() => {
     // Apply organization branding (CSS custom properties) immediately
     if (window.organizationService) {
@@ -251,6 +251,8 @@ function App() {
         console.log('🎨 App mounted: applying saved organization branding');
         window.organizationService.applyBrandingToDOM(org.branding);
       }
+      // Apply persisted light/dark mode
+      window.organizationService.applyThemeMode();
     }
 
     const role = localStorage.getItem('showsuite_user_role') || 'admin';
@@ -274,6 +276,13 @@ function App() {
 
   const [staffContactId, setStaffContactId] = useState(() => localStorage.getItem('showsuite_staff_contact_id') || '');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [themeMode, setThemeMode] = useState(() => window.organizationService?.loadThemeMode?.() || 'dark');
+
+  const handleThemeToggle = () => {
+    const next = themeMode === 'dark' ? 'light' : 'dark';
+    setThemeMode(next);
+    window.organizationService?.saveThemeMode?.(next);
+  };
 
   // Role badge — computed from userRole + optional staffContact name
   const ROLE_DISPLAY = {
@@ -457,7 +466,17 @@ function App() {
             {staffName && (
               <div className="text-xs text-gray-300 truncate mb-1.5">👤 {staffName}</div>
             )}
-            <div className="text-xs text-white opacity-40">SceneStave v1.0</div>
+            <div className="flex items-center justify-between">
+              <div className="text-xs text-white opacity-40">SceneStave v1.0</div>
+              <button
+                type="button"
+                title={themeMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                onClick={handleThemeToggle}
+                className="text-base opacity-50 hover:opacity-100 transition-opacity leading-none bg-transparent border-0 cursor-pointer px-1 py-0.5"
+              >
+                {themeMode === 'dark' ? '☀️' : '🌙'}
+              </button>
+            </div>
           </div>
         )}
       </aside>
@@ -508,7 +527,7 @@ function App() {
             </Route>
 
             <Route path="/calendar">
-              <div className="bg-gray-900 min-h-screen">
+              <div className="bg-base min-h-screen">
                 {window.GlobalCalendar && <window.GlobalCalendar />}
               </div>
             </Route>
@@ -558,7 +577,7 @@ function App() {
             </Route>
 
             <Route path="/dept-dashboard">
-              <div className="bg-gray-900 min-h-full">
+              <div className="bg-base min-h-full">
                 {window.DepartmentDashboard
                   ? React.createElement(window.DepartmentDashboard)
                   : React.createElement('div', { className: 'p-6 text-center py-20 text-gray-400' },
@@ -573,7 +592,7 @@ function App() {
             </Route>
 
             <Route path="/dept-calendar">
-              <div className="bg-gray-900 min-h-screen">
+              <div className="bg-base min-h-screen">
                 {window.DepartmentCalendar ? <window.DepartmentCalendar /> : (
                   <div className="p-6 text-center py-20 text-gray-400">
                     <p>Calendar component not loaded.</p>

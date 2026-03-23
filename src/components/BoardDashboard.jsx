@@ -48,7 +48,7 @@ const BoardDashboard = () => {
     { label: 'Board Members',       value: boardMembers.length,  icon: '👥' },
   ];
 
-  return React.createElement('div', { className: 'bg-gray-900 min-h-screen' },
+  return React.createElement('div', { className: 'bg-base min-h-screen' },
   React.createElement('div', { className: 'max-w-[1400px] mx-auto p-6 space-y-6' },
 
     // Header
@@ -64,7 +64,7 @@ const BoardDashboard = () => {
       ...kpis.map(kpi =>
         React.createElement('div', {
           key: kpi.label,
-          className: 'bg-gray-800 rounded-lg p-5 border border-gray-700'
+          className: 'bg-surface rounded-lg p-5 border border-gray-700'
         },
           React.createElement('div', { className: 'text-3xl font-bold text-white mb-1' }, kpi.value),
           React.createElement('div', { className: 'text-sm text-gray-400' }, kpi.label)
@@ -76,7 +76,7 @@ const BoardDashboard = () => {
     React.createElement('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-6' },
 
       // Active Productions
-      React.createElement('div', { className: 'bg-gray-800 rounded-lg p-5 border border-gray-700' },
+      React.createElement('div', { className: 'bg-surface rounded-lg p-5 border border-gray-700' },
         React.createElement('h3', { className: 'text-lg font-semibold text-white mb-4' }, '🎬 Active Productions'),
         activeProds.length === 0
           ? React.createElement('p', { className: 'text-gray-500 text-sm italic' }, 'No active productions')
@@ -107,7 +107,7 @@ const BoardDashboard = () => {
       ),
 
       // Upcoming Shows & Auditions
-      React.createElement('div', { className: 'bg-gray-800 rounded-lg p-5 border border-gray-700' },
+      React.createElement('div', { className: 'bg-surface rounded-lg p-5 border border-gray-700' },
         React.createElement('h3', { className: 'text-lg font-semibold text-white mb-4' }, '📅 Upcoming Shows & Auditions'),
         upcomingShows.length === 0
           ? React.createElement('p', { className: 'text-gray-500 text-sm italic' }, 'No upcoming shows or auditions')
@@ -140,7 +140,7 @@ const BoardDashboard = () => {
       ),
 
       // Financial Summary
-      React.createElement('div', { className: 'bg-gray-800 rounded-lg p-5 border border-gray-700' },
+      React.createElement('div', { className: 'bg-surface rounded-lg p-5 border border-gray-700' },
         React.createElement('div', { className: 'flex items-center justify-between mb-4' },
           React.createElement('h3', { className: 'text-lg font-semibold text-white' }, '💰 Financial Summary'),
           React.createElement('button', {
@@ -172,7 +172,7 @@ const BoardDashboard = () => {
       ),
 
       // Board Members
-      React.createElement('div', { className: 'bg-gray-800 rounded-lg p-5 border border-gray-700' },
+      React.createElement('div', { className: 'bg-surface rounded-lg p-5 border border-gray-700' },
         React.createElement('h3', { className: 'text-lg font-semibold text-white mb-4' }, '👥 Board Members'),
         boardMembers.length === 0
           ? React.createElement('p', { className: 'text-gray-500 text-sm italic' }, 'No board members tagged yet. Tag contacts with "board member" in the Contacts hub.')

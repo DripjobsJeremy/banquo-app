@@ -349,6 +349,33 @@ const OrganizationService = (() => {
         });
     };
 
+    // ── Theme mode ──────────────────────────────────────────────────────────
+    const THEME_KEY = 'scenestave_theme_mode';
+
+    const saveThemeMode = (mode) => {
+        try {
+            localStorage.setItem(THEME_KEY, mode);
+            document.documentElement.setAttribute('data-theme', mode);
+        } catch (e) {
+            console.error('OrganizationService: Error saving theme mode:', e);
+        }
+    };
+
+    const loadThemeMode = () => {
+        try {
+            return localStorage.getItem(THEME_KEY) || 'dark';
+        } catch (e) {
+            return 'dark';
+        }
+    };
+
+    const applyThemeMode = () => {
+        const mode = loadThemeMode();
+        document.documentElement.setAttribute('data-theme', mode);
+        return mode;
+    };
+    // ────────────────────────────────────────────────────────────────────────
+
     return {
         loadOrganization,
         saveOrganization,
@@ -367,6 +394,9 @@ const OrganizationService = (() => {
         updateClientOrganization,
         removeClientOrganization,
         toggleClientOrgManagement,
+        saveThemeMode,
+        loadThemeMode,
+        applyThemeMode,
         DEFAULT_ORGANIZATION,
         DEFAULT_BRANDING,
         SHOWSUITE_LOGO_SVG
