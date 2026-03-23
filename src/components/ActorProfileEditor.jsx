@@ -760,7 +760,7 @@ function ActorProfileEditor({ actor, onSave, onCancel }) {
                 </button>
               </div>
 
-              {formData.actorProfile?.specialSkills?.length > 0 ? (
+              {(formData.actorProfile?.specialSkills || []).length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {formData.actorProfile.specialSkills.map((skill, index) => (
                     <span
@@ -779,7 +779,11 @@ function ActorProfileEditor({ actor, onSave, onCancel }) {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-sm italic">No special skills added yet</p>
+                <div className="text-center py-8">
+                  <div className="text-3xl mb-2">⭐</div>
+                  <p className="text-sm font-medium mb-1 text-primary-color">No skills added yet</p>
+                  <p className="text-xs text-muted-color">Type a skill above and press Add or Enter</p>
+                </div>
               )}
             </div>
 

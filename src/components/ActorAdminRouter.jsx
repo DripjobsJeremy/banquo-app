@@ -383,16 +383,16 @@ function ActorProfileViewModal({ actor, onClose }) {
               {profile.sizeCard && Object.values(profile.sizeCard).some(v => v && v !== '') ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                   {[
-                    { label: 'Height', value: profile.sizeCard.height },
-                    { label: 'Weight', value: profile.sizeCard.weight },
-                    { label: 'Shirt Size', value: profile.sizeCard.shirtSize },
-                    { label: 'Pants Size', value: profile.sizeCard.pantsSize },
-                    { label: 'Shoe Size', value: profile.sizeCard.shoeSize },
-                    { label: 'Jacket Size', value: profile.sizeCard.jacketSize },
-                    { label: 'Dress Size', value: profile.sizeCard.dressSize },
-                    { label: 'Chest', value: profile.sizeCard.chest },
-                    { label: 'Waist', value: profile.sizeCard.waist },
-                    { label: 'Inseam', value: profile.sizeCard.inseam }
+                    { label: 'Height',      value: profile.sizeCard?.height },
+                    { label: 'Weight',      value: profile.sizeCard?.weight },
+                    { label: 'Shirt Size',  value: profile.sizeCard?.shirtSize },
+                    { label: 'Pants Size',  value: profile.sizeCard?.pantsSize },
+                    { label: 'Shoe Size',   value: profile.sizeCard?.shoeSize },
+                    { label: 'Jacket Size', value: profile.sizeCard?.jacketSize },
+                    { label: 'Dress Size',  value: profile.sizeCard?.dressSize },
+                    { label: 'Chest',       value: profile.sizeCard?.chest },
+                    { label: 'Waist',       value: profile.sizeCard?.waist },
+                    { label: 'Inseam',      value: profile.sizeCard?.inseam }
                   ].map((item, idx) => (
                     <div key={idx}>
                       <h4 className="text-sm font-medium text-gray-500 mb-1">{item.label}</h4>
@@ -401,7 +401,15 @@ function ActorProfileViewModal({ actor, onClose }) {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 italic">No size card information provided</p>
+                <div className="text-center py-12">
+                  <div className="text-4xl mb-3">📏</div>
+                  <p className="font-medium mb-1 text-primary-color">
+                    No size information yet
+                  </p>
+                  <p className="text-sm text-muted-color">
+                    The actor can add measurements via their Actor Portal
+                  </p>
+                </div>
               )}
             </div>
           )}
@@ -411,7 +419,7 @@ function ActorProfileViewModal({ actor, onClose }) {
             <div className="space-y-6">
               <div>
                 <h4 className="text-lg font-semibold text-gray-900 mb-3">Special Skills</h4>
-                {profile.specialSkills && profile.specialSkills.length > 0 ? (
+                {(profile.specialSkills || []).length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {profile.specialSkills.map((skill, idx) => (
                       <span key={idx} className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
@@ -420,7 +428,13 @@ function ActorProfileViewModal({ actor, onClose }) {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500 italic">No special skills listed</p>
+                  <div className="text-center py-12">
+                    <div className="text-4xl mb-3">⭐</div>
+                    <p className="font-medium mb-1 text-primary-color">No skills added yet</p>
+                    <p className="text-sm text-muted-color">
+                      The actor can add skills via their Actor Portal
+                    </p>
+                  </div>
                 )}
               </div>
 
