@@ -220,6 +220,25 @@
       });
     };
 
+    const levelCounts = {};
+    (donors || []).forEach(donor => {
+      const levelId = donor?.donorProfile?.donorLevelId;
+      if (levelId) {
+        levelCounts[levelId] = (levelCounts[levelId] || 0) + 1;
+      }
+    });
+    const hasData = Object.keys(levelCounts).length > 0;
+
+    if (!hasData) {
+      return React.createElement(
+        'div',
+        { className: 'donor-segmentation-chart flex flex-col items-center justify-center', style: { height: '300px' } },
+        React.createElement('div', { className: 'text-5xl mb-3' }, '👥'),
+        React.createElement('p', { className: 'font-medium mb-1 text-primary-color' }, 'No donor segments yet'),
+        React.createElement('p', { className: 'text-sm text-muted-color text-center' }, 'Assign donor levels to contacts to see segmentation')
+      );
+    }
+
     return React.createElement('div', { className: 'donor-segmentation-chart', style: { height: '300px' } },
       React.createElement('canvas', { ref: chartRef })
     );
