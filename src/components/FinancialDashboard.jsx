@@ -104,7 +104,11 @@
       syncFromHash();
       loadFinancialData();
       window.addEventListener('hashchange', syncFromHash);
-      return () => window.removeEventListener('hashchange', syncFromHash);
+      window.addEventListener('contactsUpdated', loadFinancialData);
+      return () => {
+        window.removeEventListener('hashchange', syncFromHash);
+        window.removeEventListener('contactsUpdated', loadFinancialData);
+      };
     }, []);
 
     useEffect(() => {
