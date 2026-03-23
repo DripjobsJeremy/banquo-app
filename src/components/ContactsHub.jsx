@@ -158,7 +158,18 @@ function AllContactsList({ contacts, donations }) {
                 const prodCount = (c.staffProfile?.productions || []).length;
                 return (
                   <tr key={c.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gray-900">{name}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">
+                      <div className="flex items-center gap-2">
+                        {c.donorProfile?.photoUrl ? (
+                          <img src={c.donorProfile.photoUrl} alt={name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                        ) : (
+                          <div className="w-7 h-7 rounded-full bg-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                            {name[0]?.toUpperCase() || '?'}
+                          </div>
+                        )}
+                        {name}
+                      </div>
+                    </td>
                     <td className="px-4 py-3 text-gray-500">{c.email || '—'}</td>
                     <td className="px-4 py-3 text-gray-500 hidden md:table-cell">{c.phone || '—'}</td>
                     <td className="px-4 py-3">
@@ -226,9 +237,17 @@ function BoardMembersView({ contacts }) {
             return (
               <div key={member.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:border-violet-300 hover:shadow-sm transition-all">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                    {initial}
-                  </div>
+                  {member.donorProfile?.photoUrl ? (
+                    <img
+                      src={member.donorProfile.photoUrl}
+                      alt={name}
+                      className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                      {initial}
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-gray-900 truncate">{name}</div>
                     {member.email && <div className="text-sm text-gray-500 truncate">{member.email}</div>}

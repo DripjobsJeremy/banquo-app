@@ -390,9 +390,20 @@
       React.createElement(
         'div',
         { className: 'flex items-start justify-between mb-3' },
-        React.createElement('div', { className: 'flex-1' },
-          React.createElement('h4', { className: 'font-semibold truncate text-gray-900' }, `${donor.firstName} ${donor.lastName}`),
-          donor.organization && React.createElement('p', { className: 'text-xs text-gray-600 truncate' }, donor.organization)
+        React.createElement('div', { className: 'flex items-center gap-3 flex-1 min-w-0' },
+          donor.donorProfile?.photoUrl
+            ? React.createElement('img', {
+                src: donor.donorProfile.photoUrl,
+                alt: `${donor.firstName} ${donor.lastName}`,
+                className: 'w-10 h-10 rounded-full object-cover flex-shrink-0'
+              })
+            : React.createElement('div', {
+                className: 'w-10 h-10 rounded-full bg-violet-700 flex items-center justify-center text-white text-sm font-bold flex-shrink-0'
+              }, (donor.firstName || donor.lastName || '?')[0].toUpperCase()),
+          React.createElement('div', { className: 'min-w-0' },
+            React.createElement('h4', { className: 'font-semibold truncate text-gray-900' }, `${donor.firstName} ${donor.lastName}`),
+            donor.organization && React.createElement('p', { className: 'text-xs text-gray-600 truncate' }, donor.organization)
+          )
         ),
         React.createElement('span', {
           className: 'px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-900 border border-purple-300 cursor-help',
