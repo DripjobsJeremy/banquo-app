@@ -142,9 +142,19 @@ function getNavigationTabs(userRole) {
       stage_manager: 'Stage Manager'
     };
     return [
+      { id: 'dept-dashboard',    label: 'Dashboard',                      icon: '📊', path: '/dept-dashboard' },
       { id: 'department-portal', label: `${deptLabels[userRole]} Portal`, icon: '🎨', path: '/department-portal' },
       { id: 'productions',       label: 'Productions',                    icon: '🎬', path: '/productions' },
       { id: 'dept-calendar',     label: 'My Calendar',                    icon: '📅', path: '/dept-calendar' },
+    ];
+  }
+
+  if (userRole === 'director') {
+    return [
+      { id: 'dept-dashboard', label: 'Dashboard',   icon: '📊', path: '/dept-dashboard' },
+      { id: 'productions',    label: 'Productions', icon: '🎬', path: '/productions' },
+      { id: 'calendar',       label: 'Calendar',    icon: '📅', path: '/calendar' },
+      { id: 'contacts',       label: 'Contacts',    icon: '📋', path: '/contacts' },
     ];
   }
 
@@ -193,7 +203,7 @@ function App() {
     const validViews = [
       'dashboard', 'financial', 'contacts', 'donors', 'actors', 'productions', 'calendar',
       'volunteers', 'settings', 'actor-portal',
-      'department-portal', 'dept-calendar', 'volunteer-portal', 'donor-portal', 'donor-login'
+      'dept-dashboard', 'department-portal', 'dept-calendar', 'volunteer-portal', 'donor-portal', 'donor-login'
     ];
     return validViews.includes(path) ? path : 'dashboard';
   };
@@ -250,9 +260,9 @@ function App() {
       } else if (role === 'actor') {
         console.log('   → Redirecting to /actor-portal');
         window.location.hash = '/actor-portal';
-      } else if (['lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager'].includes(role)) {
-        console.log('   → Redirecting to /department-portal');
-        window.location.hash = '/department-portal';
+      } else if (['director', 'lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager'].includes(role)) {
+        console.log('   → Redirecting to /dept-dashboard');
+        window.location.hash = '/dept-dashboard';
       }
     }
   }, []); // mount only
@@ -287,7 +297,7 @@ function App() {
     if (SUPER_ROLES.includes(newRole)) newPath = '/';
     else if (newRole === 'actor') newPath = '/actor-portal';
     else if (newRole === 'volunteer') newPath = '/volunteer-portal';
-    else if (['lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager'].includes(newRole)) newPath = '/department-portal';
+    else if (['director', 'lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager'].includes(newRole)) newPath = '/dept-dashboard';
 
     console.log('📍 Navigating to:', newPath);
     // Use window.location.hash directly — more reliable than history.push
@@ -502,6 +512,17 @@ function App() {
 
             <Route path="/volunteers">
               <TabRedirect tab="volunteers" />
+            </Route>
+
+            <Route path="/dept-dashboard">
+              <div className="bg-gray-900 min-h-full">
+                {window.DepartmentDashboard
+                  ? React.createElement(window.DepartmentDashboard)
+                  : React.createElement('div', { className: 'p-6 text-center py-20 text-gray-400' },
+                      React.createElement('p', null, 'Dashboard loading...')
+                    )
+                }
+              </div>
             </Route>
 
             <Route path="/department-portal">
