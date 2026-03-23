@@ -458,12 +458,15 @@ function App() {
                 {(userRole === 'admin' || userRole === 'super_admin' || userRole === 'venue_manager') && window.SuperAdminDashboard && (
                   <window.SuperAdminDashboard />
                 )}
+                {['board_member', 'accounting_manager'].includes(userRole) && window.BoardDashboard && (
+                  React.createElement(window.BoardDashboard)
+                )}
                 {userRole === 'volunteer' && <VolunteerPortalView />}
                 {userRole === 'actor' && <ActorPortalView />}
-                {['lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager'].includes(userRole) && (
+                {['director', 'lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager'].includes(userRole) && (
                   <div className="text-center py-12 text-gray-400">
-                    <div className="text-4xl mb-3">🎨</div>
-                    <p className="text-sm">Loading department portal...</p>
+                    <div className="text-4xl mb-3">📊</div>
+                    <p className="text-sm">Loading dashboard...</p>
                   </div>
                 )}
               </div>
