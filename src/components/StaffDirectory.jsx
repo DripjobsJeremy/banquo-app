@@ -522,6 +522,14 @@ function StaffDirectory() {
   const [editingContact, setEditingContact] = React.useState(null);
   const [showAddModal,   setShowAddModal]   = React.useState(false);
 
+  const [viewMode, setViewMode] = React.useState(() => {
+    try { return localStorage.getItem('scenestave_staff_view') || 'cards'; } catch { return 'cards'; }
+  });
+  const setView = (mode) => {
+    setViewMode(mode);
+    try { localStorage.setItem('scenestave_staff_view', mode); } catch {}
+  };
+
   const refresh = () => {
     setStaffList(loadStaff());
     setAllContacts(loadAll());
@@ -562,13 +570,19 @@ function StaffDirectory() {
             {staffList.length}
           </span>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowAddModal(true)}
-          className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-sm font-medium transition-colors"
-        >
-          + Add Staff Member
-        </button>
+        <div className="flex items-center gap-3">
+          <div className="view-toggle">
+            <button type="button" onClick={() => setView('cards')} className={`view-toggle-btn${viewMode === 'cards' ? ' active' : ''}`}>⊞ Cards</button>
+            <button type="button" onClick={() => setView('table')} className={`view-toggle-btn${viewMode === 'table' ? ' active' : ''}`}>≡ Table</button>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowAddModal(true)}
+            className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-sm font-medium transition-colors"
+          >
+            + Add Staff Member
+          </button>
+        </div>
       </div>
 
       {/* Search + Filters */}
@@ -609,8 +623,70 @@ function StaffDirectory() {
         </div>
       )}
 
+      {/* Content */}
+      {filteredStaff.length > 0 && viewMode === 'table' && (
+        <div className="hub-table-wrap">
+          <table className="hub-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Roles</th>
+                <th className="hidden md:table-cell">Productions</th>
+                <th className="hidden md:table-cell">Status</th>
+                <th><span className="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredStaff.map(contact => {
+                const name      = `${contact.firstName || ''} ${contact.lastName || ''}`.trim() || 'Unnamed';
+                const roles     = contact.staffProfile?.roles || [];
+                const prodCount = (contact.staffProfile?.productions || []).length;
+                const status    = contact.status || 'unassigned';
+                return (
+                  <tr key={contact.id}>
+                    <td className="font-medium">
+                      <div className="text-primary-color">{name}</div>
+                      {contact.email && <div className="text-xs text-muted-color">{contact.email}</div>}
+                    </td>
+                    <td>
+                      <div className="flex flex-wrap gap-1">
+                        {roles.slice(0, 2).map(role => (
+                          <span key={role} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">{role}</span>
+                        ))}
+                        {roles.length > 2 && (
+                          <span className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-xs">+{roles.length - 2}</span>
+                        )}
+                        {roles.length === 0 && <span className="text-xs text-muted-color">—</span>}
+                      </div>
+                    </td>
+                    <td className="secondary hidden md:table-cell">
+                      {prodCount > 0 ? `${prodCount} production${prodCount !== 1 ? 's' : ''}` : '—'}
+                    </td>
+                    <td className="hidden md:table-cell">
+                      <div className="flex items-center gap-1.5">
+                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${statusDot(status)}`} />
+                        <span className="text-xs text-secondary-color capitalize">{status}</span>
+                      </div>
+                    </td>
+                    <td className="right">
+                      <button
+                        type="button"
+                        onClick={() => setEditingContact(contact)}
+                        className="text-xs text-violet-600 hover:text-violet-800 font-medium"
+                      >
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {/* Cards grid */}
-      {filteredStaff.length > 0 && (
+      {filteredStaff.length > 0 && viewMode === 'cards' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredStaff.map(contact => {
             const name      = `${contact.firstName || ''} ${contact.lastName || ''}`.trim() || 'Unnamed';
@@ -619,17 +695,17 @@ function StaffDirectory() {
             const status    = contact.status || 'unassigned';
 
             return (
-              <div key={contact.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:border-violet-300 hover:shadow-sm transition-all">
+              <div key={contact.id} className="hub-card hover:border-violet-300 hover:shadow-sm transition-all">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-start gap-2 min-w-0">
                     <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1 ${statusDot(status)}`} />
                     <div className="min-w-0">
-                      <h3 className="font-semibold text-gray-900 text-sm truncate">{name}</h3>
+                      <h3 className="font-semibold text-primary-color text-sm truncate">{name}</h3>
                       {contact.email && (
-                        <p className="text-xs text-gray-500 truncate">{contact.email}</p>
+                        <p className="text-xs text-secondary-color truncate">{contact.email}</p>
                       )}
                       {contact.phone && (
-                        <p className="text-xs text-gray-400">{contact.phone}</p>
+                        <p className="text-xs text-muted-color">{contact.phone}</p>
                       )}
                     </div>
                   </div>
@@ -661,7 +737,7 @@ function StaffDirectory() {
                       {prodCount} production{prodCount !== 1 ? 's' : ''}
                     </span>
                   ) : (
-                    <span className="text-xs text-gray-400">No productions assigned</span>
+                    <span className="text-xs text-muted-color">No productions assigned</span>
                   )}
                 </div>
               </div>

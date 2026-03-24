@@ -272,15 +272,17 @@
             React.createElement('label', { className: 'text-sm font-medium text-gray-700' }, 'View:'),
             React.createElement(
               'div',
-              { className: 'inline-flex rounded border border-gray-300 overflow-hidden' },
+              { className: 'view-toggle' },
               React.createElement('button', {
+                type: 'button',
                 onClick: () => setViewMode('directory'),
-                className: `px-3 py-1.5 text-sm ${viewMode === 'directory' ? 'bg-violet-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`
-              }, 'Cards'),
+                className: `view-toggle-btn${viewMode === 'directory' ? ' active' : ''}`
+              }, '⊞ Cards'),
               React.createElement('button', {
+                type: 'button',
                 onClick: () => setViewMode('table'),
-                className: `px-3 py-1.5 text-sm ${viewMode === 'table' ? 'bg-violet-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`
-              }, 'Table')
+                className: `view-toggle-btn${viewMode === 'table' ? ' active' : ''}`
+              }, '≡ Table')
             )
           )
         ),
@@ -456,39 +458,48 @@
   const DonorTable = ({ donors }) => {
     return React.createElement(
       'div',
-      { className: 'overflow-x-auto border border-gray-300 rounded-lg bg-white' },
+      { className: 'hub-table-wrap' },
       React.createElement(
         'table',
-        { className: 'w-full' },
+        { className: 'hub-table' },
         React.createElement(
           'thead',
-          { className: 'bg-gray-50' },
+          null,
           React.createElement(
             'tr',
             null,
-            React.createElement('th', { className: 'text-left p-3 text-sm font-medium text-gray-700' }, 'Name'),
-            React.createElement('th', { className: 'text-left p-3 text-sm font-medium text-gray-700' }, 'Email'),
-            React.createElement('th', { className: 'text-left p-3 text-sm font-medium text-gray-700' }, 'Total Given'),
-            React.createElement('th', { className: 'text-left p-3 text-sm font-medium text-gray-700' }, 'Donations'),
-            React.createElement('th', { className: 'text-left p-3 text-sm font-medium text-gray-700' }, 'Last Gift'),
-            React.createElement('th', { className: 'text-left p-3 text-sm font-medium text-gray-700' }, 'Level')
+            React.createElement('th', null, 'Name'),
+            React.createElement('th', { className: 'hidden md:table-cell' }, 'Email'),
+            React.createElement('th', { className: 'right' }, 'Total Given'),
+            React.createElement('th', { className: 'right' }, 'Donations'),
+            React.createElement('th', { className: 'hidden md:table-cell' }, 'Last Gift'),
+            React.createElement('th', null, 'Level')
           )
         ),
         React.createElement(
           'tbody',
           null,
-          donors.map((donor) =>
-            React.createElement(
+          donors.map((donor) => {
+            const name = `${donor.firstName || ''} ${donor.lastName || ''}`.trim() || 'Unnamed';
+            const initial = (donor.firstName || donor.lastName || '?')[0].toUpperCase();
+            return React.createElement(
               'tr',
-              { key: donor.id, className: 'border-b border-gray-200 hover:bg-gray-50' },
-              React.createElement('td', { className: 'p-3 text-sm font-medium text-gray-900' }, `${donor.firstName} ${donor.lastName}`),
-              React.createElement('td', { className: 'p-3 text-sm text-gray-600' }, donor.email || '—'),
-              React.createElement('td', { className: 'p-3 text-sm font-semibold text-green-600' }, formatCurrency(donor.totalGiven)),
-              React.createElement('td', { className: 'p-3 text-sm text-gray-600' }, donor.frequency),
-              React.createElement('td', { className: 'p-3 text-sm text-gray-600' }, donor.lastGift ? formatDate(donor.lastGift) : '—'),
-              React.createElement('td', { className: 'p-3 text-sm text-gray-600' }, donor.level?.name || '—')
-            )
-          )
+              { key: donor.id },
+              React.createElement('td', { className: 'font-medium' },
+                React.createElement('div', { className: 'flex items-center gap-2' },
+                  donor.donorProfile?.photoUrl
+                    ? React.createElement('img', { src: donor.donorProfile.photoUrl, alt: name, className: 'w-7 h-7 rounded-full object-cover flex-shrink-0' })
+                    : React.createElement('div', { className: 'w-7 h-7 rounded-full bg-violet-700 flex items-center justify-center text-white text-xs font-bold flex-shrink-0' }, initial),
+                  name
+                )
+              ),
+              React.createElement('td', { className: 'secondary hidden md:table-cell' }, donor.email || '—'),
+              React.createElement('td', { className: 'right font-semibold text-green-600' }, formatCurrency(donor.totalGiven)),
+              React.createElement('td', { className: 'right' }, donor.frequency),
+              React.createElement('td', { className: 'secondary hidden md:table-cell' }, donor.lastGift ? formatDate(donor.lastGift) : '—'),
+              React.createElement('td', null, donor.level?.name || '—')
+            );
+          })
         )
       )
     );
