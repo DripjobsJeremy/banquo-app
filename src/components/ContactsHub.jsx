@@ -14,8 +14,48 @@ function AllContactsList({ contacts, donations }) {
   const [form, setForm] = React.useState({ firstName: '', lastName: '', email: '', phone: '' });
   const [saving, setSaving] = React.useState(false);
   const [localContacts, setLocalContacts] = React.useState(contacts);
+  const [refreshKey, setRefreshKey] = React.useState(0);
 
   React.useEffect(() => { setLocalContacts(contacts); }, [contacts]);
+
+  React.useEffect(() => {
+    const handleActorsUpdate = () => setRefreshKey(k => k + 1);
+    window.addEventListener('actorsUpdated', handleActorsUpdate);
+    window.addEventListener('storage', handleActorsUpdate);
+    return () => {
+      window.removeEventListener('actorsUpdated', handleActorsUpdate);
+      window.removeEventListener('storage', handleActorsUpdate);
+    };
+  }, []);
+
+  const getMergedContacts = () => {
+    const mainContacts = window.contactsService?.loadContacts?.() ||
+      JSON.parse(localStorage.getItem('showsuite_contacts') || '[]');
+    const actorRecords = JSON.parse(localStorage.getItem('showsuite_actors') || '[]');
+    const normalizedActors = actorRecords.map(a => ({
+      id: a.id,
+      firstName: a.firstName || a.name?.split(' ')[0] || '',
+      lastName: a.lastName || a.name?.split(' ').slice(1).join(' ') || '',
+      name: a.name || `${a.firstName || ''} ${a.lastName || ''}`.trim(),
+      email: a.email || '',
+      phone: a.phone || '',
+      type: 'Actor',
+      tags: a.tags || [],
+      isDonor: false,
+      isStaff: false,
+      donorProfile: null,
+      staffProfile: null,
+      actorData: a,
+      _source: 'actors',
+    }));
+    const mainEmails = new Set(mainContacts.map(c => (c.email || '').toLowerCase()).filter(Boolean));
+    const uniqueActors = normalizedActors.filter(a =>
+      !a.email || !mainEmails.has(a.email.toLowerCase())
+    );
+    return [...mainContacts, ...uniqueActors];
+  };
+
+  const allContacts = React.useMemo(() => getMergedContacts(), [localContacts, refreshKey]);
 
   const setView = (mode) => {
     setViewMode(mode);
@@ -26,7 +66,7 @@ function AllContactsList({ contacts, donations }) {
     const types = [];
     if (c.isDonor) types.push({ label: 'Donor', color: 'amber' });
     if (c.isStaff) types.push({ label: 'Staff', color: 'violet' });
-    if (c.type === 'Actor') types.push({ label: 'Actor', color: 'pink' });
+    if (c.type === 'Actor' || c._source === 'actors') types.push({ label: 'Actor', color: 'pink' });
     if (c.volunteerInfo || c.isVolunteer) types.push({ label: 'Volunteer', color: 'green' });
     if (Array.isArray(c.tags) && c.tags.some(t => BOARD_TAGS.includes(String(t).toLowerCase()))) types.push({ label: 'Board', color: 'blue' });
     if (types.length === 0) types.push({ label: 'Contact', color: 'gray' });
@@ -60,7 +100,7 @@ function AllContactsList({ contacts, donations }) {
 
   const filtered = React.useMemo(() => {
     const q = search.toLowerCase();
-    return localContacts.filter(c => {
+    return allContacts.filter(c => {
       const name  = `${c.firstName || ''} ${c.lastName || ''} ${c.name || ''}`.toLowerCase();
       const email = (c.email || '').toLowerCase();
       const phone = (c.phone || '').toLowerCase();
@@ -68,12 +108,12 @@ function AllContactsList({ contacts, donations }) {
       const matchesType = typeFilter === 'all'
         || (typeFilter === 'donor'     && c.isDonor)
         || (typeFilter === 'staff'     && c.isStaff)
-        || (typeFilter === 'actor'     && c.type === 'Actor')
+        || (typeFilter === 'actor'     && (c.type === 'Actor' || c._source === 'actors'))
         || (typeFilter === 'volunteer' && (c.volunteerInfo || c.isVolunteer))
         || (typeFilter === 'board'     && Array.isArray(c.tags) && c.tags.some(t => BOARD_TAGS.includes(String(t).toLowerCase())));
       return matchesSearch && matchesType;
     });
-  }, [localContacts, search, typeFilter]);
+  }, [allContacts, search, typeFilter]);
 
   const donationCountFor = (id) => (donations || []).filter(d => d.contactId === id).length;
 
@@ -106,6 +146,7 @@ function AllContactsList({ contacts, donations }) {
       all.push(newContact);
       window.contactsService.saveContactsToLS(all);
       setLocalContacts(window.contactsService.loadContacts());
+      setRefreshKey(k => k + 1);
       setForm({ firstName: '', lastName: '', email: '', phone: '' });
       setShowAddForm(false);
       window.showToast?.('Contact created', 'success');
@@ -186,10 +227,10 @@ function AllContactsList({ contacts, donations }) {
       <div className="flex items-center justify-between mb-4">
         <span className="text-sm text-muted-color">
           {filtered.length} contact{filtered.length !== 1 ? 's' : ''}
-          {filtered.length !== localContacts.length && ` of ${localContacts.length}`}
+          {filtered.length !== allContacts.length && ` of ${allContacts.length}`}
         </span>
         <span className="text-xs text-muted-color">
-          {localContacts.filter(c => c.isDonor).length} donors · {localContacts.filter(c => c.isStaff).length} staff
+          {allContacts.filter(c => c.isDonor).length} donors · {allContacts.filter(c => c.isStaff).length} staff
         </span>
       </div>
 
