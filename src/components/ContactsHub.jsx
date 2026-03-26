@@ -67,7 +67,7 @@ function AllContactsList({ contacts, donations }) {
     if (c.isDonor) types.push({ label: 'Donor', color: 'amber' });
     if (c.isStaff) types.push({ label: 'Staff', color: 'violet' });
     if (c.type === 'Actor' || c._source === 'actors') types.push({ label: 'Actor', color: 'pink' });
-    if (c.volunteerInfo || c.isVolunteer) types.push({ label: 'Volunteer', color: 'green' });
+    if (c.volunteerInfo || c.isVolunteer || (Array.isArray(c.tags) && c.tags.some(t => String(t).toLowerCase() === 'volunteer'))) types.push({ label: 'Volunteer', color: 'green' });
     if (Array.isArray(c.tags) && c.tags.some(t => BOARD_TAGS.includes(String(t).toLowerCase()))) types.push({ label: 'Board', color: 'blue' });
     if (types.length === 0) types.push({ label: 'Contact', color: 'gray' });
     return types;
@@ -109,7 +109,7 @@ function AllContactsList({ contacts, donations }) {
         || (typeFilter === 'donor'     && c.isDonor)
         || (typeFilter === 'staff'     && c.isStaff)
         || (typeFilter === 'actor'     && (c.type === 'Actor' || c._source === 'actors'))
-        || (typeFilter === 'volunteer' && (c.volunteerInfo || c.isVolunteer))
+        || (typeFilter === 'volunteer' && (c.volunteerInfo || c.isVolunteer || (Array.isArray(c.tags) && c.tags.some(t => String(t).toLowerCase() === 'volunteer'))))
         || (typeFilter === 'board'     && Array.isArray(c.tags) && c.tags.some(t => BOARD_TAGS.includes(String(t).toLowerCase())));
       return matchesSearch && matchesType;
     });
