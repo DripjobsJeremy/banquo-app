@@ -650,194 +650,179 @@ function SceneBuilder({ productionId: propId }) {
                         placeholder: 'Scene title (optional)'
                       })
                 ),
-                // Characters in scene (inline input)
+                // Characters in scene — always-visible input (SS-006)
                 React.createElement(
                   'div',
-                  { className: 'mb-3' },
-                  React.createElement('label', { className: 'block text-xs text-gray-600 mb-1' }, '🎭 Characters in Scene'),
-                  React.createElement(
+                  { className: 'mb-4' },
+                  React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🎭 Characters in Scene'),
+                  ((scene.characterIds || []).length > 0 || (scene.characters || []).length > 0) && React.createElement(
                     'div',
-                    { className: 'flex flex-wrap items-center gap-1' },
-                    // characterIds pills (production-level characters)
+                    { className: 'flex flex-wrap gap-1 mb-2' },
                     (scene.characterIds || []).map(charId => {
                       const char = (production.characters || []).find(c => c.id === charId);
                       if (!char) return null;
                       return React.createElement(
                         'span',
-                        { key: charId, className: 'inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full bg-violet-100 text-violet-800' },
+                        { key: charId, className: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-violet-100 text-violet-800' },
                         char.name,
                         React.createElement('button', {
                           type: 'button',
                           onClick: () => handleUpdateScene(actIndex, sceneIndex, 'characterIds', (scene.characterIds || []).filter(id => id !== charId)),
-                          className: 'ml-1 text-violet-600 hover:text-violet-900 font-bold'
+                          className: 'ml-0.5 text-violet-500 hover:text-violet-900 font-bold leading-none'
                         }, '×')
                       );
                     }),
-                    // scene.characters pills (free-text names)
                     (scene.characters || []).map((charName, i) =>
                       React.createElement(
                         'span',
-                        { key: `freechar-${i}`, className: 'inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full bg-violet-100 text-violet-800' },
+                        { key: `fc-${i}`, className: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-violet-100 text-violet-800' },
                         charName,
                         React.createElement('button', {
                           type: 'button',
                           onClick: () => handleUpdateScene(actIndex, sceneIndex, 'characters', (scene.characters || []).filter((_, idx) => idx !== i)),
-                          className: 'ml-1 text-violet-600 hover:text-violet-900 font-bold'
+                          className: 'ml-0.5 text-violet-500 hover:text-violet-900 font-bold leading-none'
                         }, '×')
                       )
-                    ),
-                    // Inline input or + Add Characters button
-                    openCharacterSelector === `${actIndex}-${sceneIndex}`
-                      ? React.createElement('input', {
-                          type: 'text',
-                          autoFocus: true,
-                          value: newCharInput[`${actIndex}-${sceneIndex}`] || '',
-                          onChange: e => setNewCharInput(prev => ({ ...prev, [`${actIndex}-${sceneIndex}`]: e.target.value })),
-                          onKeyDown: e => {
-                            const key = `${actIndex}-${sceneIndex}`;
-                            if (e.key === 'Enter') {
-                              const name = (newCharInput[key] || '').trim();
-                              if (name) {
-                                const unique = Array.from(new Set([...(scene.characters || []), name]));
-                                handleUpdateScene(actIndex, sceneIndex, 'characters', unique);
-                                setNewCharInput(prev => ({ ...prev, [key]: '' }));
-                              }
-                            } else if (e.key === 'Escape') {
-                              setOpenCharacterSelector(null);
-                              setNewCharInput(prev => ({ ...prev, [`${actIndex}-${sceneIndex}`]: '' }));
-                            }
-                          },
-                          onBlur: () => {
-                            const key = `${actIndex}-${sceneIndex}`;
-                            const name = (newCharInput[key] || '').trim();
-                            if (name) {
-                              const unique = Array.from(new Set([...(scene.characters || []), name]));
-                              handleUpdateScene(actIndex, sceneIndex, 'characters', unique);
-                            }
-                            setNewCharInput(prev => ({ ...prev, [key]: '' }));
-                            setOpenCharacterSelector(null);
-                          },
-                          placeholder: 'Character name, Enter to add…',
-                          className: 'px-2 py-1 text-xs border border-violet-400 rounded-full focus:outline-none focus:ring-1 focus:ring-violet-400 w-44'
-                        })
-                      : React.createElement('button', {
-                          type: 'button',
-                          onClick: () => setOpenCharacterSelector(`${actIndex}-${sceneIndex}`),
-                          className: 'inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border border-dashed border-gray-300 text-gray-600 hover:border-violet-400 hover:text-violet-600'
-                        }, '+ Add Characters')
-                  )
+                    )
+                  ),
+                  React.createElement('input', {
+                    type: 'text',
+                    value: newCharInput[`${actIndex}-${sceneIndex}`] || '',
+                    onChange: e => setNewCharInput(prev => ({ ...prev, [`${actIndex}-${sceneIndex}`]: e.target.value })),
+                    onKeyDown: e => {
+                      if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        const key = `${actIndex}-${sceneIndex}`;
+                        const name = (newCharInput[key] || '').replace(',', '').trim();
+                        if (!name) return;
+                        const unique = Array.from(new Set([...(scene.characters || []), name]));
+                        handleUpdateScene(actIndex, sceneIndex, 'characters', unique);
+                        setNewCharInput(prev => ({ ...prev, [key]: '' }));
+                      }
+                    },
+                    className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
+                    placeholder: 'Type a character name and press Enter…'
+                  }),
+                  React.createElement('p', { className: 'text-xs text-gray-400 mt-1' }, 'Press Enter or comma to add')
                 ),
+                // ── Location + Time of Day ────────────────────────────────────────────
                 React.createElement(
                   'div',
-                  { className: 'grid grid-cols-1 md:grid-cols-3 gap-3 mb-2' },
-                  React.createElement('div', { className: 'relative' },
-                    React.createElement('span', { className: 'absolute left-2.5 top-2 text-sm pointer-events-none' }, '📍'),
-                    React.createElement('textarea', {
+                  { className: 'grid grid-cols-1 md:grid-cols-2 gap-4 mb-4' },
+                  React.createElement(
+                    'div',
+                    null,
+                    React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '📍 Location'),
+                    React.createElement('input', {
+                      type: 'text',
                       value: scene.location || '',
                       onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'location', e.target.value),
-                      className: 'pl-8 pr-3 py-2 border border-gray-300 rounded w-full text-sm resize-none',
-                      placeholder: 'Location',
-                      rows: 2
+                      className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
+                      placeholder: 'e.g., The Unemployment Office, Stage Right'
                     })
                   ),
-                  React.createElement('div', { className: 'relative' },
-                    React.createElement('span', { className: 'absolute left-2.5 top-2 text-sm pointer-events-none' }, '🕐'),
-                    React.createElement('textarea', {
+                  React.createElement(
+                    'div',
+                    null,
+                    React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🕐 Time of Day'),
+                    React.createElement('input', {
+                      type: 'text',
                       value: scene.time || '',
                       onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'time', e.target.value),
-                      className: 'pl-8 pr-3 py-2 border border-gray-300 rounded w-full text-sm resize-none',
-                      placeholder: 'Time of day',
-                      rows: 2
-                    })
-                  ),
-                  React.createElement('div', { className: 'relative' },
-                    React.createElement('span', { className: 'absolute left-2.5 top-2 text-sm pointer-events-none' }, '📝'),
-                    React.createElement('textarea', {
-                      value: scene.description || '',
-                      onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'description', e.target.value),
-                      className: 'pl-8 pr-3 py-2 border border-gray-300 rounded w-full text-sm resize-none',
-                      placeholder: 'Description',
-                      rows: 2
+                      className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
+                      placeholder: 'e.g., Evening, Night, Dawn'
                     })
                   )
                 ),
-                // Department Cues toggle
+                // ── Action / Summary ──────────────────────────────────────────────────────
+                React.createElement(
+                  'div',
+                  { className: 'mb-4' },
+                  React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '📝 Action / Summary'),
+                  React.createElement('textarea', {
+                    value: scene.description || '',
+                    onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'description', e.target.value),
+                    className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors resize-y',
+                    rows: 3,
+                    placeholder: 'Brief description of what happens in this scene…'
+                  })
+                ),
+                // ── Department Cues (collapsible by default) ─────────────────────────────────
                 React.createElement(
                   'button',
                   {
                     type: 'button',
                     onClick: () => toggleSection(`${actIndex}-${sceneIndex}`, 'cues'),
-                    className: 'flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 mt-3 mb-1 w-full select-none'
+                    className: 'flex items-center gap-2 w-full py-2 text-left select-none border-t border-gray-200 mt-1 hover:text-gray-700 transition-colors'
                   },
                   React.createElement(
                     'span',
-                    { className: 'transition-transform duration-150 ' + (isSectionOpen(`${actIndex}-${sceneIndex}`, 'cues') ? 'rotate-90' : '') },
+                    { className: 'text-gray-400 text-xs transition-transform duration-150 ' + (isSectionOpen(`${actIndex}-${sceneIndex}`, 'cues') ? 'rotate-90' : '') },
                     '▶'
                   ),
-                  React.createElement('span', null, ' Department Cues'),
-                  hasCueData(scene) && !isSectionOpen(`${actIndex}-${sceneIndex}`, 'cues')
-                    ? React.createElement('span', { className: 'ml-1 text-green-500 text-xs' }, '●')
-                    : null,
-                  !hasCueData(scene)
-                    ? React.createElement('span', { className: 'ml-auto text-gray-400 text-xs italic' }, 'not set')
-                    : null
+                  React.createElement('span', { className: 'text-xs font-semibold tracking-wide text-gray-500 uppercase' }, 'Department Cues'),
+                  hasCueData(scene)
+                    ? React.createElement('span', { className: 'w-2 h-2 rounded-full bg-green-500 ml-1 shrink-0', title: 'Has cue data' })
+                    : React.createElement('span', { className: 'ml-auto text-gray-400 text-xs italic font-normal normal-case tracking-normal' }, 'not set')
                 ),
-                // Department Cues collapsible content
                 isSectionOpen(`${actIndex}-${sceneIndex}`, 'cues') && React.createElement(
                   'div',
-                  { className: 'mt-1 pt-2 border-t border-gray-200 space-y-2' },
-                  // Lighting section
+                  { className: 'pb-3 space-y-3' },
                   React.createElement(
                     'div',
                     { className: 'grid grid-cols-1 md:grid-cols-2 gap-3' },
-                    React.createElement('div', { className: 'relative' },
-                      React.createElement('span', { className: 'absolute left-2.5 top-1/2 -translate-y-1/2 text-sm pointer-events-none' }, '💡'),
+                    React.createElement(
+                      'div',
+                      null,
+                      React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '💡 Lighting Mood'),
                       React.createElement('input', {
                         type: 'text',
                         value: scene.lightingMood || '',
                         onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'lightingMood', e.target.value),
-                        className: 'pl-8 pr-3 py-2 border border-gray-300 rounded w-full text-sm',
-                        placeholder: 'Lighting mood (e.g., warm, dramatic)'
+                        className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
+                        placeholder: 'e.g., warm, dramatic, cold'
                       })
                     ),
-                    React.createElement('div', { className: 'relative' },
-                      React.createElement('span', { className: 'absolute left-2.5 top-1/2 -translate-y-1/2 text-sm pointer-events-none' }, '🎨'),
+                    React.createElement(
+                      'div',
+                      null,
+                      React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🎨 Lighting Color'),
                       React.createElement('input', {
                         type: 'text',
                         value: scene.lightingColor || '',
                         onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'lightingColor', e.target.value),
-                        className: 'pl-8 pr-3 py-2 border border-gray-300 rounded w-full text-sm',
-                        placeholder: 'Lighting color (e.g., amber, blue wash)'
+                        className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
+                        placeholder: 'e.g., amber, blue wash'
                       })
                     )
                   ),
-                  // Sound section
                   React.createElement(
                     'div',
                     { className: 'grid grid-cols-1 md:grid-cols-4 gap-3' },
-                    React.createElement('div', { className: 'relative' },
-                      React.createElement('span', { className: 'absolute left-2.5 top-1/2 -translate-y-1/2 text-sm pointer-events-none' }, '🎵'),
+                    React.createElement(
+                      'div',
+                      null,
+                      React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🎵 Song / Cue Title'),
                       React.createElement('input', {
                         type: 'text',
                         value: scene.songTitle || '',
                         onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'songTitle', e.target.value),
-                        className: 'pl-8 pr-3 py-2 border border-gray-300 rounded w-full text-sm',
+                        className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
                         placeholder: 'Song title'
                       })
                     ),
-                    // Artist field OR Character selection depending on sound type
                     (() => {
                       if (scene.soundType === 'Musical Number') {
                         const sceneChars = (production.characters || []).filter(c => (scene.characterIds || []).includes(c.id));
                         return React.createElement(
                           'div',
                           null,
-                          React.createElement('label', { className: 'block text-xs text-gray-500 mb-1' }, '🎭 Performers (Characters)'),
+                          React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🎭 Performers'),
                           React.createElement(
                             'div',
-                            { className: 'border border-gray-300 rounded bg-white p-2 max-h-32 overflow-y-auto' },
+                            { className: 'border border-gray-300 rounded-lg bg-white p-2 max-h-32 overflow-y-auto' },
                             sceneChars.length === 0
-                              ? React.createElement('p', { className: 'text-xs text-gray-400 italic' }, 'No characters in scene. Add characters above first.')
+                              ? React.createElement('p', { className: 'text-xs text-gray-400 italic' }, 'No characters in scene yet')
                               : sceneChars.map(char => React.createElement(
                                   'label',
                                   { key: char.id, className: 'flex items-center gap-2 py-0.5 cursor-pointer hover:bg-gray-50 px-1 rounded' },
@@ -846,12 +831,10 @@ function SceneBuilder({ productionId: propId }) {
                                     checked: (scene.musicalCharacterIds || []).includes(char.id),
                                     onChange: (e) => {
                                       const current = scene.musicalCharacterIds || [];
-                                      const next = e.target.checked
-                                        ? [...current, char.id]
-                                        : current.filter(id => id !== char.id);
+                                      const next = e.target.checked ? [...current, char.id] : current.filter(id => id !== char.id);
                                       handleUpdateScene(actIndex, sceneIndex, 'musicalCharacterIds', next);
                                     },
-                                    className: 'w-4 h-4 text-violet-600 rounded border-gray-300'
+                                    className: 'w-4 h-4 text-violet-600 rounded border-gray-300 focus:ring-violet-500'
                                   }),
                                   React.createElement('span', { className: 'text-sm text-gray-700' }, char.name)
                                 ))
@@ -861,84 +844,85 @@ function SceneBuilder({ productionId: propId }) {
                             { className: 'flex flex-wrap gap-1 mt-1' },
                             (production.characters || [])
                               .filter(c => (scene.musicalCharacterIds || []).includes(c.id))
-                              .map(c => React.createElement(
-                                'span',
-                                { key: c.id, className: 'px-2 py-0.5 bg-violet-100 text-violet-700 text-xs rounded-full' },
-                                c.name
-                              ))
+                              .map(c => React.createElement('span', { key: c.id, className: 'px-2 py-0.5 bg-violet-100 text-violet-700 text-xs rounded-full' }, c.name))
                           )
                         );
                       }
-                      return React.createElement('div', { className: 'relative' },
-                        React.createElement('span', { className: 'absolute left-2.5 top-1/2 -translate-y-1/2 text-sm pointer-events-none' }, '🎤'),
+                      return React.createElement(
+                        'div',
+                        null,
+                        React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🎤 Artist'),
                         React.createElement('input', {
                           type: 'text',
                           value: scene.artist || '',
                           onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'artist', e.target.value),
-                          className: 'pl-8 pr-3 py-2 border border-gray-300 rounded w-full text-sm',
+                          className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
                           placeholder: 'Artist'
                         })
                       );
                     })(),
-                    React.createElement('div', { className: 'relative' },
-                      React.createElement('span', { className: 'absolute left-2.5 top-1/2 -translate-y-1/2 text-sm pointer-events-none' }, '⏱️'),
+                    React.createElement(
+                      'div',
+                      null,
+                      React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '⏱️ Duration'),
                       React.createElement('input', {
                         type: 'text',
                         value: scene.duration || '',
                         onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'duration', e.target.value),
-                        className: 'pl-8 pr-3 py-2 border border-gray-300 rounded w-full text-sm',
+                        className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
                         placeholder: 'Duration'
                       })
                     ),
                     React.createElement(
-                      'select',
-                      {
-                        value: scene.soundType || '',
-                        onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'soundType', e.target.value),
-                        className: 'px-3 py-2 border border-gray-300 rounded w-full text-sm bg-white'
-                      },
-                      React.createElement('option', { value: '' }, '🔊 Sound Type'),
-                      React.createElement('option', { value: 'Musical Number' }, '🎵 Musical Number'),
-                      React.createElement('option', { value: 'Underscore' }, 'Underscore'),
-                      React.createElement('option', { value: 'Incidental Music' }, 'Incidental Music'),
-                      React.createElement('option', { value: 'Diegetic / Onstage' }, 'Diegetic / Onstage'),
-                      React.createElement('option', { value: 'Atmosphere / Ambience' }, 'Atmosphere / Ambience'),
-                      React.createElement('option', { value: 'Stinger / Button' }, 'Stinger / Button'),
-                      React.createElement('option', { value: 'Effect (SFX)' }, 'Effect (SFX)')
+                      'div',
+                      null,
+                      React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🔊 Sound Type'),
+                      React.createElement(
+                        'select',
+                        {
+                          value: scene.soundType || '',
+                          onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'soundType', e.target.value),
+                          className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors'
+                        },
+                        React.createElement('option', { value: '' }, 'Select type…'),
+                        React.createElement('option', { value: 'Musical Number' }, '🎵 Musical Number'),
+                        React.createElement('option', { value: 'Underscore' }, 'Underscore'),
+                        React.createElement('option', { value: 'Incidental Music' }, 'Incidental Music'),
+                        React.createElement('option', { value: 'Diegetic / Onstage' }, 'Diegetic / Onstage'),
+                        React.createElement('option', { value: 'Atmosphere / Ambience' }, 'Atmosphere / Ambience'),
+                        React.createElement('option', { value: 'Stinger / Button' }, 'Stinger / Button'),
+                        React.createElement('option', { value: 'Effect (SFX)' }, 'Effect (SFX)')
+                      )
                     )
                   )
                 ),
-                // Production Notes toggle
+                // ── Production Notes (collapsible by default) ─────────────────────────────────
                 React.createElement(
                   'button',
                   {
                     type: 'button',
                     onClick: () => toggleSection(`${actIndex}-${sceneIndex}`, 'notes'),
-                    className: 'flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 mt-3 mb-1 w-full select-none'
+                    className: 'flex items-center gap-2 w-full py-2 text-left select-none border-t border-gray-200 mt-1 hover:text-gray-700 transition-colors'
                   },
                   React.createElement(
                     'span',
-                    { className: 'transition-transform duration-150 ' + (isSectionOpen(`${actIndex}-${sceneIndex}`, 'notes') ? 'rotate-90' : '') },
+                    { className: 'text-gray-400 text-xs transition-transform duration-150 ' + (isSectionOpen(`${actIndex}-${sceneIndex}`, 'notes') ? 'rotate-90' : '') },
                     '▶'
                   ),
-                  React.createElement('span', null, ' Production Notes'),
-                  hasNotes(scene) && !isSectionOpen(`${actIndex}-${sceneIndex}`, 'notes')
-                    ? React.createElement('span', { className: 'ml-1 text-green-500 text-xs' }, '●')
-                    : null,
-                  !hasNotes(scene)
-                    ? React.createElement('span', { className: 'ml-auto text-gray-400 text-xs italic' }, 'not set')
-                    : null
+                  React.createElement('span', { className: 'text-xs font-semibold tracking-wide text-gray-500 uppercase' }, 'Production Notes'),
+                  hasNotes(scene)
+                    ? React.createElement('span', { className: 'w-2 h-2 rounded-full bg-green-500 ml-1 shrink-0', title: 'Has notes' })
+                    : React.createElement('span', { className: 'ml-auto text-gray-400 text-xs italic font-normal normal-case tracking-normal' }, 'not set')
                 ),
-                // Production Notes collapsible content
                 isSectionOpen(`${actIndex}-${sceneIndex}`, 'notes') && React.createElement(
                   'div',
-                  { className: 'mt-1 pt-2 border-t border-gray-200' },
+                  { className: 'pb-2' },
                   React.createElement('textarea', {
                     value: scene.notes || '',
                     onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'notes', e.target.value),
-                    className: 'w-full px-3 py-2 border border-gray-300 rounded text-sm resize-y',
+                    className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors resize-y',
                     rows: 3,
-                    placeholder: 'Enter blocking notes, stage directions, choreography cues, or other production notes...'
+                    placeholder: 'Enter blocking notes, stage directions, choreography cues, or other production notes…'
                   })
                 )
               )
