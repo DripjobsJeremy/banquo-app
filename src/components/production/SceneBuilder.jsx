@@ -867,14 +867,17 @@ function SceneBuilder({ productionId: propId }) {
                     (() => {
                       if (scene.soundType === 'Musical Number') {
                         const sceneChars = scene.characters || [];
-                        const currentPerformers = Array.isArray(scene.musicalCharacters)
-                          ? scene.musicalCharacters
-                          : (scene.artist || '').split(',').map(s => s.trim()).filter(Boolean);
+                        const isFullCompany = scene.fullCompany === true;
+                        const currentPerformers = isFullCompany
+                          ? [...sceneChars]
+                          : (Array.isArray(scene.musicalCharacters)
+                              ? scene.musicalCharacters
+                              : (scene.artist || '').split(',').map(s => s.trim()).filter(Boolean));
                         const availableToAdd = sceneChars.filter(c => !currentPerformers.includes(c));
-                        const isFullCompany = sceneChars.length > 0 && currentPerformers.length === sceneChars.length;
                         const updatePerformers = (updated) => {
                           handleUpdateScene(actIndex, sceneIndex, 'musicalCharacters', updated);
                           handleUpdateScene(actIndex, sceneIndex, 'artist', updated.join(', '));
+                          handleUpdateScene(actIndex, sceneIndex, 'fullCompany', false);
                         };
                         return React.createElement(
                           'div',
@@ -883,7 +886,7 @@ function SceneBuilder({ productionId: propId }) {
                             'div',
                             { className: 'flex items-center justify-between mb-2' },
                             React.createElement('label', { className: 'text-xs font-medium', style: { color: 'var(--color-text-muted)' } }, '🎭 Performers'),
-                            React.createElement('span', { className: 'text-xs', style: { color: 'var(--color-text-muted)' } }, currentPerformers.length + ' of ' + sceneChars.length)
+                            React.createElement('span', { className: 'text-xs', style: { color: 'var(--color-text-muted)' } }, isFullCompany ? sceneChars.length + ' of ' + sceneChars.length : currentPerformers.length + ' of ' + sceneChars.length)
                           ),
                           sceneChars.length === 0
                             ? React.createElement('p', {
@@ -897,7 +900,17 @@ function SceneBuilder({ productionId: propId }) {
                                   'button',
                                   {
                                     type: 'button',
-                                    onClick: () => updatePerformers(isFullCompany ? [] : [...sceneChars]),
+                                    onClick: () => {
+                                      if (isFullCompany) {
+                                        handleUpdateScene(actIndex, sceneIndex, 'fullCompany', false);
+                                        handleUpdateScene(actIndex, sceneIndex, 'musicalCharacters', []);
+                                        handleUpdateScene(actIndex, sceneIndex, 'artist', '');
+                                      } else {
+                                        handleUpdateScene(actIndex, sceneIndex, 'fullCompany', true);
+                                        handleUpdateScene(actIndex, sceneIndex, 'musicalCharacters', [...sceneChars]);
+                                        handleUpdateScene(actIndex, sceneIndex, 'artist', 'Full Company');
+                                      }
+                                    },
                                     className: 'w-full px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
                                     style: {
                                       backgroundColor: isFullCompany ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
@@ -907,7 +920,7 @@ function SceneBuilder({ productionId: propId }) {
                                   },
                                   isFullCompany ? '✓ Full Company' : '+ Full Company'
                                 ),
-                                currentPerformers.length > 0 && !isFullCompany
+                                !isFullCompany && currentPerformers.length > 0
                                   ? React.createElement(
                                       'div',
                                       { className: 'flex flex-wrap gap-1' },
