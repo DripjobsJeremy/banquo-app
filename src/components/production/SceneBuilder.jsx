@@ -682,54 +682,83 @@ function SceneBuilder({ productionId: propId }) {
                   'div',
                   { className: 'mb-4' },
                   React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🎭 Characters in Scene'),
-                  ((scene.characterIds || []).length > 0 || (scene.characters || []).length > 0) && React.createElement(
-                    'div',
-                    { className: 'flex flex-wrap gap-1 mb-2' },
-                    (scene.characterIds || []).map(charId => {
-                      const char = (production.characters || []).find(c => c.id === charId);
-                      if (!char) return null;
-                      return React.createElement(
-                        'span',
-                        { key: charId, className: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-violet-100 text-violet-800' },
-                        char.name,
-                        React.createElement('button', {
-                          type: 'button',
-                          onClick: () => handleUpdateScene(actIndex, sceneIndex, 'characterIds', (scene.characterIds || []).filter(id => id !== charId)),
-                          className: 'ml-0.5 text-violet-500 hover:text-violet-900 font-bold leading-none'
-                        }, '×')
-                      );
-                    }),
-                    (scene.characters || []).map((charName, i) =>
-                      React.createElement(
-                        'span',
-                        { key: `fc-${i}`, className: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-violet-100 text-violet-800' },
-                        charName,
-                        React.createElement('button', {
-                          type: 'button',
-                          onClick: () => handleUpdateScene(actIndex, sceneIndex, 'characters', (scene.characters || []).filter((_, idx) => idx !== i)),
-                          className: 'ml-0.5 text-violet-500 hover:text-violet-900 font-bold leading-none'
-                        }, '×')
-                      )
-                    )
-                  ),
+                  (() => {
+                    const sceneCharsArr = scene.characters || [];
+                    const isFullCompanyScene = sceneCharsArr.includes('Full Company');
+                    const hasAnyChars = (scene.characterIds || []).length > 0 || sceneCharsArr.length > 0;
+                    if (!hasAnyChars) return null;
+                    return React.createElement(
+                      'div',
+                      { className: 'flex flex-wrap gap-1 mb-2' },
+                      isFullCompanyScene
+                        ? React.createElement(
+                            'span',
+                            {
+                              className: 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium',
+                              style: { backgroundColor: 'var(--color-primary-surface)', color: 'var(--color-primary)', border: '1px solid var(--color-primary)' }
+                            },
+                            '🎭 Full Company',
+                            React.createElement('button', {
+                              type: 'button',
+                              onClick: () => handleUpdateScene(actIndex, sceneIndex, 'characters', []),
+                              style: { background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-primary)', marginLeft: '2px' }
+                            }, '×')
+                          )
+                        : [
+                            ...(scene.characterIds || []).map(charId => {
+                              const char = (production.characters || []).find(c => c.id === charId);
+                              if (!char) return null;
+                              return React.createElement(
+                                'span',
+                                { key: charId, className: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-violet-100 text-violet-800' },
+                                char.name,
+                                React.createElement('button', {
+                                  type: 'button',
+                                  onClick: () => handleUpdateScene(actIndex, sceneIndex, 'characterIds', (scene.characterIds || []).filter(id => id !== charId)),
+                                  className: 'ml-0.5 text-violet-500 hover:text-violet-900 font-bold leading-none'
+                                }, '×')
+                              );
+                            }),
+                            ...sceneCharsArr.map((charName, i) =>
+                              React.createElement(
+                                'span',
+                                { key: `fc-${i}`, className: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-violet-100 text-violet-800' },
+                                charName,
+                                React.createElement('button', {
+                                  type: 'button',
+                                  onClick: () => handleUpdateScene(actIndex, sceneIndex, 'characters', sceneCharsArr.filter((_, idx) => idx !== i)),
+                                  className: 'ml-0.5 text-violet-500 hover:text-violet-900 font-bold leading-none'
+                                }, '×')
+                              )
+                            )
+                          ]
+                    );
+                  })(),
                   (() => {
                     // castCharacters comes from component-level state (kept fresh from localStorage)
                     const sceneCharacters = scene.characters || [];
                     const available = castCharacters.filter(c => !sceneCharacters.includes(c));
                     if (castCharacters.length > 0) {
+                      const isFullCompanyScene = (scene.characters || []).includes('Full Company');
+                      if (isFullCompanyScene) return null;
                       return React.createElement(
                         'select',
                         {
                           value: '',
                           onChange: e => {
-                            const name = e.target.value;
-                            if (!name) return;
-                            const unique = Array.from(new Set([...(scene.characters || []), name]));
-                            handleUpdateScene(actIndex, sceneIndex, 'characters', unique);
+                            const val = e.target.value;
+                            if (!val) return;
+                            if (val === '__full_company__') {
+                              handleUpdateScene(actIndex, sceneIndex, 'characters', ['Full Company']);
+                            } else {
+                              const unique = Array.from(new Set([...(scene.characters || []), val]));
+                              handleUpdateScene(actIndex, sceneIndex, 'characters', unique);
+                            }
                           },
                           className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors'
                         },
-                        React.createElement('option', { value: '' }, available.length > 0 ? '+ Add character from Cast List...' : '✓ All cast members added'),
+                        React.createElement('option', { value: '' }, '+ Add character from Cast List...'),
+                        React.createElement('option', { value: '__full_company__' }, '🎭 Full Company'),
                         ...available.map(char => React.createElement('option', { key: char, value: char }, char))
                       );
                     }
@@ -778,12 +807,12 @@ function SceneBuilder({ productionId: propId }) {
                     'div',
                     null,
                     React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🕐 Time of Day'),
-                    React.createElement('input', {
-                      type: 'text',
+                    React.createElement(SmartDropdown, {
+                      field: 'timeOfDay',
                       value: scene.time || '',
-                      onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'time', e.target.value),
-                      className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
-                      placeholder: 'e.g., Evening, Night, Dawn'
+                      defaultOptions: TIME_OF_DAY_OPTIONS,
+                      onChange: (val) => handleUpdateScene(actIndex, sceneIndex, 'time', val),
+                      placeholder: 'Select time of day...'
                     })
                   )
                 ),
@@ -828,12 +857,12 @@ function SceneBuilder({ productionId: propId }) {
                       'div',
                       null,
                       React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '💡 Lighting Mood'),
-                      React.createElement('input', {
-                        type: 'text',
+                      React.createElement(SmartDropdown, {
+                        field: 'lightingMood',
                         value: scene.lightingMood || '',
-                        onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'lightingMood', e.target.value),
-                        className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
-                        placeholder: 'e.g., warm, dramatic, cold'
+                        defaultOptions: LIGHTING_MOOD_OPTIONS,
+                        onChange: (val) => handleUpdateScene(actIndex, sceneIndex, 'lightingMood', val),
+                        placeholder: 'Select lighting mood...'
                       })
                     ),
                     React.createElement(
@@ -965,8 +994,8 @@ function SceneBuilder({ productionId: propId }) {
                                   },
                                   className: 'text-xs px-3 py-1 rounded-full font-medium transition-colors',
                                   style: {
-                                    backgroundColor: isFullCompany ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
-                                    color: isFullCompany ? '#ffffff' : 'var(--color-text-secondary)',
+                                    backgroundColor: isFullCompany ? 'var(--color-primary-surface)' : 'var(--color-bg-elevated)',
+                                    color: isFullCompany ? 'var(--color-primary)' : 'var(--color-text-secondary)',
                                     border: '1px solid ' + (isFullCompany ? 'var(--color-primary)' : 'var(--color-border)'),
                                   }
                                 },
@@ -1168,6 +1197,104 @@ function SceneBuilder({ productionId: propId }) {
         )
       )
     : null;
+
+  // ── SmartDropdown helpers ──────────────────────────────────────────────────
+  const CUSTOM_VALUES_KEY = 'scenestave_custom_field_values';
+  const getCustomValues = (field) => {
+    try {
+      const all = JSON.parse(localStorage.getItem(CUSTOM_VALUES_KEY) || '{}');
+      return all[field] || [];
+    } catch { return []; }
+  };
+  const saveCustomValue = (field, value) => {
+    try {
+      const all = JSON.parse(localStorage.getItem(CUSTOM_VALUES_KEY) || '{}');
+      const existing = all[field] || [];
+      if (!existing.includes(value)) {
+        all[field] = [...existing, value];
+        localStorage.setItem(CUSTOM_VALUES_KEY, JSON.stringify(all));
+      }
+    } catch {}
+  };
+  const TIME_OF_DAY_OPTIONS = [
+    'Dawn', 'Morning', 'Midday', 'Afternoon', 'Dusk',
+    'Evening', 'Night', 'Midnight', 'Pre-show', 'Intermission', 'Post-show'
+  ];
+  const LIGHTING_MOOD_OPTIONS = [
+    'Warm', 'Cool', 'Neutral', 'Bright', 'Dim', 'Dark',
+    'Dramatic', 'Romantic', 'Mysterious', 'Tense', 'Joyful',
+    'Melancholic', 'Ethereal', 'Harsh', 'Soft', 'Spotlight'
+  ];
+  const SmartDropdown = ({ field, value, defaultOptions, onChange, placeholder }) => {
+    const [showCustomInput, setShowCustomInput] = React.useState(false);
+    const [customText, setCustomText] = React.useState('');
+    const [customOptions, setCustomOptions] = React.useState(() => getCustomValues(field));
+    const allOptions = [...defaultOptions, ...customOptions.filter(c => !defaultOptions.includes(c))];
+    if (showCustomInput) {
+      return React.createElement(
+        'div',
+        { className: 'flex gap-2' },
+        React.createElement('input', {
+          autoFocus: true,
+          type: 'text',
+          value: customText,
+          onChange: (e) => setCustomText(e.target.value),
+          onKeyDown: (e) => {
+            if (e.key === 'Enter') {
+              const val = customText.trim();
+              if (val) {
+                saveCustomValue(field, val);
+                setCustomOptions(getCustomValues(field));
+                onChange(val);
+              }
+              setShowCustomInput(false);
+              setCustomText('');
+            }
+            if (e.key === 'Escape') {
+              setShowCustomInput(false);
+              setCustomText('');
+            }
+          },
+          placeholder: 'Type and press Enter...',
+          className: 'flex-1 px-3 py-2 rounded-lg text-sm',
+          style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', border: '1px solid var(--color-primary)' }
+        }),
+        React.createElement(
+          'button',
+          {
+            type: 'button',
+            onClick: () => { setShowCustomInput(false); setCustomText(''); },
+            className: 'px-3 py-2 rounded-lg text-sm',
+            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }
+          },
+          '✕'
+        )
+      );
+    }
+    return React.createElement(
+      'select',
+      {
+        value: value || '',
+        onChange: (e) => {
+          if (e.target.value === '__custom__') {
+            setShowCustomInput(true);
+          } else {
+            onChange(e.target.value);
+          }
+        },
+        className: 'w-full px-3 py-2 rounded-lg text-sm',
+        style: {
+          backgroundColor: 'var(--color-bg-elevated)',
+          color: value ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
+          border: '1px solid var(--color-border)'
+        }
+      },
+      React.createElement('option', { value: '' }, placeholder),
+      allOptions.map(opt => React.createElement('option', { key: opt, value: opt }, opt)),
+      React.createElement('option', { value: '__custom__' }, '+ Add custom...')
+    );
+  };
+
 
   return React.createElement(
     'div',
