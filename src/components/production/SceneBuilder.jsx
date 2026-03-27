@@ -4,6 +4,17 @@ const { Link, useParams } = window.ReactRouterDOM || {};
 // Global SceneBuilder component - uses React Router useParams for production ID
 const CUSTOM_VALUES_KEY = 'scenestave_custom_field_values';
 
+const TIME_OF_DAY_OPTIONS = [
+  'Dawn', 'Morning', 'Midday', 'Afternoon', 'Dusk',
+  'Evening', 'Night', 'Midnight', 'Pre-show', 'Intermission', 'Post-show'
+];
+
+const LIGHTING_MOOD_OPTIONS = [
+  'Warm', 'Cool', 'Neutral', 'Bright', 'Dim', 'Dark',
+  'Dramatic', 'Romantic', 'Mysterious', 'Tense', 'Joyful',
+  'Melancholic', 'Ethereal', 'Harsh', 'Soft', 'Spotlight'
+];
+
 const getCustomValues = (field) => {
   try {
     const all = JSON.parse(localStorage.getItem(CUSTOM_VALUES_KEY) || '{}');
