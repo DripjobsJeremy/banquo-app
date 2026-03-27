@@ -851,172 +851,219 @@ function SceneBuilder({ productionId: propId }) {
                   ),
                   React.createElement(
                     'div',
-                    { className: 'grid grid-cols-1 md:grid-cols-4 gap-3' },
+                    { className: 'space-y-3' },
                     React.createElement(
                       'div',
-                      null,
-                      React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🎵 Song / Cue Title'),
-                      React.createElement('input', {
-                        type: 'text',
-                        value: scene.songTitle || '',
-                        onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'songTitle', e.target.value),
-                        className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
-                        placeholder: 'Song title'
-                      })
-                    ),
-                    (() => {
-                      if (scene.soundType === 'Musical Number') {
-                        const sceneChars = scene.characters || [];
-                        const isFullCompany = scene.fullCompany === true;
-                        const currentPerformers = isFullCompany
-                          ? [...sceneChars]
-                          : (Array.isArray(scene.musicalCharacters)
-                              ? scene.musicalCharacters
-                              : (scene.artist || '').split(',').map(s => s.trim()).filter(Boolean));
-                        const availableToAdd = sceneChars.filter(c => !currentPerformers.includes(c));
-                        const updatePerformers = (updated) => {
-                          handleUpdateScene(actIndex, sceneIndex, 'musicalCharacters', updated);
-                          handleUpdateScene(actIndex, sceneIndex, 'artist', updated.join(', '));
-                          handleUpdateScene(actIndex, sceneIndex, 'fullCompany', false);
-                        };
-                        return React.createElement(
-                          'div',
-                          null,
-                          React.createElement(
-                            'div',
-                            { className: 'flex items-center justify-between mb-2' },
-                            React.createElement('label', { className: 'text-xs font-medium', style: { color: 'var(--color-text-muted)' } }, '🎭 Performers'),
-                            React.createElement('span', { className: 'text-xs', style: { color: 'var(--color-text-muted)' } }, isFullCompany ? sceneChars.length + ' of ' + sceneChars.length : currentPerformers.length + ' of ' + sceneChars.length)
-                          ),
-                          sceneChars.length === 0
-                            ? React.createElement('p', {
-                                className: 'text-xs px-3 py-2 rounded-lg',
-                                style: { color: 'var(--color-text-muted)', backgroundColor: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }
-                              }, 'No characters in scene — add characters above first')
-                            : React.createElement(
-                                'div',
-                                { className: 'space-y-2' },
-                                React.createElement(
-                                  'button',
-                                  {
-                                    type: 'button',
-                                    onClick: () => {
-                                      if (isFullCompany) {
-                                        handleUpdateScene(actIndex, sceneIndex, 'fullCompany', false);
-                                        handleUpdateScene(actIndex, sceneIndex, 'musicalCharacters', []);
-                                        handleUpdateScene(actIndex, sceneIndex, 'artist', '');
-                                      } else {
-                                        handleUpdateScene(actIndex, sceneIndex, 'fullCompany', true);
-                                        handleUpdateScene(actIndex, sceneIndex, 'musicalCharacters', [...sceneChars]);
-                                        handleUpdateScene(actIndex, sceneIndex, 'artist', 'Full Company');
-                                      }
-                                    },
-                                    className: 'w-full px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
-                                    style: {
-                                      backgroundColor: isFullCompany ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
-                                      color: isFullCompany ? '#ffffff' : 'var(--color-text-secondary)',
-                                      border: '1px solid ' + (isFullCompany ? 'var(--color-primary)' : 'var(--color-border)'),
-                                    }
-                                  },
-                                  isFullCompany ? '✓ Full Company' : '+ Full Company'
-                                ),
-                                !isFullCompany && currentPerformers.length > 0
-                                  ? React.createElement(
-                                      'div',
-                                      { className: 'flex flex-wrap gap-1' },
-                                      currentPerformers.map(p =>
-                                        React.createElement(
-                                          'span',
-                                          {
-                                            key: p,
-                                            className: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium',
-                                            style: { backgroundColor: 'var(--color-primary-surface)', color: 'var(--color-primary)' }
-                                          },
-                                          p,
-                                          React.createElement(
-                                            'button',
-                                            {
-                                              type: 'button',
-                                              onClick: () => updatePerformers(currentPerformers.filter(x => x !== p)),
-                                              style: { background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-primary)', lineHeight: 1, padding: '0 1px' }
-                                            },
-                                            '×'
-                                          )
-                                        )
-                                      )
-                                    )
-                                  : null,
-                                !isFullCompany && availableToAdd.length > 0
-                                  ? React.createElement(
-                                      'select',
-                                      {
-                                        value: '',
-                                        onChange: (e) => {
-                                          if (!e.target.value) return;
-                                          updatePerformers([...currentPerformers, e.target.value]);
-                                        },
-                                        className: 'w-full px-3 py-2 rounded-lg text-sm',
-                                        style: {
-                                          backgroundColor: 'var(--color-bg-elevated)',
-                                          color: 'var(--color-text-muted)',
-                                          border: '1px solid var(--color-border)',
-                                        }
-                                      },
-                                      React.createElement('option', { value: '' }, '+ Add performer...'),
-                                      availableToAdd.map(char =>
-                                        React.createElement('option', { key: char, value: char }, char)
-                                      )
-                                    )
-                                  : null
-                              )
-                        );
-                      }
-                      return React.createElement(
+                      { className: 'grid gap-3', style: { gridTemplateColumns: '1fr auto auto' } },
+                      React.createElement(
                         'div',
                         null,
-                        React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🎤 Artist / Composer'),
+                        React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🎵 Song / Cue Title'),
                         React.createElement('input', {
                           type: 'text',
-                          value: scene.artist || '',
-                          onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'artist', e.target.value),
+                          value: scene.songTitle || '',
+                          onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'songTitle', e.target.value),
                           className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
-                          placeholder: 'e.g., Stephen Sondheim'
+                          placeholder: 'Song title'
                         })
-                      );
-                    })(),
-                    React.createElement(
-                      'div',
-                      null,
-                      React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '⏱️ Duration'),
-                      React.createElement('input', {
-                        type: 'text',
-                        value: scene.duration || '',
-                        onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'duration', e.target.value),
-                        className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
-                        placeholder: 'Duration'
-                      })
-                    ),
-                    React.createElement(
-                      'div',
-                      null,
-                      React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🔊 Sound Type'),
+                      ),
                       React.createElement(
-                        'select',
-                        {
-                          value: scene.soundType || '',
-                          onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'soundType', e.target.value),
-                          className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors'
-                        },
-                        React.createElement('option', { value: '' }, 'Select type…'),
-                        React.createElement('option', { value: 'Musical Number' }, '🎵 Musical Number'),
-                        React.createElement('option', { value: 'Underscore' }, 'Underscore'),
-                        React.createElement('option', { value: 'Incidental Music' }, 'Incidental Music'),
-                        React.createElement('option', { value: 'Diegetic / Onstage' }, 'Diegetic / Onstage'),
-                        React.createElement('option', { value: 'Atmosphere / Ambience' }, 'Atmosphere / Ambience'),
-                        React.createElement('option', { value: 'Stinger / Button' }, 'Stinger / Button'),
-                        React.createElement('option', { value: 'Effect (SFX)' }, 'Effect (SFX)')
+                        'div',
+                        null,
+                        React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '⏱ Duration'),
+                        React.createElement('input', {
+                          type: 'text',
+                          value: scene.duration || '',
+                          onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'duration', e.target.value),
+                          className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
+                          placeholder: 'Duration'
+                        })
+                      ),
+                      React.createElement(
+                        'div',
+                        null,
+                        React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🔊 Sound Type'),
+                        React.createElement(
+                          'select',
+                          {
+                            value: scene.soundType || '',
+                            onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'soundType', e.target.value),
+                            className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors'
+                          },
+                          React.createElement('option', { value: '' }, 'Select type…'),
+                          React.createElement('option', { value: 'Musical Number' }, '🎵 Musical Number'),
+                          React.createElement('option', { value: 'Underscore' }, 'Underscore'),
+                          React.createElement('option', { value: 'Incidental Music' }, 'Incidental Music'),
+                          React.createElement('option', { value: 'Diegetic / Onstage' }, 'Diegetic / Onstage'),
+                          React.createElement('option', { value: 'Atmosphere / Ambience' }, 'Atmosphere / Ambience'),
+                          React.createElement('option', { value: 'Stinger / Button' }, 'Stinger / Button'),
+                          React.createElement('option', { value: 'Effect (SFX)' }, 'Effect (SFX)')
+                        )
                       )
-                    )
+                    ),
+                    scene.soundType !== 'Musical Number'
+                      ? React.createElement(
+                          'div',
+                          null,
+                          React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🎤 Artist / Composer'),
+                          React.createElement('input', {
+                            type: 'text',
+                            value: scene.artist || '',
+                            onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'artist', e.target.value),
+                            className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
+                            placeholder: 'e.g., Stephen Sondheim'
+                          })
+                        )
+                      : null,
+                    scene.soundType === 'Musical Number'
+                      ? (() => {
+                          const sceneChars = scene.characters || [];
+                          const isFullCompany = scene.fullCompany === true;
+                          const currentPerformers = isFullCompany
+                            ? [...sceneChars]
+                            : (Array.isArray(scene.musicalCharacters)
+                                ? scene.musicalCharacters
+                                : (scene.artist || '').split(',').map(s => s.trim()).filter(Boolean));
+                          const availableToAdd = sceneChars.filter(c => !currentPerformers.includes(c));
+                          const updatePerformers = (updated) => {
+                            handleUpdateScene(actIndex, sceneIndex, 'musicalCharacters', updated);
+                            handleUpdateScene(actIndex, sceneIndex, 'artist', updated.join(', '));
+                            handleUpdateScene(actIndex, sceneIndex, 'fullCompany', false);
+                          };
+                          return React.createElement(
+                            'div',
+                            { className: 'space-y-2' },
+                            React.createElement(
+                              'div',
+                              { className: 'flex items-center justify-between' },
+                              React.createElement('label', { className: 'text-xs font-medium', style: { color: 'var(--color-text-muted)' } }, '🎭 Performers'),
+                              React.createElement(
+                                'button',
+                                {
+                                  type: 'button',
+                                  onClick: () => {
+                                    if (isFullCompany) {
+                                      handleUpdateScene(actIndex, sceneIndex, 'fullCompany', false);
+                                      handleUpdateScene(actIndex, sceneIndex, 'musicalCharacters', []);
+                                      handleUpdateScene(actIndex, sceneIndex, 'artist', '');
+                                    } else {
+                                      handleUpdateScene(actIndex, sceneIndex, 'fullCompany', true);
+                                      handleUpdateScene(actIndex, sceneIndex, 'musicalCharacters', [...sceneChars]);
+                                      handleUpdateScene(actIndex, sceneIndex, 'artist', 'Full Company');
+                                    }
+                                  },
+                                  className: 'text-xs px-3 py-1 rounded-full font-medium transition-colors',
+                                  style: {
+                                    backgroundColor: isFullCompany ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
+                                    color: isFullCompany ? '#ffffff' : 'var(--color-text-secondary)',
+                                    border: '1px solid ' + (isFullCompany ? 'var(--color-primary)' : 'var(--color-border)'),
+                                  }
+                                },
+                                isFullCompany ? '✓ Full Company' : '+ Full Company'
+                              )
+                            ),
+                            sceneChars.length === 0
+                              ? React.createElement('p', {
+                                  className: 'text-xs px-3 py-2 rounded-lg',
+                                  style: { color: 'var(--color-text-muted)', backgroundColor: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }
+                                }, 'No characters in scene — add characters above first')
+                              : React.createElement(
+                                  'div',
+                                  { className: 'rounded-lg overflow-hidden', style: { border: '1px solid var(--color-border)' } },
+                                  React.createElement(
+                                    'div',
+                                    {
+                                      className: 'grid text-xs font-semibold uppercase tracking-wide px-3 py-2',
+                                      style: { gridTemplateColumns: '1fr 80px 100px 1fr', backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-muted)', borderBottom: '1px solid var(--color-border)' }
+                                    },
+                                    React.createElement('span', null, 'Character'),
+                                    React.createElement('span', null, 'Mic #'),
+                                    React.createElement('span', null, 'Level'),
+                                    React.createElement('span', null, 'Custom')
+                                  ),
+                                  (isFullCompany ? sceneChars : currentPerformers).map(char => {
+                                    const mic = (scene.micAssignments || {})[char] || {};
+                                    const updateMic = (field, value) => {
+                                      const existing = scene.micAssignments || {};
+                                      handleUpdateScene(actIndex, sceneIndex, 'micAssignments', {
+                                        ...existing,
+                                        [char]: { ...(existing[char] || {}), [field]: value }
+                                      });
+                                    };
+                                    return React.createElement(
+                                      'div',
+                                      {
+                                        key: char,
+                                        className: 'grid items-center px-3 py-2 gap-2',
+                                        style: { gridTemplateColumns: '1fr 80px 100px 1fr', borderTop: '1px solid var(--color-border)' }
+                                      },
+                                      React.createElement(
+                                        'div',
+                                        { className: 'flex items-center gap-1 min-w-0' },
+                                        !isFullCompany ? React.createElement(
+                                          'button',
+                                          {
+                                            type: 'button',
+                                            onClick: () => updatePerformers(currentPerformers.filter(x => x !== char)),
+                                            className: 'text-xs flex-shrink-0',
+                                            style: { background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }
+                                          },
+                                          '×'
+                                        ) : null,
+                                        React.createElement('span', { className: 'text-sm truncate', style: { color: 'var(--color-text-primary)' } }, char)
+                                      ),
+                                      React.createElement('input', {
+                                        type: 'number',
+                                        min: '1',
+                                        max: '99',
+                                        placeholder: '—',
+                                        value: mic.micNumber || '',
+                                        onChange: (e) => updateMic('micNumber', e.target.value),
+                                        className: 'w-full px-2 py-1 rounded text-sm text-center',
+                                        style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)' }
+                                      }),
+                                      React.createElement('input', {
+                                        type: 'text',
+                                        placeholder: 'e.g. -6dB',
+                                        value: mic.level || '',
+                                        onChange: (e) => updateMic('level', e.target.value),
+                                        className: 'w-full px-2 py-1 rounded text-sm',
+                                        style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)' }
+                                      }),
+                                      React.createElement('input', {
+                                        type: 'text',
+                                        placeholder: 'Notes...',
+                                        value: mic.custom || '',
+                                        onChange: (e) => updateMic('custom', e.target.value),
+                                        className: 'w-full px-2 py-1 rounded text-sm',
+                                        style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)' }
+                                      })
+                                    );
+                                  }),
+                                  !isFullCompany && availableToAdd.length > 0
+                                    ? React.createElement(
+                                        'div',
+                                        { className: 'px-3 py-2', style: { borderTop: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg-elevated)' } },
+                                        React.createElement(
+                                          'select',
+                                          {
+                                            value: '',
+                                            onChange: (e) => {
+                                              if (!e.target.value) return;
+                                              updatePerformers([...currentPerformers, e.target.value]);
+                                            },
+                                            className: 'w-full px-2 py-1.5 rounded text-sm',
+                                            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }
+                                          },
+                                          React.createElement('option', { value: '' }, '+ Add performer...'),
+                                          availableToAdd.map(char => React.createElement('option', { key: char, value: char }, char))
+                                        )
+                                      )
+                                    : null
+                                )
+                          );
+                        })()
+                      : null
                   )
                 ),
                 // ── Production Notes (collapsible by default) ─────────────────────────────────
