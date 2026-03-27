@@ -1380,3 +1380,6 @@ function SceneBuilder({ productionId: propId }) {
 }
 
 window.SceneBuilder = SceneBuilder;
+window.SmartDropdown = SmartDropdown;
+window.LIGHTING_MOOD_OPTIONS = LIGHTING_MOOD_OPTIONS;
+

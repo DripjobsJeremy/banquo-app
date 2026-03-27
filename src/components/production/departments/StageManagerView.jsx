@@ -271,7 +271,7 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                       })(),
                       // Sound
                       (() => {
-                        const soundVal = [scene.soundSong, scene.soundArtist, scene.soundType].filter(Boolean).join(' • ') || null;
+                        const soundVal = [scene.songTitle, scene.artist, scene.soundType].filter(Boolean).join(' • ') || null;
                         const soundEmpty = isEmpty(soundVal);
                         return React.createElement(
                           'div',

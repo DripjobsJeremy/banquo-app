@@ -122,6 +122,11 @@ function LightingView({ production, onUpdateScene }) {
                       { className: 'text-sm font-medium text-gray-800' },
                       scene.name
                     ),
+                    scene.time && React.createElement(
+                      'span',
+                      { className: 'text-xs ml-auto', style: { color: 'var(--color-text-muted)' } },
+                      '🕐 ' + scene.time
+                    ),
                     // Character count
                     scene.characterIds?.length > 0 && React.createElement(
                       'span',
@@ -151,13 +156,21 @@ function LightingView({ production, onUpdateScene }) {
                       'div',
                       null,
                       React.createElement('label', { className: 'block text-xs text-gray-500 mb-1' }, 'Mood'),
-                      React.createElement('input', {
-                        type: 'text',
-                        value: scene.lightingMood || '',
-                        onChange: (e) => handleLightingUpdate(actIndex, sceneIndex, 'lightingMood', e.target.value),
-                        className: 'w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500',
-                        placeholder: 'e.g., warm, dramatic'
-                      })
+                      window.SmartDropdown
+                        ? React.createElement(window.SmartDropdown, {
+                            field: 'lightingMood',
+                            value: scene.lightingMood || '',
+                            defaultOptions: window.LIGHTING_MOOD_OPTIONS || ['Warm','Cool','Neutral','Bright','Dim','Dark','Dramatic','Romantic','Mysterious','Tense','Joyful','Melancholic','Ethereal','Harsh','Soft','Spotlight'],
+                            onChange: (val) => handleLightingUpdate(actIndex, sceneIndex, 'lightingMood', val),
+                            placeholder: 'Select lighting mood...'
+                          })
+                        : React.createElement('input', {
+                            type: 'text',
+                            value: scene.lightingMood || '',
+                            onChange: (e) => handleLightingUpdate(actIndex, sceneIndex, 'lightingMood', e.target.value),
+                            className: 'w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500',
+                            placeholder: 'e.g., warm, dramatic'
+                          })
                     ),
                     // Color
                     React.createElement(
