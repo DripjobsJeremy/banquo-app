@@ -1011,16 +1011,19 @@ function SceneBuilder({ productionId: propId }) {
                                       React.createElement(
                                         'div',
                                         { className: 'flex items-center gap-1 min-w-0' },
-                                        !isFullCompany ? React.createElement(
+                                        React.createElement(
                                           'button',
                                           {
                                             type: 'button',
-                                            onClick: () => updatePerformers(currentPerformers.filter(x => x !== char)),
+                                            onClick: () => {
+                                              const base = isFullCompany ? [...castCharacters] : [...currentPerformers];
+                                              updatePerformers(base.filter(x => x !== char));
+                                            },
                                             className: 'text-xs flex-shrink-0',
                                             style: { background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }
                                           },
                                           '×'
-                                        ) : null,
+                                        ),
                                         React.createElement('span', { className: 'text-sm truncate', style: { color: 'var(--color-text-primary)' } }, char)
                                       ),
                                       React.createElement('input', {
