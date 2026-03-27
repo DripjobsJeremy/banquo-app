@@ -887,7 +887,18 @@ function SceneBuilder({ productionId: propId }) {
                           'select',
                           {
                             value: scene.soundType || '',
-                            onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'soundType', e.target.value),
+                            onChange: (e) => {
+                              const newType = e.target.value;
+                              const wasMusical = scene.soundType === 'Musical Number';
+                              const isNowMusical = newType === 'Musical Number';
+                              handleUpdateScene(actIndex, sceneIndex, 'soundType', newType);
+                              if (wasMusical && !isNowMusical) {
+                                handleUpdateScene(actIndex, sceneIndex, 'artist', '');
+                                handleUpdateScene(actIndex, sceneIndex, 'musicalCharacters', []);
+                                handleUpdateScene(actIndex, sceneIndex, 'fullCompany', false);
+                                handleUpdateScene(actIndex, sceneIndex, 'micAssignments', {});
+                              }
+                            },
                             className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors'
                           },
                           React.createElement('option', { value: '' }, 'Select type…'),
@@ -948,7 +959,7 @@ function SceneBuilder({ productionId: propId }) {
                                       handleUpdateScene(actIndex, sceneIndex, 'artist', '');
                                     } else {
                                       handleUpdateScene(actIndex, sceneIndex, 'fullCompany', true);
-                                      handleUpdateScene(actIndex, sceneIndex, 'musicalCharacters', [...sceneChars]);
+                                      handleUpdateScene(actIndex, sceneIndex, 'musicalCharacters', [...castCharacters]);
                                       handleUpdateScene(actIndex, sceneIndex, 'artist', 'Full Company');
                                     }
                                   },
@@ -981,7 +992,7 @@ function SceneBuilder({ productionId: propId }) {
                                     React.createElement('span', null, 'Level'),
                                     React.createElement('span', null, 'Custom')
                                   ),
-                                  (isFullCompany ? sceneChars : currentPerformers).map(char => {
+                                  (isFullCompany ? castCharacters : currentPerformers).map(char => {
                                     const mic = (scene.micAssignments || {})[char] || {};
                                     const updateMic = (field, value) => {
                                       const existing = scene.micAssignments || {};
