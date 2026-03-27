@@ -3,13 +3,13 @@ const { useState, useEffect } = React;
 function SoundDepartmentView({ production, onUpdateScene }) {
   const [expandedActs, setExpandedActs] = useState({});
   const soundTypeOptions = [
-    '🎵 Musical Number',
-    'Underscore',
-    'Incidental Music',
-    'Diegetic / Onstage',
-    'Atmosphere / Ambience',
-    'Stinger / Button',
-    'Effect (SFX)'
+    { value: 'Musical Number', label: '🎵 Musical Number' },
+    { value: 'Underscore', label: 'Underscore' },
+    { value: 'Incidental Music', label: 'Incidental Music' },
+    { value: 'Diegetic / Onstage', label: 'Diegetic / Onstage' },
+    { value: 'Atmosphere / Ambience', label: 'Atmosphere / Ambience' },
+    { value: 'Stinger / Button', label: 'Stinger / Button' },
+    { value: 'Effect (SFX)', label: 'Effect (SFX)' }
   ];
 
   const toggleAct = (actIndex) => {
@@ -143,7 +143,7 @@ function SoundDepartmentView({ production, onUpdateScene }) {
                           })
                         )
                       ),
-                      React.createElement(
+                      scene.soundType !== 'Musical Number' && React.createElement(
                         'div',
                         null,
                         React.createElement('label', { className: 'block text-xs text-gray-500 mb-1' }, 'Artist'),
@@ -191,7 +191,7 @@ function SoundDepartmentView({ production, onUpdateScene }) {
                               className: 'w-full pl-9 pr-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white appearance-none'
                             },
                             React.createElement('option', { value: '' }, 'Select type...'),
-                            soundTypeOptions.map(option => React.createElement('option', { key: option, value: option }, option))
+                            soundTypeOptions.map(opt => React.createElement('option', { key: opt.value, value: opt.value }, opt.label))
                           )
                         )
                       )
