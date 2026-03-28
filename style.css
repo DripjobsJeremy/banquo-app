@@ -65,17 +65,20 @@
   --btn-primary-hover-bg:   #6D28D9;
   --btn-primary-active-bg:  #5B21B6;
   --btn-primary-text:       #FFFFFF;
+  --btn-primary-hover-text: #FFFFFF;
 
-  --btn-secondary-bg:         #374151;
-  --btn-secondary-hover-bg:   #4B5563;
-  --btn-secondary-active-bg:  #1F2937;
-  --btn-secondary-text:       #FFFFFF;
-  --btn-secondary-border:     #6B7280;
+  --btn-secondary-bg:           #374151;
+  --btn-secondary-hover-bg:     #4B5563;
+  --btn-secondary-active-bg:    #1F2937;
+  --btn-secondary-text:         #FFFFFF;
+  --btn-secondary-hover-text:   #FFFFFF;
+  --btn-secondary-border:       #6B7280;
 
   --btn-success-bg:         #059669;
   --btn-success-hover-bg:   #047857;
   --btn-success-active-bg:  #065F46;
   --btn-success-text:       #FFFFFF;
+  --btn-success-hover-text: #FFFFFF;
 }
 
 /* ── Light mode overrides ── */
@@ -515,6 +518,7 @@ select:focus {
 }
 .btn-primary:hover:not(:disabled) {
   background-color: var(--btn-primary-hover-bg) !important;
+  color: var(--btn-primary-hover-text) !important;
 }
 .btn-primary:active:not(:disabled) {
   background-color: var(--btn-primary-active-bg) !important;
@@ -531,7 +535,7 @@ select:focus {
 }
 .btn-secondary:hover:not(:disabled) {
   background-color: var(--btn-secondary-hover-bg) !important;
-  color: var(--btn-secondary-text) !important;
+  color: var(--btn-secondary-hover-text) !important;
 }
 .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -544,6 +548,7 @@ select:focus {
 }
 .btn-success:hover:not(:disabled) {
   background-color: var(--btn-success-hover-bg) !important;
+  color: var(--btn-success-hover-text) !important;
 }
 .btn-success:active:not(:disabled) {
   transform: scale(0.98);

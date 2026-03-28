@@ -894,13 +894,13 @@ function OrganizationSettings(props) {
 
             {/* Color inputs per button type */}
             {[
-              { type: 'primary',   label: 'Primary Button',   fields: [{ field: 'bg', fieldLabel: 'Background' }, { field: 'hover', fieldLabel: 'Hover' }, { field: 'active', fieldLabel: 'Active' }, { field: 'text', fieldLabel: 'Text' }] },
-              { type: 'secondary', label: 'Secondary Button', fields: [{ field: 'bg', fieldLabel: 'Background' }, { field: 'hover', fieldLabel: 'Hover' }, { field: 'border', fieldLabel: 'Border' }, { field: 'text', fieldLabel: 'Text' }] },
-              { type: 'success',   label: 'Success Button',   fields: [{ field: 'bg', fieldLabel: 'Background' }, { field: 'hover', fieldLabel: 'Hover' }, { field: 'active', fieldLabel: 'Active' }, { field: 'text', fieldLabel: 'Text' }] },
+              { type: 'primary',   label: 'Primary Button',   fields: [{ field: 'bg', fieldLabel: 'Background' }, { field: 'text', fieldLabel: 'Text' }, { field: 'hover', fieldLabel: 'Hover Bg' }, { field: 'hoverText', fieldLabel: 'Hover Text' }, { field: 'active', fieldLabel: 'Active' }] },
+              { type: 'secondary', label: 'Secondary Button', fields: [{ field: 'bg', fieldLabel: 'Background' }, { field: 'text', fieldLabel: 'Text' }, { field: 'hover', fieldLabel: 'Hover Bg' }, { field: 'hoverText', fieldLabel: 'Hover Text' }, { field: 'border', fieldLabel: 'Border' }] },
+              { type: 'success',   label: 'Success Button',   fields: [{ field: 'bg', fieldLabel: 'Background' }, { field: 'text', fieldLabel: 'Text' }, { field: 'hover', fieldLabel: 'Hover Bg' }, { field: 'hoverText', fieldLabel: 'Hover Text' }, { field: 'active', fieldLabel: 'Active' }] },
             ].map(({ type, label, fields }) => (
               <div key={type} className="p-4 border border-gray-200 rounded-lg space-y-3">
                 <div className="font-medium text-gray-800 text-sm">{label}</div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                   {fields.map(({ field, fieldLabel }) => (
                     <div key={field}>
                       <label className="block text-xs text-gray-500 mb-1">{fieldLabel}</label>
