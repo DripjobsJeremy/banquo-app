@@ -486,9 +486,45 @@ function SceneBuilder({ productionId: propId }) {
     localStorage.setItem('showsuite_active_department_tab', newTab);
   };
 
+  // Returns all role labels the current staff contact has on this production, or null to use currentRole
+  const getStaffProductionRoles = () => {
+    const staffId = localStorage.getItem('showsuite_staff_contact_id');
+    if (!staffId || staffId === '__test_manager__') return null;
+    const contact = window.contactsService?.getContactById?.(staffId);
+    if (!contact?.staffProfile?.productions) return null;
+    const entries = contact.staffProfile.productions.filter(p => p.productionId === productionId);
+    const roles = entries.flatMap(e => Array.isArray(e.role) ? e.role : (e.role ? [e.role] : []));
+    return roles.length > 0 ? roles : null;
+  };
+
+  const ROLE_LABEL_TO_TABS = {
+    'Director':          ['scenes','lighting','wardrobe','sound','props','set','stage_manager','actors','calendar','images'],
+    'Stage Manager':     ['scenes','actors','calendar','images'],
+    'Wardrobe Designer': ['wardrobe','scenes','actors','calendar','images'],
+    'Lighting Designer': ['lighting','scenes','actors','calendar','images'],
+    'Sound Designer':    ['sound','scenes','actors','calendar','images'],
+    'Props Master':      ['props','scenes','actors','calendar','images'],
+    'Scenic Designer':   ['set','scenes','actors','calendar','images'],
+    'Musical Director':  ['sound','scenes','actors','calendar','images'],
+    'Choreographer':     ['scenes','actors','calendar','images'],
+  };
+
   const canAccessTab = (tabId) => {
-    if (tabId === 'scenes') return true; // Everyone can see scenes (read-only for dept roles)
+    if (tabId === 'scenes') return true;   // Everyone can see scenes (read-only for dept roles)
     if (tabId === 'calendar') return true; // Everyone can view the calendar
+
+    // Test Manager sees all tabs
+    const staffId = localStorage.getItem('showsuite_staff_contact_id');
+    if (staffId === '__test_manager__') return true;
+
+    // Per-production role check — union tabs across all roles the staff member holds
+    const productionRoles = getStaffProductionRoles();
+    if (productionRoles) {
+      const allowedTabs = new Set(productionRoles.flatMap(role => ROLE_LABEL_TO_TABS[role] || []));
+      return allowedTabs.has(tabId);
+    }
+
+    // Fall back to the app-level currentRole
     return window.canAccessAllDepartments?.(currentRole.id) ||
            window.canAccessDepartment?.(currentRole.id, tabId);
   };
