@@ -3,6 +3,21 @@ const { useState, useEffect } = React;
 // Lighting Department View - displays and manages lighting data for all scenes
 function LightingView({ production, onUpdateScene }) {
   const [expandedActs, setExpandedActs] = useState({});
+  const [localProduction, setLocalProduction] = useState(production);
+
+  useEffect(() => { setLocalProduction(production); }, [production]);
+
+  useEffect(() => {
+    const refresh = () => {
+      try {
+        const prods = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
+        const fresh = prods.find(p => p.id === production?.id);
+        if (fresh) setLocalProduction(fresh);
+      } catch {}
+    };
+    window.addEventListener('productionUpdated', refresh);
+    return () => window.removeEventListener('productionUpdated', refresh);
+  }, [production?.id]);
 
   // Toggle act expansion
   const toggleAct = (actIndex) => {
@@ -26,7 +41,7 @@ function LightingView({ production, onUpdateScene }) {
     onUpdateScene?.(actIndex, sceneIndex, field, value);
   };
 
-  if (!production?.acts?.length) {
+  if (!localProduction?.acts?.length) {
     return React.createElement(
       'div',
       { className: 'text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300' },
@@ -37,8 +52,8 @@ function LightingView({ production, onUpdateScene }) {
   }
 
   // Summary stats
-  const totalScenes = production.acts.reduce((sum, act) => sum + (act.scenes?.length || 0), 0);
-  const scenesWithLighting = production.acts.reduce((sum, act) => 
+  const totalScenes = localProduction.acts.reduce((sum, act) => sum + (act.scenes?.length || 0), 0);
+  const scenesWithLighting = localProduction.acts.reduce((sum, act) =>
     sum + (act.scenes?.filter(s => s.lightingMood || s.lightingColor || s.lightingCue)?.length || 0), 0
   );
 
@@ -62,7 +77,7 @@ function LightingView({ production, onUpdateScene }) {
   const actsList = React.createElement(
     'div',
     { className: 'space-y-4' },
-    production.acts.map((act, actIndex) =>
+    localProduction.acts.map((act, actIndex) =>
       React.createElement(
         'div',
         { key: actIndex, className: 'bg-white rounded-lg border border-gray-200 overflow-hidden' },

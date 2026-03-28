@@ -345,6 +345,7 @@ function SceneBuilder({ productionId: propId }) {
       allProductions.push(updated);
     }
     localStorage.setItem('showsuite_productions', JSON.stringify(allProductions));
+    window.dispatchEvent(new CustomEvent('productionUpdated', { detail: { productionId: updated.id } }));
 
     console.log('✅ Production saved:', updated.title, 'Calendar events:', updated.calendar?.length || 0);
   };

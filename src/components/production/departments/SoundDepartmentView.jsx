@@ -2,6 +2,21 @@ const { useState, useEffect } = React;
 
 function SoundDepartmentView({ production, onUpdateScene }) {
   const [expandedActs, setExpandedActs] = useState({});
+  const [localProduction, setLocalProduction] = useState(production);
+
+  useEffect(() => { setLocalProduction(production); }, [production]);
+
+  useEffect(() => {
+    const refresh = () => {
+      try {
+        const prods = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
+        const fresh = prods.find(p => p.id === production?.id);
+        if (fresh) setLocalProduction(fresh);
+      } catch {}
+    };
+    window.addEventListener('productionUpdated', refresh);
+    return () => window.removeEventListener('productionUpdated', refresh);
+  }, [production?.id]);
   const soundTypeOptions = [
     { value: 'Musical Number', label: '🎵 Musical Number' },
     { value: 'Underscore', label: 'Underscore' },
@@ -55,7 +70,7 @@ function SoundDepartmentView({ production, onUpdateScene }) {
     onUpdateScene?.(actIndex, sceneIndex, field, value);
   };
 
-  if (!production?.acts?.length) {
+  if (!localProduction?.acts?.length) {
     return React.createElement(
       'div',
       { className: 'text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300' },
@@ -77,7 +92,7 @@ function SoundDepartmentView({ production, onUpdateScene }) {
       'div',
       { className: 'text-right' },
       React.createElement('p', { className: 'text-sm font-medium text-gray-700' },
-        (production.acts.reduce((sum, act) => sum + (act.scenes?.filter(s => s.songTitle || s.artist || s.duration || s.soundType)?.length || 0), 0))
+        (localProduction.acts.reduce((sum, act) => sum + (act.scenes?.filter(s => s.songTitle || s.artist || s.duration || s.soundType)?.length || 0), 0))
         + ' scenes have sound data'
       )
     )
@@ -86,7 +101,7 @@ function SoundDepartmentView({ production, onUpdateScene }) {
   const actsList = React.createElement(
     'div',
     { className: 'space-y-4' },
-    production.acts.map((act, actIndex) =>
+    localProduction.acts.map((act, actIndex) =>
       React.createElement(
         'div',
         { key: actIndex, className: 'bg-white rounded-lg border border-gray-200 overflow-hidden' },
