@@ -257,6 +257,8 @@ function App() {
       }
       // Apply persisted light/dark mode
       window.organizationService.applyThemeMode();
+      // Apply persisted button theme
+      window.organizationService.applyButtonTheme();
     }
 
     const role = localStorage.getItem('showsuite_user_role') || 'admin';

@@ -349,6 +349,51 @@ const OrganizationService = (() => {
         });
     };
 
+    // ── Button theming ──────────────────────────────────────────────────────
+    const BTN_THEME_KEY = 'scenestave_button_theme';
+
+    const DEFAULT_BTN_THEME = {
+        primary:   { bg: '#7C3AED', hover: '#6D28D9', active: '#5B21B6', text: '#FFFFFF' },
+        secondary: { bg: '#374151', hover: '#4B5563', active: '#1F2937', text: '#FFFFFF' },
+        success:   { bg: '#059669', hover: '#047857', active: '#065F46', text: '#FFFFFF' },
+    };
+
+    const applyButtonTheme = () => {
+        try {
+            const stored = localStorage.getItem(BTN_THEME_KEY);
+            const theme = stored ? JSON.parse(stored) : DEFAULT_BTN_THEME;
+            const root = document.documentElement;
+            ['primary', 'secondary', 'success'].forEach(type => {
+                const t = theme[type] || DEFAULT_BTN_THEME[type];
+                root.style.setProperty(`--btn-${type}-bg`,     t.bg);
+                root.style.setProperty(`--btn-${type}-hover`,  t.hover);
+                root.style.setProperty(`--btn-${type}-active`, t.active);
+                root.style.setProperty(`--btn-${type}-text`,   t.text);
+            });
+        } catch (e) {
+            console.warn('applyButtonTheme error:', e);
+        }
+    };
+
+    const saveButtonTheme = (theme) => {
+        try {
+            localStorage.setItem(BTN_THEME_KEY, JSON.stringify(theme));
+            applyButtonTheme();
+        } catch (e) {
+            console.error('saveButtonTheme error:', e);
+        }
+    };
+
+    const loadButtonTheme = () => {
+        try {
+            const stored = localStorage.getItem(BTN_THEME_KEY);
+            return stored ? JSON.parse(stored) : { ...DEFAULT_BTN_THEME };
+        } catch (e) {
+            return { ...DEFAULT_BTN_THEME };
+        }
+    };
+    // ────────────────────────────────────────────────────────────────────────
+
     // ── Theme mode ──────────────────────────────────────────────────────────
     const THEME_KEY = 'scenestave_theme_mode';
 
@@ -397,6 +442,10 @@ const OrganizationService = (() => {
         saveThemeMode,
         loadThemeMode,
         applyThemeMode,
+        applyButtonTheme,
+        saveButtonTheme,
+        loadButtonTheme,
+        DEFAULT_BTN_THEME,
         DEFAULT_ORGANIZATION,
         DEFAULT_BRANDING,
         SHOWSUITE_LOGO_SVG

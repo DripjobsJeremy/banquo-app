@@ -10,10 +10,25 @@ function OrganizationSettings(props) {
   const [activeSection, setActiveSection] = useState('general');
   const [showClientOrgModal, setShowClientOrgModal] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
+  const [btnTheme, setBtnTheme] = useState(null);
 
   useEffect(() => {
     loadOrganization();
+    const stored = window.organizationService?.loadButtonTheme();
+    setBtnTheme(stored || window.organizationService?.DEFAULT_BTN_THEME);
   }, []);
+
+  const saveBtnTheme = (updated) => {
+    setBtnTheme(updated);
+    window.organizationService?.saveButtonTheme(updated);
+  };
+
+  const resetBtnTheme = () => {
+    const def = window.organizationService?.DEFAULT_BTN_THEME;
+    setBtnTheme({ ...def });
+    window.organizationService?.saveButtonTheme({ ...def });
+    if (window.showToast) window.showToast('Button theme reset to defaults', 'info');
+  };
 
   const loadOrganization = () => {
     const org = window.organizationService?.loadOrganization();
@@ -851,6 +866,88 @@ function OrganizationSettings(props) {
               </div>
             )}
           </div>
+
+          {/* ── Button Styles ──────────────────────────────────────────────── */}
+          {btnTheme && (
+          <div className="border-t border-gray-200 pt-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="font-medium text-gray-900">Button Styles</h4>
+              <button
+                type="button"
+                onClick={resetBtnTheme}
+                className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-xs font-medium transition-colors"
+              >
+                Reset to Defaults
+              </button>
+            </div>
+            <p className="text-sm text-gray-600">
+              Customize the colors for each button type used throughout SceneStave.
+            </p>
+
+            {/* Live preview */}
+            <div className="flex flex-wrap gap-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <span className="text-xs text-gray-500 self-center mr-1">Preview:</span>
+              <button type="button" className="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Primary</button>
+              <button type="button" className="btn-secondary px-4 py-2 rounded-lg text-sm font-medium">Secondary</button>
+              <button type="button" className="btn-success px-4 py-2 rounded-lg text-sm font-medium">Success</button>
+            </div>
+
+            {/* Color inputs per button type */}
+            {[
+              { type: 'primary',   label: 'Primary Button' },
+              { type: 'secondary', label: 'Secondary Button' },
+              { type: 'success',   label: 'Success Button' },
+            ].map(({ type, label }) => (
+              <div key={type} className="p-4 border border-gray-200 rounded-lg space-y-3">
+                <div className="font-medium text-gray-800 text-sm">{label}</div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { field: 'bg',     fieldLabel: 'Background' },
+                    { field: 'hover',  fieldLabel: 'Hover' },
+                    { field: 'active', fieldLabel: 'Active' },
+                    { field: 'text',   fieldLabel: 'Text' },
+                  ].map(({ field, fieldLabel }) => (
+                    <div key={field}>
+                      <label className="block text-xs text-gray-500 mb-1">{fieldLabel}</label>
+                      <div className="flex gap-1">
+                        <input
+                          type="color"
+                          value={btnTheme[type]?.[field] || '#000000'}
+                          onChange={e => {
+                            const updated = {
+                              ...btnTheme,
+                              [type]: { ...btnTheme[type], [field]: e.target.value }
+                            };
+                            saveBtnTheme(updated);
+                          }}
+                          title={`${label} ${fieldLabel}`}
+                          aria-label={`${label} ${fieldLabel}`}
+                          className="w-10 h-8 rounded border border-gray-300 cursor-pointer p-0.5"
+                        />
+                        <input
+                          type="text"
+                          value={btnTheme[type]?.[field] || ''}
+                          onChange={e => {
+                            if (/^#[0-9A-Fa-f]{0,6}$/.test(e.target.value)) {
+                              const updated = {
+                                ...btnTheme,
+                                [type]: { ...btnTheme[type], [field]: e.target.value }
+                              };
+                              saveBtnTheme(updated);
+                            }
+                          }}
+                          className="flex-1 min-w-0 px-2 py-1 border border-gray-300 rounded font-mono text-xs"
+                          placeholder="#000000"
+                          maxLength={7}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          )}
         </div>
       )}
 
