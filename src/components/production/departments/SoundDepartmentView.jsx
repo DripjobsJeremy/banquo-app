@@ -62,10 +62,23 @@ function SoundDepartmentView({ production, onUpdateScene }) {
   }, [production?.id, production?.acts]);
 
   const updateSoundField = (actIndex, sceneIndex, field, value) => {
-    console.log('=== UPDATE SOUND FIELD ===');
-    console.log('Act Index:', actIndex, 'Scene Index:', sceneIndex);
-    console.log('Field:', field);
-    console.log('New Value:', value);
+    // Optimistic update so Artist/Performers toggle without waiting for the localStorage round-trip
+    setLocalProduction(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        acts: prev.acts.map((act, ai) => {
+          if (ai !== actIndex) return act;
+          return {
+            ...act,
+            scenes: act.scenes.map((scene, si) => {
+              if (si !== sceneIndex) return scene;
+              return { ...scene, [field]: value };
+            })
+          };
+        })
+      };
+    });
 
     onUpdateScene?.(actIndex, sceneIndex, field, value);
   };
