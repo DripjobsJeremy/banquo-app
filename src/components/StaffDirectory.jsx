@@ -50,14 +50,51 @@ function StaffProfileModal({ contact, productions, onClose, onSave }) {
       window.showToast?.('Select a production and at least one role', 'warning');
       return;
     }
-    if (profile.productions.some(p => p.productionId === newAssign.productionId)) {
-      window.showToast?.('Already assigned to this production', 'warning');
-      return;
-    }
-    const assignment = { ...newAssign, invitedAt: new Date().toISOString(), acceptedAt: null };
-    setProfile(p => ({ ...p, productions: [...p.productions, assignment] }));
+    setProfile(p => {
+      const existing = p.productions.find(a => a.productionId === newAssign.productionId);
+      if (existing) {
+        // Merge new roles into the existing assignment
+        const existingRoles = existing.roles?.length > 0 ? existing.roles : (existing.role ? [existing.role] : []);
+        const merged = Array.from(new Set([...existingRoles, ...newAssign.roles]));
+        return {
+          ...p,
+          productions: p.productions.map(a =>
+            a.productionId === newAssign.productionId
+              ? { ...a, roles: merged, role: undefined }
+              : a
+          )
+        };
+      }
+      return {
+        ...p,
+        productions: [...p.productions, { ...newAssign, invitedAt: new Date().toISOString(), acceptedAt: null }]
+      };
+    });
     setShowAssignForm(false);
     setNewAssign({ productionId: '', roles: [], status: 'invited' });
+  };
+
+  const handleAddRoleToAssignment = (productionId, newRole) => {
+    setProfile(p => ({
+      ...p,
+      productions: p.productions.map(a => {
+        if (a.productionId !== productionId) return a;
+        const existing = a.roles?.length > 0 ? a.roles : (a.role ? [a.role] : []);
+        if (existing.includes(newRole)) return a;
+        return { ...a, roles: [...existing, newRole], role: undefined };
+      })
+    }));
+  };
+
+  const handleRemoveRoleFromAssignment = (productionId, roleToRemove) => {
+    setProfile(p => ({
+      ...p,
+      productions: p.productions.map(a => {
+        if (a.productionId !== productionId) return a;
+        const existing = a.roles?.length > 0 ? a.roles : (a.role ? [a.role] : []);
+        return { ...a, roles: existing.filter(r => r !== roleToRemove), role: undefined };
+      })
+    }));
   };
 
   const handleRemove = (productionId) => {
@@ -225,6 +262,7 @@ function StaffProfileModal({ contact, productions, onClose, onSave }) {
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Production</label>
                     <select
+                      title="Select production"
                       value={newAssign.productionId}
                       onChange={e => setNewAssign(a => ({ ...a, productionId: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
@@ -250,6 +288,7 @@ function StaffProfileModal({ contact, productions, onClose, onSave }) {
                       </div>
                     )}
                     <select
+                      title="Add role"
                       value=""
                       onChange={e => {
                         if (e.target.value && !newAssign.roles.includes(e.target.value))
@@ -266,6 +305,7 @@ function StaffProfileModal({ contact, productions, onClose, onSave }) {
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Status</label>
                     <select
+                      title="Assignment status"
                       value={newAssign.status}
                       onChange={e => setNewAssign(a => ({ ...a, status: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
@@ -473,6 +513,7 @@ function AddStaffModal({ allContacts, onClose, onAdded }) {
                 <label className="block text-xs font-medium text-gray-700 mb-1">First Name *</label>
                 <input
                   type="text"
+                  placeholder="First name"
                   value={form.firstName}
                   onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-violet-400"
@@ -482,6 +523,7 @@ function AddStaffModal({ allContacts, onClose, onAdded }) {
                 <label className="block text-xs font-medium text-gray-700 mb-1">Last Name</label>
                 <input
                   type="text"
+                  placeholder="Last name"
                   value={form.lastName}
                   onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-violet-400"
@@ -492,6 +534,7 @@ function AddStaffModal({ allContacts, onClose, onAdded }) {
               <label className="block text-xs font-medium text-gray-700 mb-1">Email *</label>
               <input
                 type="email"
+                placeholder="email@example.com"
                 value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-violet-400"
@@ -501,6 +544,7 @@ function AddStaffModal({ allContacts, onClose, onAdded }) {
               <label className="block text-xs font-medium text-gray-700 mb-1">Phone</label>
               <input
                 type="tel"
+                placeholder="Phone number"
                 value={form.phone}
                 onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-violet-400"
@@ -617,6 +661,7 @@ function StaffDirectory() {
           className="flex-1 min-w-[200px] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-violet-400 focus:border-violet-400"
         />
         <select
+          title="Filter by role"
           value={roleFilter}
           onChange={e => setRoleFilter(e.target.value)}
           className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-violet-400"
@@ -625,6 +670,7 @@ function StaffDirectory() {
           {STAFF_ROLES.map(r => <option key={r} value={r.toLowerCase()}>{r}</option>)}
         </select>
         <select
+          title="Filter by status"
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
           className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-violet-400"

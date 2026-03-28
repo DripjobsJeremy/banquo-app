@@ -533,19 +533,25 @@ function SceneBuilder({ productionId: propId }) {
            window.canAccessDepartment?.(currentRole.id, tabId);
   };
 
+  const visibleTabs = departmentTabs.filter(tab => canAccessTab(tab.id));
+
+  // Derive the effective tab synchronously — prevents content/tab mismatch when role changes
+  const TAB_FALLBACK_ORDER = ['scenes','lighting','wardrobe','sound','props','set','stage_manager','actors','calendar'];
+  const effectiveTab = canAccessTab(activeTab)
+    ? activeTab
+    : (TAB_FALLBACK_ORDER.find(t => canAccessTab(t)) || 'calendar');
+
   const canEditCurrentTab = () => {
     // Admins and directors can edit everything
     if (window.canAccessAllDepartments?.(currentRole.id)) return true;
     // Dept roles can edit their own tab, but not scenes (read-only) or calendar (limited)
-    if (activeTab === 'scenes') return false;
-    if (activeTab === 'calendar') return false; // calendar gating handled inside CalendarView
-    return window.canAccessDepartment?.(currentRole.id, activeTab) || false;
+    if (effectiveTab === 'scenes') return false;
+    if (effectiveTab === 'calendar') return false; // calendar gating handled inside CalendarView
+    return window.canAccessDepartment?.(currentRole.id, effectiveTab) || false;
   };
 
-  const visibleTabs = departmentTabs.filter(tab => canAccessTab(tab.id));
-
   // True when a dept role is viewing the Scenes tab (read-only)
-  const scenesReadOnly = activeTab === 'scenes' && !canEditCurrentTab();
+  const scenesReadOnly = effectiveTab === 'scenes' && !canEditCurrentTab();
 
   const tabNavigation = React.createElement(
     'div',
@@ -557,7 +563,7 @@ function SceneBuilder({ productionId: propId }) {
           key: tab.id,
           onClick: () => handleTabChange(tab.id),
           className: 'px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ' +
-            (activeTab === tab.id
+            (effectiveTab === tab.id
               ? 'border-violet-600 text-violet-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300')
         },
@@ -1349,7 +1355,7 @@ function SceneBuilder({ productionId: propId }) {
     { className: 'p-6 max-w-4xl mx-auto' },
     header,
     tabNavigation,
-    activeTab === 'scenes' && React.createElement(
+    effectiveTab === 'scenes' && React.createElement(
       React.Fragment,
       null,
       scenesReadOnly && React.createElement(
@@ -1364,20 +1370,20 @@ function SceneBuilder({ productionId: propId }) {
       emptyState || actsList,
       !emptyState && addActButton
     ),
-    activeTab === 'lighting' && React.createElement(LightingView, {
+    effectiveTab === 'lighting' && React.createElement(LightingView, {
       production: production,
       onUpdateScene: (actIndex, sceneIndex, field, value) => {
         handleUpdateScene(actIndex, sceneIndex, field, value);
       }
     }),
-    activeTab === 'sound' && React.createElement(SoundDepartmentView, {
+    effectiveTab === 'sound' && React.createElement(SoundDepartmentView, {
       production: production,
       userRole: currentRole.id,
       onUpdateScene: (actIndex, sceneIndex, field, value) => {
         handleUpdateScene(actIndex, sceneIndex, field, value);
       }
     }),
-    activeTab === 'wardrobe' && (
+    effectiveTab === 'wardrobe' && (
       typeof WardrobeView !== 'undefined' ? React.createElement(WardrobeView, {
         production: production,
         onSave: saveProduction,
@@ -1391,20 +1397,20 @@ function SceneBuilder({ productionId: propId }) {
         React.createElement('p', { className: 'text-pink-600' }, 'Costume tracking coming soon...')
       )
     ),
-    activeTab === 'props' && React.createElement(PropsView, {
+    effectiveTab === 'props' && React.createElement(PropsView, {
       production: production,
       onSave: saveProduction,
       onUpdateScene: (actIndex, sceneIndex, field, value) => {
         handleUpdateScene(actIndex, sceneIndex, field, value);
       }
     }),
-    activeTab === 'set' && (
+    effectiveTab === 'set' && (
       React.createElement(SetDesignView, {
         production: production,
         onSave: saveProduction
       })
     ),
-    activeTab === 'stage_manager' && React.createElement(StageManagerView, {
+    effectiveTab === 'stage_manager' && React.createElement(StageManagerView, {
       production: production,
       onUpdateScene: (actIndex, sceneIndex, field, value) => {
         handleUpdateScene(actIndex, sceneIndex, field, value);
@@ -1413,7 +1419,7 @@ function SceneBuilder({ productionId: propId }) {
         handleUpdateProduction(updates);
       }
     }),
-    activeTab === 'calendar' && React.createElement(CalendarView, {
+    effectiveTab === 'calendar' && React.createElement(CalendarView, {
       production: production,
       onSave: saveProduction,
       userRole: currentRole.id
