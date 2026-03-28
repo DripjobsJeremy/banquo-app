@@ -164,7 +164,7 @@ const DepartmentDashboard = () => {
   // Resolve assigned productions
   const assignedProductions = (() => {
     if (SUPER_ROLES.includes(userRole)) return allProductions;
-    if (!staffContactId) return allProductions;
+    if (!staffContactId || staffContactId === '__test_manager__') return allProductions;
     const contact = contacts.find(c => c.id === staffContactId);
     const assignedIds = new Set(
       (contact?.staffProfile?.productions || [])
@@ -233,7 +233,9 @@ const DepartmentDashboard = () => {
 
   const stats = config.stats(allItems, allScenes, assignedProductions[0]);
 
-  const staffContact = staffContactId ? contacts.find(c => c.id === staffContactId) : null;
+  const staffContact = staffContactId === '__test_manager__'
+    ? { firstName: 'Test', lastName: 'Manager' }
+    : (staffContactId ? contacts.find(c => c.id === staffContactId) : null);
   const staffName = staffContact
     ? (`${staffContact.firstName || ''} ${staffContact.lastName || ''}`).trim() || staffContact.email
     : null;

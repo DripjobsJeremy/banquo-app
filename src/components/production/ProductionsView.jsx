@@ -145,7 +145,7 @@ const ProductionsView = () => {
   
 
   const getVisibleProductions = () => {
-    if (!staffContactId) return productions;
+    if (!staffContactId || staffContactId === '__test_manager__') return productions;
     const contact = window.contactsService?.getContactById?.(staffContactId);
     if (!contact) return productions;
     const assignedIds = new Set((contact.staffProfile?.productions || []).map(p => p.productionId));
@@ -154,9 +154,9 @@ const ProductionsView = () => {
 
   const visibleProductions = getVisibleProductions();
 
-  const staffContact = staffContactId
-    ? window.contactsService?.getContactById?.(staffContactId)
-    : null;
+  const staffContact = staffContactId === '__test_manager__'
+    ? { firstName: 'Test', lastName: 'Manager' }
+    : (staffContactId ? window.contactsService?.getContactById?.(staffContactId) : null);
 
   const staffBanner = staffContact
     ? React.createElement(

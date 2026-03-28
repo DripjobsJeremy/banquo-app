@@ -305,7 +305,10 @@ function App() {
     set:                { label: 'Set & Scenic',   cls: 'bg-teal-800 text-teal-300' },
   };
   const roleInfo = ROLE_DISPLAY[userRole] || { label: userRole, cls: 'bg-gray-700 text-gray-300' };
-  const staffContact = staffContactId ? window.contactsService?.getContactById?.(staffContactId) : null;
+  const TEST_MANAGER_ID = '__test_manager__';
+  const staffContact = staffContactId === TEST_MANAGER_ID
+    ? { firstName: 'Test', lastName: 'Manager' }
+    : (staffContactId ? window.contactsService?.getContactById?.(staffContactId) : null);
   const staffName = staffContact
     ? (`${staffContact.firstName || ''} ${staffContact.lastName || ''}`).trim() || staffContact.email
     : null;
@@ -666,16 +669,14 @@ function App() {
                           }}
                           className="w-full px-3 py-2 border border-amber-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-400"
                         >
-                          <option value="">— All productions (admin view) —</option>
+                          <option value="">— Select a staff member —</option>
+                          <option value="__test_manager__">🧪 Test Manager (all departments)</option>
                           {matchingStaff.map(c => (
                             <option key={c.id} value={c.id}>
                               {`${c.firstName || ''} ${c.lastName || ''}`.trim() || c.email}
                             </option>
                           ))}
                         </select>
-                        {matchingStaff.length === 0 && (
-                          <p className="text-xs text-amber-600 mt-1">No staff with the {ROLE_LABEL_MAP[userRole]} role. Add them in Contacts → Staff & Crew.</p>
-                        )}
                       </div>
                     );
                   })()}
