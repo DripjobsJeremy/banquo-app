@@ -1332,6 +1332,7 @@ function SceneBuilder({ productionId: propId }) {
     }),
     activeTab === 'sound' && React.createElement(SoundDepartmentView, {
       production: production,
+      userRole: currentRole.id,
       onUpdateScene: (actIndex, sceneIndex, field, value) => {
         handleUpdateScene(actIndex, sceneIndex, field, value);
       }

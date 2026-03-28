@@ -1,8 +1,11 @@
 const { useState, useEffect } = React;
 
-function SoundDepartmentView({ production, onUpdateScene }) {
+function SoundDepartmentView({ production, onUpdateScene, userRole }) {
   const [expandedActs, setExpandedActs] = useState({});
   const [localProduction, setLocalProduction] = useState(production);
+
+  const EDIT_ROLES = ['super_admin', 'venue_manager', 'admin', 'client_admin', 'sound', 'sound_designer', 'director'];
+  const canEdit = EDIT_ROLES.includes(userRole);
 
   useEffect(() => { setLocalProduction(production); }, [production]);
 
@@ -81,6 +84,32 @@ function SoundDepartmentView({ production, onUpdateScene }) {
     });
 
     onUpdateScene?.(actIndex, sceneIndex, field, value);
+  };
+
+  const updateMicAssignment = (actIndex, sceneIndex, char, field, value) => {
+    const scene = localProduction.acts[actIndex]?.scenes?.[sceneIndex];
+    const existing = scene?.micAssignments || {};
+    const updatedMicAssignments = {
+      ...existing,
+      [char]: { ...(existing[char] || {}), [field]: value }
+    };
+    setLocalProduction(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        acts: prev.acts.map((act, ai) => {
+          if (ai !== actIndex) return act;
+          return {
+            ...act,
+            scenes: act.scenes.map((s, si) => {
+              if (si !== sceneIndex) return s;
+              return { ...s, micAssignments: updatedMicAssignments };
+            })
+          };
+        })
+      };
+    });
+    onUpdateScene?.(actIndex, sceneIndex, 'micAssignments', updatedMicAssignments);
   };
 
   if (!localProduction?.acts?.length) {
@@ -279,9 +308,33 @@ function SoundDepartmentView({ production, onUpdateScene }) {
                                           style: { gridTemplateColumns: '1fr 70px 90px 1fr', borderTop: '1px solid var(--color-border)', color: 'var(--color-text-primary)' }
                                         },
                                         React.createElement('span', null, char),
-                                        React.createElement('span', { style: { color: mic.micNumber ? 'var(--color-text-primary)' : 'var(--color-text-muted)' } }, mic.micNumber || '—'),
-                                        React.createElement('span', { style: { color: mic.level ? 'var(--color-text-primary)' : 'var(--color-text-muted)' } }, mic.level || '—'),
-                                        React.createElement('span', { style: { color: mic.custom ? 'var(--color-text-primary)' : 'var(--color-text-muted)' } }, mic.custom || '—')
+                                        canEdit
+                                          ? React.createElement('input', {
+                                              type: 'number', min: '1', max: '99', placeholder: '—',
+                                              value: mic.micNumber || '',
+                                              onChange: (e) => updateMicAssignment(actIndex, sceneIndex, char, 'micNumber', e.target.value),
+                                              className: 'w-full px-2 py-1 rounded text-sm text-center',
+                                              style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)' }
+                                            })
+                                          : React.createElement('span', { style: { color: mic.micNumber ? 'var(--color-text-primary)' : 'var(--color-text-muted)' } }, mic.micNumber || '—'),
+                                        canEdit
+                                          ? React.createElement('input', {
+                                              type: 'text', placeholder: 'e.g. -6dB',
+                                              value: mic.level || '',
+                                              onChange: (e) => updateMicAssignment(actIndex, sceneIndex, char, 'level', e.target.value),
+                                              className: 'w-full px-2 py-1 rounded text-sm',
+                                              style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)' }
+                                            })
+                                          : React.createElement('span', { style: { color: mic.level ? 'var(--color-text-primary)' : 'var(--color-text-muted)' } }, mic.level || '—'),
+                                        canEdit
+                                          ? React.createElement('input', {
+                                              type: 'text', placeholder: 'Notes...',
+                                              value: mic.custom || '',
+                                              onChange: (e) => updateMicAssignment(actIndex, sceneIndex, char, 'custom', e.target.value),
+                                              className: 'w-full px-2 py-1 rounded text-sm',
+                                              style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)' }
+                                            })
+                                          : React.createElement('span', { style: { color: mic.custom ? 'var(--color-text-primary)' : 'var(--color-text-muted)' } }, mic.custom || '—')
                                       );
                                     })
                                   )
