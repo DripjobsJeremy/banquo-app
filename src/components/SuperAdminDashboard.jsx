@@ -223,9 +223,8 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
               </button>
             </div>
             <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-              {clientOrgs.map(org => {
-                const clientProds = productions.filter(p => p.clientOrgId === org.id || p.clientOrg === org.name);
-                return (
+              {/* TODO: Link productions to client orgs via production.clientOrgId — Sprint future */}
+              {clientOrgs.map(org => (
                   <div
                     key={org.id}
                     className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md hover:border-violet-300 transition-all cursor-pointer"
@@ -252,14 +251,8 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
                     {org.phone && (
                       <div className="text-xs text-gray-500 mb-1">📞 {org.phone}</div>
                     )}
-                    {clientProds.length > 0 && (
-                      <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-gray-100">
-                        🎭 {clientProds.length} production{clientProds.length !== 1 ? 's' : ''}
-                      </div>
-                    )}
                   </div>
-                );
-              })}
+              ))}
             </div>
           </div>
         );
@@ -358,6 +351,7 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button
+            type="button"
             onClick={() => window.location.hash = '/productions'}
             className="flex flex-col items-center gap-2 p-5 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-200 cursor-pointer"
           >
@@ -365,6 +359,7 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
             <span className="text-sm font-medium text-purple-900">Productions</span>
           </button>
           <button
+            type="button"
             onClick={() => setShowAddDonationModal(true)}
             className="flex flex-col items-center gap-2 p-5 bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200 cursor-pointer"
           >
@@ -372,6 +367,7 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
             <span className="text-sm font-medium text-green-900">Log Donation</span>
           </button>
           <button
+            type="button"
             onClick={() => window.location.hash = '/actors'}
             className="flex flex-col items-center gap-2 p-5 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200 cursor-pointer"
           >
@@ -379,6 +375,7 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
             <span className="text-sm font-medium text-blue-900">Actors</span>
           </button>
           <button
+            type="button"
             onClick={() => window.location.hash = '/donors'}
             className="flex flex-col items-center gap-2 p-5 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-200 cursor-pointer"
           >
