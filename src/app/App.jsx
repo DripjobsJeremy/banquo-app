@@ -337,13 +337,13 @@ function App() {
     if (SUPER_ROLES.includes(newRole)) newPath = '/';
     else if (newRole === 'actor') newPath = '/actor-portal';
     else if (newRole === 'volunteer') newPath = '/volunteer-portal';
-    else if (newRole === 'director') {
-      // Only redirect if a staff contact is already selected — otherwise stay
-      // on Settings so the user can pick one from the "Viewing as" picker
-      const existingContactId = localStorage.getItem('showsuite_staff_contact_id');
-      newPath = existingContactId ? '/dept-dashboard' : '/settings';
+    else if (['director', 'lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager'].includes(newRole)) {
+      // Clear previous staff selection — user must pick one for the new role
+      setStaffContactId('');
+      localStorage.removeItem('showsuite_staff_contact_id');
+      // Stay on Settings so the "Viewing as" picker is visible before redirecting
+      newPath = '/settings';
     }
-    else if (['lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager'].includes(newRole)) newPath = '/dept-dashboard';
 
     console.log('📍 Navigating to:', newPath);
     // Use window.location.hash directly — more reliable than history.push
@@ -657,8 +657,12 @@ function App() {
                           onChange={e => {
                             const id = e.target.value;
                             setStaffContactId(id);
-                            if (id) localStorage.setItem('showsuite_staff_contact_id', id);
-                            else localStorage.removeItem('showsuite_staff_contact_id');
+                            if (id) {
+                              localStorage.setItem('showsuite_staff_contact_id', id);
+                              window.location.hash = '/dept-dashboard';
+                            } else {
+                              localStorage.removeItem('showsuite_staff_contact_id');
+                            }
                           }}
                           className="w-full px-3 py-2 border border-amber-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-400"
                         >
