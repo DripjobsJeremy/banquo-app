@@ -7,13 +7,22 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
     const BUDGET_ROLES = ['super_admin', 'venue_manager', 'admin', 'client_admin', 'board_member', 'accounting_manager'];
     const canEditBudget = BUDGET_ROLES.includes(localStorage.getItem('showsuite_user_role') || 'admin');
 
-    const [royalties, setRoyalties] = React.useState(() => ({
-        flatFee: parseFloat(production?.royalties?.flatFee || 0),
-        perPerformance: parseFloat(production?.royalties?.perPerformance || 0),
-        perSeat: parseFloat(production?.royalties?.perSeat || 0),
-        numberOfPerformances: parseInt(production?.royalties?.numberOfPerformances || 0),
-        notes: production?.royalties?.notes || '',
-    }));
+    const [royalties, setRoyalties] = React.useState(() => {
+        try {
+            const prods = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
+            const prod = prods.find(p => p.id === production?.id);
+            const r = prod?.royalties || production?.royalties || {};
+            return {
+                flatFee: parseFloat(r.flatFee || 0),
+                perPerformance: parseFloat(r.perPerformance || 0),
+                perSeat: parseFloat(r.perSeat || 0),
+                numberOfPerformances: parseInt(r.numberOfPerformances || 0),
+                notes: r.notes || '',
+            };
+        } catch {
+            return { flatFee: 0, perPerformance: 0, perSeat: 0, numberOfPerformances: 0, notes: '' };
+        }
+    });
     const [royaltiesExpanded, setRoyaltiesExpanded] = React.useState(false);
 
     const saveRoyalties = (updates) => {
