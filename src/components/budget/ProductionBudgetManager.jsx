@@ -13,15 +13,28 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
             const prod = prods.find(p => p.id === production?.id);
             const r = prod?.royalties || production?.royalties || {};
             return {
+                contractType: r.contractType || 'perf_seat',
+                numberOfPerformances: parseInt(r.numberOfPerformances || 0),
+                seatingCapacity: parseInt(r.seatingCapacity || 0),
+                avgTicketPrice: parseFloat(r.avgTicketPrice || 0),
+                attendancePct: parseFloat(r.attendancePct || 80),
                 flatFee: parseFloat(r.flatFee || 0),
                 perPerformance: parseFloat(r.perPerformance || 0),
                 perSeat: parseFloat(r.perSeat || 0),
-                numberOfPerformances: parseInt(r.numberOfPerformances || 0),
-                numberOfSeats: parseInt(r.numberOfSeats || 0),
+                seatBasis: r.seatBasis || 'capacity',
+                pctGross: parseFloat(r.pctGross || 0),
+                minGuarantee: parseFloat(r.minGuarantee || 0),
+                maxCap: parseFloat(r.maxCap || 0),
+                discount: parseFloat(r.discount || 0),
                 notes: r.notes || '',
             };
         } catch {
-            return { flatFee: 0, perPerformance: 0, perSeat: 0, numberOfPerformances: 0, numberOfSeats: 0, notes: '' };
+            return {
+                contractType: 'perf_seat', numberOfPerformances: 0, seatingCapacity: 0,
+                avgTicketPrice: 0, attendancePct: 80, flatFee: 0, perPerformance: 0,
+                perSeat: 0, seatBasis: 'capacity', pctGross: 0, minGuarantee: 0,
+                maxCap: 0, discount: 0, notes: '',
+            };
         }
     });
     const [royaltiesExpanded, setRoyaltiesExpanded] = React.useState(false);
@@ -31,12 +44,12 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
         setRoyalties(updated);
         try {
             const prods = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
-            const idx = prods.findIndex(p => p.id === production.id);
+            const idx = prods.findIndex(p => p.id === production?.id);
             if (idx !== -1) {
-                prods[idx].royalties = updated;
+                prods[idx] = { ...prods[idx], royalties: updated };
                 localStorage.setItem('showsuite_productions', JSON.stringify(prods));
             }
-        } catch (e) { /* ignore */ }
+        } catch {}
     };
 
     React.useEffect(() => {
@@ -111,9 +124,60 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
     if (!budget) return <div className="p-6">Loading budget...</div>;
 
     const summary = window.budgetService.calculateBudgetSummary(production.id);
-    const royaltiesTotal = royalties.flatFee +
-        (royalties.perPerformance * royalties.numberOfPerformances) +
-        (royalties.perSeat * royalties.numberOfPerformances * royalties.numberOfSeats);
+
+    const royaltyCalc = React.useMemo(() => {
+        const r = royalties;
+        const perfs = r.numberOfPerformances;
+        const seats = r.seatingCapacity;
+        const seatsUsed = r.seatBasis === 'capacity'
+            ? seats
+            : Math.round(seats * r.attendancePct / 100);
+        const grossRev = seats * (r.attendancePct / 100) * perfs * r.avgTicketPrice;
+        const type = r.contractType;
+        const rows = [];
+        let subtotal = 0;
+
+        if (['flat','perf_seat','custom'].includes(type) && r.flatFee > 0) {
+            const amt = r.flatFee;
+            rows.push({ label: 'Flat licensing fee', amount: amt });
+            subtotal += amt;
+        }
+        if (['per_perf','perf_seat','custom'].includes(type) && r.perPerformance > 0) {
+            const amt = r.perPerformance * perfs;
+            rows.push({ label: `Per performance ($${r.perPerformance.toFixed(2)} × ${perfs} perfs)`, amount: amt });
+            subtotal += amt;
+        }
+        if (['per_seat','perf_seat','custom'].includes(type) && r.perSeat > 0) {
+            const amt = r.perSeat * seatsUsed * perfs;
+            const basis = r.seatBasis === 'capacity' ? 'capacity' : 'tickets sold';
+            rows.push({ label: `Per seat ($${r.perSeat.toFixed(2)} × ${seatsUsed} seats × ${perfs} perfs, ${basis})`, amount: amt });
+            subtotal += amt;
+        }
+        if (['pct_gross','pct_min'].includes(type) && r.pctGross > 0) {
+            let amt = grossRev * (r.pctGross / 100);
+            if (type === 'pct_min') amt = Math.max(amt, r.minGuarantee);
+            const label = type === 'pct_min'
+                ? `${r.pctGross}% of gross revenue (min $${r.minGuarantee.toFixed(2)})`
+                : `${r.pctGross}% of gross revenue`;
+            rows.push({ label, amount: amt });
+            subtotal += amt;
+        }
+
+        let total = subtotal;
+        let afterCap = null;
+        let afterDiscount = null;
+
+        if (r.maxCap > 0 && total > r.maxCap) {
+            afterCap = r.maxCap;
+            total = r.maxCap;
+        }
+        if (r.discount > 0) {
+            afterDiscount = total * (1 - r.discount / 100);
+            total = afterDiscount;
+        }
+
+        return { rows, subtotal, afterCap, afterDiscount, total, grossRev, seatsUsed };
+    }, [royalties]);
 
     const DEPARTMENTS = [
         { id: 'lighting', name: 'Lighting', icon: '💡' },
@@ -203,7 +267,7 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                             canEditBudget={canEditBudget}
                             onUpdateTotalBudget={handleUpdateTotalBudget}
                             onSyncCosts={handleSyncDepartmentCosts}
-                            royaltiesTotal={royaltiesTotal}
+                            royaltiesTotal={royaltyCalc.total}
                         />
                     )}
 
@@ -221,91 +285,241 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                             />
 
                             {/* Royalties & Licensing */}
-                            <div className="border border-gray-200 rounded-lg overflow-hidden mt-6">
-                                <button
-                                    type="button"
-                                    className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                            <div className="royalties-wrapper">
+                                <div
                                     onClick={() => setRoyaltiesExpanded(e => !e)}
+                                    className={`royalties-header flex items-center justify-between px-4 py-3 ${royaltiesExpanded ? 'royalties-header--open' : ''}`}
                                 >
                                     <div className="flex items-center gap-2">
                                         <span>🎭</span>
-                                        <span className="font-semibold text-gray-900">Royalties &amp; Licensing</span>
-                                        {royaltiesTotal > 0 && (
-                                            <span className="text-xs text-yellow-600 font-medium ml-2">
-                                                ${royaltiesTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })} total
+                                        <span className="royalties-header-title">Royalties &amp; Licensing</span>
+                                        {royaltyCalc.total > 0 && (
+                                            <span className="royalties-header-total">
+                                                ${royaltyCalc.total.toLocaleString('en-US', { minimumFractionDigits: 2 })} total
                                             </span>
                                         )}
                                     </div>
-                                    <span className="text-gray-400 text-sm">{royaltiesExpanded ? '▼' : '▶'}</span>
-                                </button>
+                                    <span className="royalties-header-chevron">
+                                        {royaltiesExpanded ? '▼' : '▶'}
+                                    </span>
+                                </div>
 
                                 {royaltiesExpanded && (
-                                    <div className="p-4 grid grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="block text-xs text-gray-600 mb-1">Flat Licensing Fee</label>
-                                            <input
-                                                type="number" min="0" step="0.01"
-                                                value={royalties.flatFee}
-                                                onChange={e => saveRoyalties({ flatFee: parseFloat(e.target.value) || 0 })}
-                                                placeholder="0.00"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500"
-                                            />
-                                            <p className="text-xs text-gray-400 mt-1">One-time fee paid to licensor</p>
-                                        </div>
+                                    <div className="royalties-body">
 
-                                        <div>
-                                            <label className="block text-xs text-gray-600 mb-1">Per-Performance Royalty</label>
-                                            <input
-                                                type="number" min="0" step="0.01"
-                                                value={royalties.perPerformance}
-                                                onChange={e => saveRoyalties({ perPerformance: parseFloat(e.target.value) || 0 })}
-                                                placeholder="0.00"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500"
-                                            />
-                                            <p className="text-xs text-gray-400 mt-1">Rate per performance</p>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-xs text-gray-600 mb-1">Number of Performances</label>
-                                            <input
-                                                type="number" min="0" step="1"
-                                                value={royalties.numberOfPerformances}
-                                                onChange={e => saveRoyalties({ numberOfPerformances: parseInt(e.target.value) || 0 })}
-                                                placeholder="0"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-xs text-gray-600 mb-1">
-                                                Per-Seat Royalty <span className="text-gray-400 font-normal">(optional)</span>
-                                            </label>
-                                            <input
-                                                type="number" min="0" step="0.01"
-                                                value={royalties.perSeat}
-                                                onChange={e => saveRoyalties({ perSeat: parseFloat(e.target.value) || 0 })}
-                                                placeholder="0.00"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500"
-                                            />
-                                            <p className="text-xs text-gray-400 mt-1">Rate × performances × seats</p>
-                                        </div>
-
-                                        {royalties.perSeat > 0 && (
-                                            <div>
-                                                <label className="block text-xs text-gray-600 mb-1">Number of Seats</label>
-                                                <input
-                                                    type="number" min="0" step="1"
-                                                    value={royalties.numberOfSeats || ''}
-                                                    onChange={e => saveRoyalties({ numberOfSeats: parseInt(e.target.value) || 0 })}
-                                                    placeholder="e.g. 250"
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500"
-                                                />
-                                                <p className="text-xs text-gray-400 mt-1">Seats × per-seat rate × performances</p>
+                                        {/* Production Details */}
+                                        <div className="royalties-section">
+                                            <div className="royalties-section-label">Production details</div>
+                                            <div className="royalties-grid-3">
+                                                {[
+                                                    { key: 'numberOfPerformances', label: 'Performances', step: 1 },
+                                                    { key: 'seatingCapacity', label: 'Seating capacity', step: 1 },
+                                                    { key: 'avgTicketPrice', label: 'Avg ticket price', step: 0.01 },
+                                                ].map(f => (
+                                                    <div key={f.key}>
+                                                        <label className="royalties-field-label">{f.label}</label>
+                                                        <input type="number" step={f.step} min="0"
+                                                            value={royalties[f.key] || ''}
+                                                            title={f.label}
+                                                            placeholder="0"
+                                                            onChange={e => saveRoyalties({ [f.key]: f.step === 1 ? parseInt(e.target.value) || 0 : parseFloat(e.target.value) || 0 })}
+                                                            className="w-full px-3 py-2 rounded-lg text-sm border border-gray-300 focus:ring-2 focus:ring-green-500"
+                                                        />
+                                                    </div>
+                                                ))}
                                             </div>
-                                        )}
+                                            <div className="royalties-grid-2">
+                                                <div>
+                                                    <label className="royalties-field-label">Expected attendance %</label>
+                                                    <input type="number" min="0" max="100" step="1"
+                                                        value={royalties.attendancePct || ''}
+                                                        title="Expected attendance %"
+                                                        placeholder="80"
+                                                        onChange={e => saveRoyalties({ attendancePct: parseFloat(e.target.value) || 0 })}
+                                                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-300 focus:ring-2 focus:ring-green-500"
+                                                    />
+                                                    <p className="royalties-field-hint">% of capacity per performance</p>
+                                                </div>
+                                                <div className="royalties-gross-col">
+                                                    <span className="royalties-gross-label">
+                                                        Est. gross revenue: <strong className="royalties-gross-value">${royaltyCalc.grossRev.toLocaleString('en-US', { minimumFractionDigits: 2 })}</strong>
+                                                    </span>
+                                                    <span className="royalties-gross-sub">
+                                                        {royaltyCalc.seatsUsed} seats × {royalties.numberOfPerformances} perfs
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                        <div className="col-span-2">
-                                            <label className="block text-xs text-gray-600 mb-1">Licensing Notes</label>
+                                        {/* Contract Type */}
+                                        <div className="royalties-section">
+                                            <div className="royalties-section-label">Royalty structure</div>
+                                            <select
+                                                value={royalties.contractType}
+                                                onChange={e => saveRoyalties({ contractType: e.target.value })}
+                                                title="Royalty structure"
+                                                className="w-full px-3 py-2 rounded-lg text-sm border border-gray-300 focus:ring-2 focus:ring-green-500"
+                                            >
+                                                <option value="flat">Flat fee only</option>
+                                                <option value="per_perf">Per performance</option>
+                                                <option value="per_seat">Per seat</option>
+                                                <option value="perf_seat">Per performance + per seat</option>
+                                                <option value="pct_gross">Percentage of gross</option>
+                                                <option value="pct_min">Percentage of gross w/ minimum guarantee</option>
+                                                <option value="custom">Custom / hybrid</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Fee Fields */}
+                                        <div className="royalties-fee-grid">
+                                            {['flat','perf_seat','custom'].includes(royalties.contractType) && (
+                                                <div>
+                                                    <label className="royalties-field-label">Flat licensing fee</label>
+                                                    <input type="number" min="0" step="0.01"
+                                                        value={royalties.flatFee || ''}
+                                                        onChange={e => saveRoyalties({ flatFee: parseFloat(e.target.value) || 0 })}
+                                                        placeholder="0.00"
+                                                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-300 focus:ring-2 focus:ring-green-500"
+                                                    />
+                                                    <p className="royalties-field-hint">One-time fee paid to licensor</p>
+                                                </div>
+                                            )}
+
+                                            {['per_perf','perf_seat','custom'].includes(royalties.contractType) && (
+                                                <div>
+                                                    <label className="royalties-field-label">Per-performance royalty</label>
+                                                    <input type="number" min="0" step="0.01"
+                                                        value={royalties.perPerformance || ''}
+                                                        onChange={e => saveRoyalties({ perPerformance: parseFloat(e.target.value) || 0 })}
+                                                        placeholder="0.00"
+                                                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-300 focus:ring-2 focus:ring-green-500"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {['per_seat','perf_seat','custom'].includes(royalties.contractType) && (
+                                                <>
+                                                    <div>
+                                                        <label className="royalties-field-label">Per-seat royalty</label>
+                                                        <input type="number" min="0" step="0.01"
+                                                            value={royalties.perSeat || ''}
+                                                            onChange={e => saveRoyalties({ perSeat: parseFloat(e.target.value) || 0 })}
+                                                            placeholder="0.00"
+                                                            className="w-full px-3 py-2 rounded-lg text-sm border border-gray-300 focus:ring-2 focus:ring-green-500"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="royalties-field-label">Applied to</label>
+                                                        <div className="royalties-radio-group">
+                                                            {[['capacity','Capacity'],['attendance','Tickets sold']].map(([val,lbl]) => (
+                                                                <label key={val} className="royalties-radio-label">
+                                                                    <input type="radio" name="seatBasis" value={val}
+                                                                        checked={royalties.seatBasis === val}
+                                                                        onChange={() => saveRoyalties({ seatBasis: val })}
+                                                                    />
+                                                                    {lbl}
+                                                                </label>
+                                                            ))}
+                                                        </div>
+                                                        <p className="royalties-field-hint">
+                                                            {royalties.seatBasis === 'capacity'
+                                                                ? `${royalties.seatingCapacity} seats per performance`
+                                                                : `${royaltyCalc.seatsUsed} seats per performance (${royalties.attendancePct}% attendance)`}
+                                                        </p>
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            {['pct_gross','pct_min'].includes(royalties.contractType) && (
+                                                <div>
+                                                    <label className="royalties-field-label">% of gross revenue</label>
+                                                    <input type="number" min="0" max="100" step="0.1"
+                                                        value={royalties.pctGross || ''}
+                                                        onChange={e => saveRoyalties({ pctGross: parseFloat(e.target.value) || 0 })}
+                                                        placeholder="0.0"
+                                                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-300 focus:ring-2 focus:ring-green-500"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {royalties.contractType === 'pct_min' && (
+                                                <div>
+                                                    <label className="royalties-field-label">Minimum guarantee</label>
+                                                    <input type="number" min="0" step="0.01"
+                                                        value={royalties.minGuarantee || ''}
+                                                        onChange={e => saveRoyalties({ minGuarantee: parseFloat(e.target.value) || 0 })}
+                                                        placeholder="0.00"
+                                                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-300 focus:ring-2 focus:ring-green-500"
+                                                    />
+                                                    <p className="royalties-field-hint">Higher of % or minimum is charged</p>
+                                                </div>
+                                            )}
+
+                                            {royalties.contractType !== 'flat' && (
+                                                <div>
+                                                    <label className="royalties-field-label">
+                                                        Maximum royalty cap <span className="font-normal">(optional)</span>
+                                                    </label>
+                                                    <input type="number" min="0" step="0.01"
+                                                        value={royalties.maxCap || ''}
+                                                        onChange={e => saveRoyalties({ maxCap: parseFloat(e.target.value) || 0 })}
+                                                        placeholder="No cap"
+                                                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-300 focus:ring-2 focus:ring-green-500"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {royalties.contractType !== 'flat' && (
+                                                <div>
+                                                    <label className="royalties-field-label">
+                                                        Discount % <span className="font-normal">(optional)</span>
+                                                    </label>
+                                                    <input type="number" min="0" max="100" step="0.1"
+                                                        value={royalties.discount || ''}
+                                                        onChange={e => saveRoyalties({ discount: parseFloat(e.target.value) || 0 })}
+                                                        placeholder="0%"
+                                                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-300 focus:ring-2 focus:ring-green-500"
+                                                    />
+                                                    <p className="royalties-field-hint">Negotiated reduction</p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Breakdown */}
+                                        <div className="royalties-breakdown">
+                                            {royaltyCalc.rows.length === 0 ? (
+                                                <p className="royalties-breakdown-empty">Enter values above to see breakdown</p>
+                                            ) : (
+                                                <>
+                                                    {royaltyCalc.rows.map((row, i) => (
+                                                        <div key={i} className="royalties-breakdown-row">
+                                                            <span>{row.label}</span>
+                                                            <span>${row.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                                                        </div>
+                                                    ))}
+                                                    {royaltyCalc.afterCap !== null && (
+                                                        <div className="royalties-breakdown-cap">
+                                                            <span>After cap</span>
+                                                            <span>${royaltyCalc.afterCap.toLocaleString('en-US', { minimumFractionDigits: 2 })} (capped)</span>
+                                                        </div>
+                                                    )}
+                                                    {royaltyCalc.afterDiscount !== null && (
+                                                        <div className="royalties-breakdown-discount">
+                                                            <span>After {royalties.discount}% discount</span>
+                                                            <span>${royaltyCalc.afterDiscount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                                                        </div>
+                                                    )}
+                                                    <div className="royalties-breakdown-total">
+                                                        <span>Total royalties</span>
+                                                        <span className="royalties-breakdown-total-amount">${royaltyCalc.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+
+                                        {/* Notes */}
+                                        <div>
+                                            <label className="royalties-field-label">Licensing notes</label>
                                             <textarea
                                                 value={royalties.notes}
                                                 onChange={e => saveRoyalties({ notes: e.target.value })}
@@ -315,23 +529,9 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                                             />
                                         </div>
 
-                                        <div className="col-span-2 bg-gray-50 border border-gray-200 rounded-lg p-3">
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-sm text-gray-600">
-                                                    Flat fee ${royalties.flatFee.toFixed(2)}
-                                                    {royalties.perPerformance > 0 && ` + $${royalties.perPerformance.toFixed(2)} × ${royalties.numberOfPerformances} performances`}
-                                                    {royalties.perSeat > 0 && royalties.numberOfSeats > 0 && ` + $${royalties.perSeat.toFixed(2)}/seat × ${royalties.numberOfSeats} seats × ${royalties.numberOfPerformances} perf`}
-                                                </span>
-                                                <span className={`text-base font-bold ${royaltiesTotal > 0 ? 'text-yellow-600' : 'text-gray-400'}`}>
-                                                    ${royaltiesTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                                                </span>
-                                            </div>
-                                            {royaltiesTotal > 0 && (
-                                                <p className="text-xs text-gray-400 mt-1">
-                                                    Royalties are not included in department allocations — budget accordingly
-                                                </p>
-                                            )}
-                                        </div>
+                                        <p className="royalties-footer-note">
+                                            Royalties are separate from department allocations — budget accordingly
+                                        </p>
                                     </div>
                                 )}
                             </div>

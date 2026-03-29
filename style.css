@@ -951,3 +951,54 @@ select:focus {
   width: 12px; height: 12px; border-radius: 50%;
   background: #34d399; border: none; cursor: pointer;
 }
+
+/* ── Royalties & Licensing section ──────────────────────────────────────────── */
+.royalties-wrapper { margin-top: 16px; }
+.royalties-header {
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.royalties-header--open { border-radius: 8px 8px 0 0; }
+.royalties-header-title { font-weight: 600; color: var(--color-text-primary); }
+.royalties-header-total { font-size: 12px; color: var(--color-warning); margin-left: 8px; }
+.royalties-header-chevron { color: var(--color-text-muted); font-size: 12px; }
+.royalties-body {
+  border: 1px solid var(--color-border);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: 16px;
+}
+.royalties-section { margin-bottom: 16px; }
+.royalties-section-label {
+  font-size: 11px; font-weight: 600; color: var(--color-text-muted);
+  text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px;
+}
+.royalties-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.royalties-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.royalties-field-label { font-size: 12px; color: var(--color-text-muted); display: block; margin-bottom: 4px; }
+.royalties-field-hint { font-size: 11px; color: var(--color-text-muted); margin-top: 2px; }
+.royalties-gross-col { display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 4px; }
+.royalties-gross-label { font-size: 13px; color: var(--color-text-secondary); }
+.royalties-gross-value { color: var(--color-text-primary); }
+.royalties-gross-sub { font-size: 11px; color: var(--color-text-muted); margin-top: 2px; }
+.royalties-fee-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.royalties-radio-group { display: flex; gap: 16px; margin-top: 8px; }
+.royalties-radio-label { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+.royalties-breakdown {
+  background-color: var(--color-bg-elevated);
+  border-radius: 8px; padding: 12px; margin-bottom: 12px;
+  border: 1px solid var(--color-border);
+}
+.royalties-breakdown-empty { font-size: 13px; color: var(--color-text-muted); font-style: italic; }
+.royalties-breakdown-row { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; color: var(--color-text-secondary); }
+.royalties-breakdown-cap { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; color: var(--color-warning); }
+.royalties-breakdown-discount { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; color: var(--color-success); }
+.royalties-breakdown-total {
+  display: flex; justify-content: space-between; font-size: 15px; font-weight: 500;
+  padding: 8px 0 3px; border-top: 1px solid var(--color-border); margin-top: 6px;
+  color: var(--color-text-primary);
+}
+.royalties-breakdown-total-amount { color: var(--color-warning); }
+.royalties-footer-note { font-size: 11px; color: var(--color-text-muted); margin-top: 8px; }
