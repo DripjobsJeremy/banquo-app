@@ -358,10 +358,14 @@ const OrganizationService = (() => {
         success:   { bg: '#059669', hover: '#047857', active: '#065F46', text: '#FFFFFF', hoverText: '#FFFFFF' },
     };
 
-    const applyButtonTheme = () => {
+    const applyButtonTheme = (overrideTheme) => {
         try {
-            const stored = localStorage.getItem(BTN_THEME_KEY);
-            const theme = stored ? JSON.parse(stored) : DEFAULT_BTN_THEME;
+            const theme = overrideTheme || (() => {
+                try {
+                    const stored = localStorage.getItem(BTN_THEME_KEY);
+                    return stored ? JSON.parse(stored) : DEFAULT_BTN_THEME;
+                } catch { return DEFAULT_BTN_THEME; }
+            })();
             const r = document.documentElement.style;
             ['primary', 'secondary', 'success'].forEach(type => {
                 const t = theme[type] || DEFAULT_BTN_THEME[type];

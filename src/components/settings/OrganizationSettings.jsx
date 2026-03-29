@@ -25,9 +25,10 @@ function OrganizationSettings(props) {
 
   const resetBtnTheme = () => {
     const def = window.organizationService?.DEFAULT_BTN_THEME;
+    localStorage.removeItem('scenestave_button_theme');
+    window.organizationService?.applyButtonTheme?.(def);
     setBtnTheme({ ...def });
-    window.organizationService?.saveButtonTheme({ ...def });
-    if (window.showToast) window.showToast('Button theme reset to defaults', 'info');
+    if (window.showToast) window.showToast('Button styles reset to defaults', 'success');
   };
 
   const loadOrganization = () => {
