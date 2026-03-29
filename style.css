@@ -1092,6 +1092,31 @@ select:focus {
 .budget-planned-amount { font-weight: 500; color: var(--color-text-primary); }
 .budget-planned-amount--over { color: var(--color-danger, #ef4444); }
 
+/* ── Department tab bar ──────────────────────────────────────── */
+.dept-tab-bar-wrap { position: relative; margin-bottom: 24px; }
+.dept-tab-bar {
+  display: flex; gap: 4px; align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
+  padding-bottom: 1px;
+}
+.dept-tab-bar::-webkit-scrollbar { display: none; }
+.dept-tab-btn {
+  padding: 8px 14px; font-size: 13px; font-weight: 500;
+  border: none; border-bottom: 2px solid transparent;
+  background: transparent; cursor: pointer;
+  white-space: nowrap; transition: color 0.15s, border-color 0.15s;
+  flex-shrink: 0; margin-bottom: -1px;
+}
+.dept-tab-btn--active { border-bottom-color: #7c3aed; color: #7c3aed; }
+.dept-tab-btn--idle { color: #6b7280; }
+.dept-tab-btn--idle:hover { color: #374151; border-bottom-color: #d1d5db; }
+.dept-tab-bar-fade {
+  position: absolute; right: 0; top: 0; bottom: 1px; width: 48px;
+  background: linear-gradient(to right, transparent, #fff);
+  pointer-events: none;
+}
+
 /* ── Production card mode toggle ─────────────────────────────── */
 .prod-card-mode-toggle { display: flex; gap: 2px; background: #f3f4f6; border-radius: 8px; padding: 3px; }
 .prod-card-mode-btn { padding: 5px 10px; border-radius: 6px; border: none; background: transparent; cursor: pointer; font-size: 14px; color: #6b7280; transition: background 0.15s, color 0.15s; }

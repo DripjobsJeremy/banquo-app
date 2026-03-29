@@ -483,9 +483,9 @@ function SceneBuilder({ productionId: propId }) {
     { id: 'wardrobe', label: 'Wardrobe', icon: '👗' },
     { id: 'props', label: 'Props', icon: '🎭' },
     { id: 'set', label: 'Set', icon: '🏗️' },
+    { id: 'images',        label: 'Images',        icon: '🖼️' },
     { id: 'stage_manager', label: 'Stage Manager', icon: '📋' },
-    { id: 'calendar', label: 'Calendar', icon: '📅' },
-    { id: 'images',   label: 'Images',   icon: '🖼️' }
+    { id: 'calendar',      label: 'Calendar',      icon: '📅' },
   ];
 
   const handleTabChange = (newTab) => {
@@ -562,21 +562,24 @@ function SceneBuilder({ productionId: propId }) {
 
   const tabNavigation = React.createElement(
     'div',
-    { className: 'flex items-center gap-1 border-b border-gray-200 mb-6 overflow-x-auto scrollbar-hide' },
-    visibleTabs.map(tab =>
-      React.createElement(
-        'button',
-        {
-          key: tab.id,
-          onClick: () => handleTabChange(tab.id),
-          className: 'px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ' +
-            (effectiveTab === tab.id
-              ? 'border-violet-600 text-violet-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300')
-        },
-        tab.icon + ' ' + tab.label
+    { className: 'dept-tab-bar-wrap' },
+    React.createElement(
+      'div',
+      { className: 'dept-tab-bar' },
+      visibleTabs.map(tab =>
+        React.createElement(
+          'button',
+          {
+            key: tab.id,
+            onClick: () => handleTabChange(tab.id),
+            className: 'dept-tab-btn ' +
+              (effectiveTab === tab.id ? 'dept-tab-btn--active' : 'dept-tab-btn--idle')
+          },
+          tab.icon + ' ' + tab.label
+        )
       )
-    )
+    ),
+    React.createElement('div', { className: 'dept-tab-bar-fade' })
   );
 
   // Character & Cast List section
