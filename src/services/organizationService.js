@@ -265,6 +265,8 @@ const OrganizationService = (() => {
         org.branding = { ...themeColors };
         saveOrganization(org);
         applyBrandingToDOM(org.branding);
+        // Re-apply button theme after branding so --color-primary stays in sync with button theme
+        applyButtonTheme();
         return org;
     };
 

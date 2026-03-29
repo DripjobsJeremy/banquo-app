@@ -25,7 +25,9 @@ function OrganizationSettings(props) {
 
   const resetBtnTheme = () => {
     const def = window.organizationService?.DEFAULT_BTN_THEME;
-    localStorage.removeItem('scenestave_button_theme');
+    // Write defaults explicitly (not removeItem) — so applyButtonTheme() on next mount
+    // always finds a value and wins over applyBrandingToDOM's --color-primary
+    localStorage.setItem('scenestave_button_theme', JSON.stringify(def));
     window.organizationService?.applyButtonTheme?.(def);
     setBtnTheme({ ...def });
     if (window.showToast) window.showToast('Button styles reset to defaults', 'success');
