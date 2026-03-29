@@ -109,9 +109,9 @@ const CueSheetBuilder = ({ production, userRole }) => {
       return idx >= 0 ? idx : null;
     };
 
-    // Brightness control — persisted across sessions
+    // Brightness control — persisted across sessions, range 0.2–1.25
     const [brightness, setBrightness] = React.useState(() =>
-      parseFloat(localStorage.getItem('scenestave_call_brightness') || '1')
+      parseFloat(localStorage.getItem('scenestave_call_brightness') || '0.75')
     );
     const sliderRef = React.useRef(null);
 
@@ -120,17 +120,18 @@ const CueSheetBuilder = ({ production, userRole }) => {
       localStorage.setItem('scenestave_call_brightness', String(val));
     };
 
-    // Sync CSS variable to root (applies opacity to content elements via CSS calc)
+    // Sync CSS variable to root — filter: brightness() on .cs-scroll reads this
     React.useEffect(() => {
       document.documentElement.style.setProperty('--call-brightness', String(brightness));
       return () => document.documentElement.style.removeProperty('--call-brightness');
     }, [brightness]);
 
-    // Update slider fill gradient (dynamic — can't be done in CSS alone)
+    // Update slider fill gradient (normalized to 0.2–1.25 range)
     React.useEffect(() => {
       if (sliderRef.current) {
+        const pct = ((brightness - 0.2) / (1.25 - 0.2)) * 100;
         sliderRef.current.style.background =
-          `linear-gradient(to right, #34d399 ${brightness * 100}%, #333 ${brightness * 100}%)`;
+          `linear-gradient(to right, #34d399 ${pct}%, #333 ${pct}%)`;
       }
     }, [brightness]);
 
@@ -219,7 +220,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
               <input
                 type="range"
                 min="0.2"
-                max="1"
+                max="1.25"
                 step="0.05"
                 value={brightness}
                 ref={sliderRef}
@@ -267,7 +268,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
             </div>
           )}
 
-          {/* ── CURRENT CUE — GO box ──────────────────────────────────────────── */}
+          {/* ── CURRENT CUE — info only (GO button is a sibling outside this filtered zone) */}
           <div className="cs-current-cue" data-cue-type={current.type}>
             <div className="cs-current-badge-col">
               <DarkBadge type={current.type} number={current.number} />
@@ -276,15 +277,6 @@ const CueSheetBuilder = ({ production, userRole }) => {
               <div className="cs-current-desc">{current.description || 'No description'}</div>
               {current.notes && <div className="cs-current-notes">{current.notes}</div>}
             </div>
-            {/* GO button — large for backstage dark use (Fitts's Law + UX Principle 2) */}
-            <button
-              type="button"
-              onClick={onAdvance}
-              className="cs-go-btn"
-              aria-label="GO — advance to next cue"
-            >
-              GO
-            </button>
           </div>
 
           {/* Next cues */}
@@ -300,6 +292,18 @@ const CueSheetBuilder = ({ production, userRole }) => {
               </div>
             ) : null
           )}
+        </div>
+
+        {/* ── GO button — sibling of cs-scroll, outside filter: brightness() ────── */}
+        <div className="cs-go-row">
+          <button
+            type="button"
+            onClick={onAdvance}
+            className="cs-go-btn"
+            aria-label="GO — advance to next cue"
+          >
+            GO
+          </button>
         </div>
 
         {/* ── Footer ──────────────────────────────────────────────────────────── */}
