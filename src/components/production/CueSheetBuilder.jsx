@@ -108,6 +108,32 @@ const CueSheetBuilder = ({ production, userRole }) => {
       const idx = sorted.findIndex(c => c.sceneId === sceneId);
       return idx >= 0 ? idx : null;
     };
+
+    // Brightness control — persisted across sessions
+    const [brightness, setBrightness] = React.useState(() =>
+      parseFloat(localStorage.getItem('scenestave_call_brightness') || '1')
+    );
+    const sliderRef = React.useRef(null);
+
+    const handleBrightness = (val) => {
+      setBrightness(val);
+      localStorage.setItem('scenestave_call_brightness', String(val));
+    };
+
+    // Sync CSS variable to root (applies opacity to content elements via CSS calc)
+    React.useEffect(() => {
+      document.documentElement.style.setProperty('--call-brightness', String(brightness));
+      return () => document.documentElement.style.removeProperty('--call-brightness');
+    }, [brightness]);
+
+    // Update slider fill gradient (dynamic — can't be done in CSS alone)
+    React.useEffect(() => {
+      if (sliderRef.current) {
+        sliderRef.current.style.background =
+          `linear-gradient(to right, #34d399 ${brightness * 100}%, #333 ${brightness * 100}%)`;
+      }
+    }, [brightness]);
+
     const current = sorted[currentIdx];
     const prev2 = sorted[currentIdx - 2];
     const prev1 = sorted[currentIdx - 1];
@@ -188,6 +214,21 @@ const CueSheetBuilder = ({ production, userRole }) => {
             <div className="cs-live-badge">LIVE</div>
             <div className="cs-counter">{currentIdx + 1} / {sorted.length}</div>
             <button type="button" onClick={onExit} className="cs-btn-exit">Exit</button>
+            <div className="cs-brightness-control">
+              <span className="cs-brightness-icon">☀</span>
+              <input
+                type="range"
+                min="0.2"
+                max="1"
+                step="0.05"
+                value={brightness}
+                ref={sliderRef}
+                onChange={e => handleBrightness(parseFloat(e.target.value))}
+                title="Adjust screen brightness"
+                className="cs-brightness-slider"
+              />
+              <span className="cs-brightness-icon cs-brightness-icon--dim">☾</span>
+            </div>
           </div>
         </div>
 

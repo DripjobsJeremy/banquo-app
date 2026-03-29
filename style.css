@@ -752,11 +752,11 @@ select:focus {
   padding: 8px 12px; border-radius: 6px; display: flex; gap: 10px;
   align-items: flex-start; background: #0d0d0d; border: 1px solid #1a1a1a;
 }
-.cs-cue-row--prev2 { opacity: 0.30; border-color: #1e1e1e; }
-.cs-cue-row--prev1 { opacity: 0.50; }
-.cs-cue-row--next1 { opacity: 0.90; border-color: #1c1c1c; }
-.cs-cue-row--next2 { opacity: 0.68; border-color: #1c1c1c; }
-.cs-cue-row--next3 { opacity: 0.46; border-color: #1c1c1c; }
+.cs-cue-row--prev2 { opacity: calc(0.30 * var(--call-brightness, 1)); border-color: #1e1e1e; }
+.cs-cue-row--prev1 { opacity: calc(0.50 * var(--call-brightness, 1)); }
+.cs-cue-row--next1 { opacity: calc(0.90 * var(--call-brightness, 1)); border-color: #1c1c1c; }
+.cs-cue-row--next2 { opacity: calc(0.68 * var(--call-brightness, 1)); border-color: #1c1c1c; }
+.cs-cue-row--next3 { opacity: calc(0.46 * var(--call-brightness, 1)); border-color: #1c1c1c; }
 
 .cs-prev-desc { flex: 1; font-size: 12px; color: #666; text-decoration: line-through; }
 .cs-completed-divider { height: 1px; background: #1a1a1a; margin: 4px 0; }
@@ -773,6 +773,7 @@ select:focus {
 .cs-standby-bar {
   padding: 9px 12px; border-radius: 6px; background: #1c1500;
   border: 1px solid #5c4400; display: flex; flex-direction: column; gap: 4px;
+  opacity: var(--call-brightness, 1);
 }
 .cs-standby-row     { display: flex; align-items: center; gap: 8px; }
 .cs-standby-keyword {
@@ -798,8 +799,8 @@ select:focus {
 .cs-current-cue[data-cue-type="intermission"] { border-color: #334155; }
 .cs-current-cue[data-cue-type="other"]        { border-color: #334155; }
 
-.cs-current-badge-col { flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 2px; }
-.cs-current-body      { flex: 1; min-width: 0; }
+.cs-current-badge-col { flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 2px; opacity: var(--call-brightness, 1); }
+.cs-current-body      { flex: 1; min-width: 0; opacity: var(--call-brightness, 1); }
 .cs-current-desc      { font-size: 17px; font-weight: 600; color: #f0f0f0; line-height: 1.35; }
 .cs-current-notes     { font-size: 11px; color: #4a4a4a; margin-top: 6px; }
 
@@ -907,4 +908,27 @@ select:focus {
   background: #1a1a1a; color: #888; border: 1px solid #333;
   padding: 6px 12px; border-radius: 6px; font-size: 12px;
   cursor: pointer; max-width: 200px;
+}
+
+/* Brightness control in CallingScreen header */
+.cs-brightness-control {
+  display: flex; align-items: center; gap: 6px; margin-left: 8px;
+}
+.cs-brightness-icon { font-size: 11px; color: #444; line-height: 1; }
+.cs-brightness-icon--dim { color: #2a2a2a; }
+.cs-brightness-slider {
+  width: 72px; height: 3px;
+  -webkit-appearance: none; appearance: none;
+  border-radius: 2px; outline: none; cursor: pointer;
+  /* Initial gradient — overridden by JS on each change */
+  background: linear-gradient(to right, #34d399 100%, #333 100%);
+}
+.cs-brightness-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #34d399; cursor: pointer;
+}
+.cs-brightness-slider::-moz-range-thumb {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #34d399; border: none; cursor: pointer;
 }
