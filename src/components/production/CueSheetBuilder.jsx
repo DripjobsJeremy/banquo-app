@@ -52,7 +52,22 @@ const CueSheetBuilder = ({ production, userRole }) => {
   };
 
   const handleBack = () => setCurrentCueIdx(i => Math.max(i - 1, 0));
-  const handleExitCalling = () => { setCallingMode(false); setCurrentCueIdx(0); };
+
+  const handleEnterCallingMode = () => {
+    const currentTheme = localStorage.getItem('scenestave_theme_mode') || 'dark';
+    sessionStorage.setItem('scenestave_pre_call_theme', currentTheme);
+    window.organizationService?.saveThemeMode?.('dark');
+    setCallingMode(true);
+    setCurrentCueIdx(0);
+  };
+
+  const handleExitCalling = () => {
+    const previousTheme = sessionStorage.getItem('scenestave_pre_call_theme') || 'dark';
+    window.organizationService?.saveThemeMode?.(previousTheme);
+    sessionStorage.removeItem('scenestave_pre_call_theme');
+    setCallingMode(false);
+    setCurrentCueIdx(0);
+  };
 
   // Group cues by scene for scene view
   const cuesByScene = React.useMemo(() => {
@@ -470,7 +485,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
               <div className="cue-call-divider" />
               <button
                 type="button"
-                onClick={() => { setCallingMode(true); setCurrentCueIdx(0); }}
+                onClick={handleEnterCallingMode}
                 className="btn-call-show"
               >
                 ▶ Call Show
