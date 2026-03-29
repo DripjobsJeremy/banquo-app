@@ -17,10 +17,11 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                 perPerformance: parseFloat(r.perPerformance || 0),
                 perSeat: parseFloat(r.perSeat || 0),
                 numberOfPerformances: parseInt(r.numberOfPerformances || 0),
+                numberOfSeats: parseInt(r.numberOfSeats || 0),
                 notes: r.notes || '',
             };
         } catch {
-            return { flatFee: 0, perPerformance: 0, perSeat: 0, numberOfPerformances: 0, notes: '' };
+            return { flatFee: 0, perPerformance: 0, perSeat: 0, numberOfPerformances: 0, numberOfSeats: 0, notes: '' };
         }
     });
     const [royaltiesExpanded, setRoyaltiesExpanded] = React.useState(false);
@@ -112,7 +113,7 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
     const summary = window.budgetService.calculateBudgetSummary(production.id);
     const royaltiesTotal = royalties.flatFee +
         (royalties.perPerformance * royalties.numberOfPerformances) +
-        (royalties.perSeat * royalties.numberOfPerformances * (production?.seatingCapacity || 0));
+        (royalties.perSeat * royalties.numberOfPerformances * royalties.numberOfSeats);
 
     const DEPARTMENTS = [
         { id: 'lighting', name: 'Lighting', icon: '💡' },
@@ -289,6 +290,20 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                                             <p className="text-xs text-gray-400 mt-1">Rate × performances × seats</p>
                                         </div>
 
+                                        {royalties.perSeat > 0 && (
+                                            <div>
+                                                <label className="block text-xs text-gray-600 mb-1">Number of Seats</label>
+                                                <input
+                                                    type="number" min="0" step="1"
+                                                    value={royalties.numberOfSeats || ''}
+                                                    onChange={e => saveRoyalties({ numberOfSeats: parseInt(e.target.value) || 0 })}
+                                                    placeholder="e.g. 250"
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500"
+                                                />
+                                                <p className="text-xs text-gray-400 mt-1">Seats × per-seat rate × performances</p>
+                                            </div>
+                                        )}
+
                                         <div className="col-span-2">
                                             <label className="block text-xs text-gray-600 mb-1">Licensing Notes</label>
                                             <textarea
@@ -305,7 +320,7 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                                                 <span className="text-sm text-gray-600">
                                                     Flat fee ${royalties.flatFee.toFixed(2)}
                                                     {royalties.perPerformance > 0 && ` + $${royalties.perPerformance.toFixed(2)} × ${royalties.numberOfPerformances} performances`}
-                                                    {royalties.perSeat > 0 && ` + $${royalties.perSeat.toFixed(2)}/seat`}
+                                                    {royalties.perSeat > 0 && royalties.numberOfSeats > 0 && ` + $${royalties.perSeat.toFixed(2)}/seat × ${royalties.numberOfSeats} seats × ${royalties.numberOfPerformances} perf`}
                                                 </span>
                                                 <span className={`text-base font-bold ${royaltiesTotal > 0 ? 'text-yellow-600' : 'text-gray-400'}`}>
                                                     ${royaltiesTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
