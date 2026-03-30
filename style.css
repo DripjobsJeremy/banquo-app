@@ -1182,6 +1182,32 @@ select:focus {
 .prod-list-actions { flex-shrink: 0; min-width: 210px; }
 .prod-list-actions .prod-card-actions { padding: 0; margin: 0; }
 
+/* ── MentionTextarea ─────────────────────────────────────────── */
+.mention-wrap { position: relative; }
+.mention-dropdown {
+  position: absolute; top: calc(100% + 4px); left: 0; z-index: 60;
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+  padding: 4px; min-width: 210px; max-width: 290px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+.mention-dropdown-header { font-size: 10px; font-weight: 600; color: #9ca3af; padding: 4px 8px 2px; letter-spacing: 0.06em; text-transform: uppercase; }
+.mention-item {
+  display: flex; align-items: center; gap: 8px; padding: 7px 10px;
+  border-radius: 5px; cursor: pointer; transition: background 0.1s;
+}
+.mention-item:hover { background: #f5f3ff; }
+.mention-avatar {
+  width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+  background: #ede9fe; color: #7c3aed;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+}
+.mention-item-name { font-size: 13px; font-weight: 500; color: #111827; }
+.mention-item-role { font-size: 11px; color: #9ca3af; }
+.mention-dropdown-footer { font-size: 10px; color: #9ca3af; padding: 4px 8px; border-top: 1px solid #f3f4f6; margin-top: 2px; }
+.mention-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.mention-pill { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: #ede9fe; color: #7c3aed; border: 1px solid #c4b5fd; }
+
 /* ── Production Images Manager ───────────────────────────────── */
 .prod-images-wrap { padding: 0; }
 .prod-images-header { margin-bottom: 20px; }

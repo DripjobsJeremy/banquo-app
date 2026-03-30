@@ -103,6 +103,163 @@ const SmartDropdown = ({ field, value, defaultOptions, onChange, placeholder }) 
   );
 };
 
+// ── MentionTextarea ──────────────────────────────────────────────────────────
+// Wraps a textarea with @mention autocomplete for cast members.
+const MentionTextarea = ({ value, onChange, placeholder, rows, castMembers, className }) => {
+  const [mentionQuery, setMentionQuery] = React.useState('');
+  const [mentionOpen, setMentionOpen] = React.useState(false);
+  const [mentionStart, setMentionStart] = React.useState(-1);
+  const textareaRef = React.useRef(null);
+  const dropdownRef = React.useRef(null);
+
+  const filtered = mentionQuery.length > 0
+    ? castMembers.filter(m => m.name.toLowerCase().includes(mentionQuery.toLowerCase()))
+    : castMembers.slice(0, 8);
+
+  const handleChange = (e) => {
+    const val = e.target.value;
+    const pos = e.target.selectionStart;
+    onChange(val);
+    const textBefore = val.slice(0, pos);
+    const atIdx = textBefore.lastIndexOf('@');
+    if (atIdx !== -1) {
+      const query = textBefore.slice(atIdx + 1);
+      if (!query.includes(' ') || query.length === 0) {
+        setMentionQuery(query);
+        setMentionStart(atIdx);
+        setMentionOpen(true);
+        return;
+      }
+    }
+    setMentionOpen(false);
+    setMentionQuery('');
+    setMentionStart(-1);
+  };
+
+  const handleKeyDown = (e) => {
+    if (!mentionOpen) return;
+    if (e.key === 'Escape') { setMentionOpen(false); e.preventDefault(); }
+    if (e.key === 'Enter' && filtered.length > 0) { e.preventDefault(); insertMention(filtered[0]); }
+  };
+
+  const insertMention = (member) => {
+    const before = (value || '').slice(0, mentionStart);
+    const after = (value || '').slice(mentionStart + mentionQuery.length + 1);
+    const newVal = before + '@' + member.name + ' ' + after;
+    onChange(newVal);
+    setMentionOpen(false);
+    setMentionQuery('');
+    setMentionStart(-1);
+    setTimeout(() => {
+      if (textareaRef.current) {
+        const newPos = mentionStart + member.name.length + 2;
+        textareaRef.current.focus();
+        textareaRef.current.setSelectionRange(newPos, newPos);
+      }
+    }, 0);
+  };
+
+  React.useEffect(() => {
+    if (!mentionOpen) return;
+    const close = (e) => {
+      if (!dropdownRef.current?.contains(e.target) && e.target !== textareaRef.current) {
+        setMentionOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [mentionOpen]);
+
+  const taggedNames = [...new Set(
+    [...((value || '').matchAll(/@([\w][^\s@,.]*)(?=[\s,.]|$)/g))].map(m => m[1]).filter(Boolean)
+  )];
+
+  return React.createElement(
+    'div',
+    { className: 'mention-wrap' },
+    React.createElement('textarea', {
+      ref: textareaRef,
+      value: value || '',
+      onChange: handleChange,
+      onKeyDown: handleKeyDown,
+      placeholder,
+      rows: rows || 3,
+      className: className || 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors resize-y',
+    }),
+    mentionOpen && filtered.length > 0 && React.createElement(
+      'div',
+      { ref: dropdownRef, className: 'mention-dropdown' },
+      React.createElement('div', { className: 'mention-dropdown-header' }, 'Tag cast member'),
+      filtered.map(member =>
+        React.createElement(
+          'div',
+          {
+            key: member.id || member.name,
+            className: 'mention-item',
+            onMouseDown: (e) => { e.preventDefault(); insertMention(member); },
+          },
+          React.createElement('div', { className: 'mention-avatar' }, member.name.charAt(0).toUpperCase()),
+          React.createElement(
+            'div',
+            null,
+            React.createElement('div', { className: 'mention-item-name' }, member.name),
+            member.character && React.createElement('div', { className: 'mention-item-role' }, 'as ', member.character)
+          )
+        )
+      ),
+      React.createElement('div', { className: 'mention-dropdown-footer' }, 'Enter to select · Esc to close')
+    ),
+    taggedNames.length > 0 && React.createElement(
+      'div',
+      { className: 'mention-pills' },
+      taggedNames.map(name =>
+        React.createElement('span', { key: name, className: 'mention-pill' }, '@', name)
+      )
+    )
+  );
+};
+
+// Returns cast members for a scene, merging characterIds + legacy characters arrays with casting data.
+const getCastMembers = (production, scene) => {
+  const allChars = production.characters || [];
+  const casting = production.casting || {};
+  const actors = (() => {
+    try { return JSON.parse(localStorage.getItem('showsuite_actors') || '[]'); } catch { return []; }
+  })();
+
+  const results = [];
+  const seen = new Set();
+
+  // Modern: characterIds
+  (scene.characterIds || []).forEach(charId => {
+    const char = allChars.find(c => c.id === charId);
+    if (!char || seen.has(char.name)) return;
+    seen.add(char.name);
+    const actorId = casting[char.name] || char.actorId;
+    const actor = actorId ? actors.find(a => a.id === actorId) : null;
+    results.push({
+      id: actorId || char.id,
+      name: actor ? `${actor.firstName} ${actor.lastName}`.trim() : char.name,
+      character: char.name,
+    });
+  });
+
+  // Legacy: scene.characters (string names)
+  (scene.characters || []).filter(n => n && n !== 'Full Company').forEach(charName => {
+    if (seen.has(charName)) return;
+    seen.add(charName);
+    const actorId = casting[charName];
+    const actor = actorId ? actors.find(a => a.id === actorId) : null;
+    results.push({
+      id: actorId || charName,
+      name: actor ? `${actor.firstName} ${actor.lastName}`.trim() : charName,
+      character: charName,
+    });
+  });
+
+  return results.filter(m => m.name);
+};
+
 function SceneBuilder({ productionId: propId }) {
   const [production, setProduction] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1306,12 +1463,12 @@ function SceneBuilder({ productionId: propId }) {
                   React.createElement(
                     'div', null,
                     React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '📐 Blocking / Staging'),
-                    React.createElement('textarea', {
+                    React.createElement(MentionTextarea, {
                       value: scene.blocking || scene.notes || '',
-                      onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'blocking', e.target.value),
-                      className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors resize-y',
+                      onChange: (val) => handleUpdateScene(actIndex, sceneIndex, 'blocking', val),
+                      placeholder: 'Blocking notes, staging directions... Type @ to tag a cast member',
                       rows: 3,
-                      placeholder: 'Blocking notes, staging directions, choreography cues...'
+                      castMembers: getCastMembers(production, scene),
                     })
                   ),
                   React.createElement(
