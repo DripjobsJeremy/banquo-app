@@ -4,6 +4,7 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
   const [showCompose, setShowCompose] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [replyBody, setReplyBody] = React.useState('');
+  const [textareaKey, setTextareaKey] = React.useState(0);
   const replyRef = React.useRef(null);
 
   // currentUser shape: { id, name, role }
@@ -58,13 +59,13 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
 
   const handleSendReply = () => {
     if (!replyBody.trim() || !activeThreadId) return;
-    if (replyRef.current) replyRef.current.style.height = '40px';
     window.messagesService.sendMessage({
       threadId: activeThreadId,
       senderUser: me,
       body: replyBody.trim(),
     });
     setReplyBody('');
+    setTextareaKey(k => k + 1);
     loadThreads();
   };
 
@@ -266,6 +267,7 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
             <div style={{ padding: '12px 16px', borderTop: '1px solid var(--color-border)',
               backgroundColor: 'var(--color-bg-surface)', display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
               <textarea
+                key={textareaKey}
                 ref={replyRef}
                 value={replyBody}
                 onChange={e => {
@@ -276,7 +278,6 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
                 onKeyDown={e => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    if (replyRef.current) replyRef.current.style.height = '40px';
                     handleSendReply();
                   }
                 }}
