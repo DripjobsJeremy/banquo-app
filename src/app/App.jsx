@@ -1,6 +1,6 @@
 const { useState, useEffect } = React;
 
-function ActorPortalView() {
+function ActorPortalView({ onExitToApp }) {
   const [portalView, setPortalView] = useState('dashboard');
   const [activeProductionId, setActiveProductionId] = useState(null);
   const [navExpanded, setNavExpanded] = useState({ productions: true });
@@ -81,6 +81,13 @@ function ActorPortalView() {
     <div className="ap-shell">
       {/* ── Sidebar ── */}
       <aside className="ap-sidebar">
+        {/* Exit to main app — only shown when an admin is previewing the actor portal */}
+        {onExitToApp && (
+          <button type="button" className="ap-exit-btn" onClick={onExitToApp}>
+            ← Back to SceneStave
+          </button>
+        )}
+
         {/* Actor identity */}
         <div className="ap-sidebar-actor">
           <div className="ap-sidebar-avatar">
@@ -624,7 +631,7 @@ function App() {
                   React.createElement(window.BoardDashboard)
                 )}
                 {userRole === 'volunteer' && <VolunteerPortalView />}
-                {userRole === 'actor' && <ActorPortalView />}
+                {userRole === 'actor' && <ActorPortalView onExitToApp={() => handleRoleChange('admin')} />}
                 {['director', 'lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager'].includes(userRole) && (
                   <div className="text-center py-12 text-gray-400">
                     <div className="text-4xl mb-3">📊</div>
@@ -791,7 +798,7 @@ function App() {
 
             <Route path="/actor-portal">
               <div className="p-6 max-w-7xl mx-auto">
-                <ActorPortalView />
+                <ActorPortalView onExitToApp={() => handleRoleChange('admin')} />
               </div>
             </Route>
 
