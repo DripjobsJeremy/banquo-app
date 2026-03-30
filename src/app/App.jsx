@@ -5,9 +5,19 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
   const [activeProductionId, setActiveProductionId] = useState(null);
   const [navExpanded, setNavExpanded] = useState({ productions: true });
   const [refreshKey, setRefreshKey] = useState(0);
+  const [actorUnreadCount, setActorUnreadCount] = useState(0);
 
   const session = window.actorAuthService?.loadSession();
   const currentActor = session ? window.actorAuthService?.getCurrentActor() : null;
+
+  useEffect(() => {
+    const actorId = window.actorAuthService?.getCurrentActor()?.id;
+    if (!actorId || !window.messagesService) return;
+    const refresh = () => setActorUnreadCount(window.messagesService.getUnreadCount(actorId));
+    refresh();
+    window.addEventListener('messagesUpdated', refresh);
+    return () => window.removeEventListener('messagesUpdated', refresh);
+  }, [portalView]);
 
   if (!currentActor) {
     return window.ActorLogin ? React.createElement(window.ActorLogin, {
@@ -38,6 +48,7 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
   const navItems = [
     { id: 'dashboard',   label: 'Dashboard',    icon: '🏠' },
     { id: 'productions', label: 'Productions',  icon: '🎭', expandable: true },
+    { id: 'messages',    label: 'Messages',     icon: '💬' },
     { id: 'calendar',    label: 'Calendar',     icon: '📅' },
   ];
 
@@ -65,6 +76,17 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
     }
     if (portalView === 'rehearsal-notes' && window.RehearsalNotesView) {
       return React.createElement(window.RehearsalNotesView, { actor: currentActor });
+    }
+    if (portalView === 'messages' && window.MessagesView) {
+      return React.createElement(window.MessagesView, {
+        currentUser: {
+          id: currentActor.id,
+          name: `${currentActor.firstName || ''} ${currentActor.lastName || ''}`.trim(),
+          role: 'actor',
+        },
+        productions: actorProductions,
+        userRole: 'actor',
+      });
     }
     // dashboard (default)
     return window.ActorSelfDashboard ? React.createElement(window.ActorSelfDashboard, {
@@ -126,6 +148,15 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
                 }}
               >
                 <span>{item.icon} {item.label}</span>
+                {item.id === 'messages' && actorUnreadCount > 0 && (
+                  <span style={{
+                    backgroundColor: '#ef4444', color: '#fff',
+                    fontSize: '10px', fontWeight: 700,
+                    padding: '1px 5px', borderRadius: '99px', minWidth: '16px', textAlign: 'center',
+                  }}>
+                    {actorUnreadCount}
+                  </span>
+                )}
                 {item.expandable && (
                   <span className="ap-nav-chevron">{navExpanded[item.id] ? '▼' : '▶'}</span>
                 )}
