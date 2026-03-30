@@ -105,7 +105,7 @@ const SmartDropdown = ({ field, value, defaultOptions, onChange, placeholder }) 
 
 // ── MentionTextarea ──────────────────────────────────────────────────────────
 // Wraps a textarea with @mention autocomplete for cast members.
-const MentionTextarea = ({ value, onChange, placeholder, rows, castMembers, className }) => {
+const MentionTextarea = ({ value, onChange, onBlur, placeholder, rows, castMembers, className }) => {
   const [mentionQuery, setMentionQuery] = React.useState('');
   const [mentionOpen, setMentionOpen] = React.useState(false);
   const [mentionStart, setMentionStart] = React.useState(-1);
@@ -182,6 +182,7 @@ const MentionTextarea = ({ value, onChange, placeholder, rows, castMembers, clas
       value: value || '',
       onChange: handleChange,
       onKeyDown: handleKeyDown,
+      onBlur,
       placeholder,
       rows: rows || 3,
       className: className || 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors resize-y',
@@ -258,6 +259,44 @@ const getCastMembers = (production, scene) => {
   });
 
   return results.filter(m => m.name);
+};
+
+// Extract unique @mentioned names from a blocking note string.
+const extractMentions = (text) => {
+  if (!text) return [];
+  const matches = [...text.matchAll(/@([\w][^\s@,./!?]*)/g)];
+  return [...new Set(matches.map(m => m[1].trim()).filter(Boolean))];
+};
+
+// Push the full blocking text as a rehearsal note to every @mentioned actor.
+// Called on textarea blur — not on every keystroke.
+const pushRehearsalNotes = (production, scene, actIndex) => {
+  if (!window.actorsService?.addRehearsalNote) return;
+  const blockingText = scene.blocking || '';
+  const mentionedNames = extractMentions(blockingText);
+  if (mentionedNames.length === 0) return;
+
+  const castMembers = getCastMembers(production, scene);
+  const actEntry = production.acts?.[actIndex];
+  const actName = actEntry?.name || actEntry?.title || `Act ${actIndex + 1}`;
+  const sceneName = scene.name || scene.sceneLabel || scene.title || 'Scene';
+  const sceneRef = `${actName} — ${sceneName}`;
+
+  mentionedNames.forEach(mentionedName => {
+    const member = castMembers.find(m => m.name.toLowerCase() === mentionedName.toLowerCase());
+    if (!member?.actorId) return;
+    window.actorsService.addRehearsalNote(member.actorId, {
+      productionId: production.id,
+      productionTitle: production.title,
+      actName,
+      sceneName,
+      sceneRef,
+      note: blockingText,
+      taggedBy: 'Director',
+      actorName: member.name,
+      character: member.character,
+    });
+  });
 };
 
 function SceneBuilder({ productionId: propId }) {
@@ -1466,10 +1505,25 @@ function SceneBuilder({ productionId: propId }) {
                     React.createElement(MentionTextarea, {
                       value: scene.blocking || scene.notes || '',
                       onChange: (val) => handleUpdateScene(actIndex, sceneIndex, 'blocking', val),
+                      onBlur: () => pushRehearsalNotes(production, scene, actIndex),
                       placeholder: 'Blocking notes, staging directions... Type @ to tag a cast member',
                       rows: 3,
                       castMembers: getCastMembers(production, scene),
-                    })
+                    }),
+                    (() => {
+                      const mentions = extractMentions(scene.blocking || '');
+                      if (mentions.length === 0) return null;
+                      const castMems = getCastMembers(production, scene);
+                      const matched = mentions.filter(name =>
+                        castMems.some(m => m.name.toLowerCase() === name.toLowerCase() && m.actorId)
+                      );
+                      if (matched.length === 0) return null;
+                      return React.createElement(
+                        'p',
+                        { className: 'mention-notify-hint' },
+                        `✓ Note will be sent to ${matched.length} actor${matched.length !== 1 ? 's' : ''} in their portal`
+                      );
+                    })()
                   ),
                   React.createElement(
                     'div', null,

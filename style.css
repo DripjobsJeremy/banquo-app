@@ -1207,6 +1207,7 @@ select:focus {
 .mention-dropdown-footer { font-size: 10px; color: #9ca3af; padding: 4px 8px; border-top: 1px solid #f3f4f6; margin-top: 2px; }
 .mention-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 .mention-pill { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: #ede9fe; color: #7c3aed; border: 1px solid #c4b5fd; }
+.mention-notify-hint { font-size: 11px; color: #16a34a; margin-top: 4px; }
 
 /* ── Production Images Manager ───────────────────────────────── */
 .prod-images-wrap { padding: 0; }
