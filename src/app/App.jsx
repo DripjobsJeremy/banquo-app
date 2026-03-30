@@ -2,6 +2,8 @@ const { useState, useEffect } = React;
 
 function ActorPortalView() {
   const [portalView, setPortalView] = useState('dashboard');
+  const [activeProductionId, setActiveProductionId] = useState(null);
+  const [navExpanded, setNavExpanded] = useState({ productions: true });
   const [refreshKey, setRefreshKey] = useState(0);
 
   const session = window.actorAuthService?.loadSession();
@@ -9,56 +11,149 @@ function ActorPortalView() {
 
   if (!currentActor) {
     return window.ActorLogin ? React.createElement(window.ActorLogin, {
-      onLoginSuccess: (actor) => {
-        console.log('Actor logged in:', actor);
-        window.location.reload();
-      }
+      onLoginSuccess: () => window.location.reload()
     }) : null;
   }
 
-  // Set global navigation handlers
-  window.onNavigateToCalendar = () => setPortalView('calendar');
-  window.onNavigateToRehearsalNotes = () => setPortalView('rehearsal-notes');
-
-  if (portalView === 'calendar' && window.ActorPersonalCalendar) {
-    return React.createElement(window.ActorPersonalCalendar, {
-      actor: currentActor,
-      onBack: () => setPortalView('dashboard')
-    });
-  }
-
-  if (portalView === 'rehearsal-notes' && window.RehearsalNotesView) {
-    return React.createElement(window.RehearsalNotesView, {
-      actor: currentActor,
-      onBack: () => setPortalView('dashboard')
-    });
-  }
-
+  // Profile editor is full-screen (own save/cancel flow)
   if (portalView === 'edit-profile' && window.ActorSelfProfileEditor) {
     return React.createElement(window.ActorSelfProfileEditor, {
       actor: currentActor,
       onSave: (updatedActor) => {
-        console.log('Profile saved:', updatedActor);
         window.actorAuthService.updateSession(updatedActor);
         setRefreshKey(k => k + 1);
         setPortalView('dashboard');
       },
-      onCancel: () => {
-        setPortalView('dashboard');
-      }
+      onCancel: () => setPortalView('dashboard'),
     });
   }
 
-  return window.ActorSelfDashboard ? React.createElement(window.ActorSelfDashboard, {
-    key: refreshKey,
-    actor: currentActor,
-    onEditProfile: () => setPortalView('edit-profile'),
-    onViewRehearsalNotes: () => setPortalView('rehearsal-notes'),
-    onLogout: () => {
-      window.actorAuthService.logout();
-      window.location.reload();
+  const actorProductions = (() => {
+    try {
+      const all = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
+      return all.filter(p => (p.characters || []).some(c => c.actorId === currentActor.id));
+    } catch { return []; }
+  })();
+
+  const navItems = [
+    { id: 'dashboard',       label: 'Dashboard',        icon: '🏠' },
+    { id: 'productions',     label: 'Productions',      icon: '🎭', expandable: true },
+    { id: 'profile',         label: 'My Profile',       icon: '👤' },
+    { id: 'calendar',        label: 'Calendar',         icon: '📅' },
+    { id: 'rehearsal-notes', label: 'Rehearsal Notes',  icon: '📋' },
+  ];
+
+  const navigate = (viewId, prodId = null) => {
+    setPortalView(viewId);
+    setActiveProductionId(prodId);
+  };
+
+  // Globals for legacy calendar/notes navigation calls
+  window.onNavigateToCalendar = () => navigate('calendar');
+  window.onNavigateToRehearsalNotes = () => navigate('rehearsal-notes');
+
+  const renderContent = () => {
+    if (portalView === 'production' && activeProductionId) {
+      const prod = actorProductions.find(p => p.id === activeProductionId);
+      if (prod && window.ActorProductionDashboard) {
+        return React.createElement(window.ActorProductionDashboard, { production: prod, actor: currentActor });
+      }
     }
-  }) : null;
+    if (portalView === 'calendar' && window.ActorPersonalCalendar) {
+      return React.createElement(window.ActorPersonalCalendar, {
+        actor: currentActor,
+        onBack: () => navigate('dashboard'),
+      });
+    }
+    if (portalView === 'rehearsal-notes' && window.RehearsalNotesView) {
+      return React.createElement(window.RehearsalNotesView, { actor: currentActor });
+    }
+    // dashboard (default)
+    return window.ActorSelfDashboard ? React.createElement(window.ActorSelfDashboard, {
+      key: refreshKey,
+      actor: currentActor,
+      onEditProfile: () => navigate('edit-profile'),
+      onViewRehearsalNotes: () => navigate('rehearsal-notes'),
+    }) : null;
+  };
+
+  const isNavActive = (itemId) => portalView === itemId && !activeProductionId;
+
+  return (
+    <div className="ap-shell">
+      {/* ── Sidebar ── */}
+      <aside className="ap-sidebar">
+        {/* Actor identity */}
+        <div className="ap-sidebar-actor">
+          <div className="ap-sidebar-avatar">
+            {currentActor.firstName?.charAt(0)}{currentActor.lastName?.charAt(0)}
+          </div>
+          <div className="ap-sidebar-name">{currentActor.firstName} {currentActor.lastName}</div>
+          <div className="ap-sidebar-email">{currentActor.email}</div>
+        </div>
+
+        {/* Nav */}
+        <nav className="ap-sidebar-nav">
+          {navItems.map(item => (
+            <div key={item.id}>
+              <div
+                className={`ap-nav-item${isNavActive(item.id) ? ' ap-nav-item--active' : ''}`}
+                onClick={() => {
+                  if (item.expandable) {
+                    setNavExpanded(prev => ({ ...prev, [item.id]: !prev[item.id] }));
+                  } else {
+                    navigate(item.id);
+                  }
+                }}
+              >
+                <span>{item.icon} {item.label}</span>
+                {item.expandable && (
+                  <span className="ap-nav-chevron">{navExpanded[item.id] ? '▼' : '▶'}</span>
+                )}
+              </div>
+
+              {/* Productions sub-items */}
+              {item.id === 'productions' && navExpanded.productions && (
+                <div className="ap-nav-subitems">
+                  {actorProductions.length === 0 ? (
+                    <div className="ap-nav-empty">No productions yet</div>
+                  ) : actorProductions.map(prod => {
+                    const isActive = activeProductionId === prod.id;
+                    return (
+                      <div
+                        key={prod.id}
+                        className={`ap-nav-subitem${isActive ? ' ap-nav-subitem--active' : ''}`}
+                        onClick={() => navigate('production', prod.id)}
+                      >
+                        <div className="ap-nav-subitem-title">{prod.title}</div>
+                        <div className="ap-nav-subitem-status">{prod.status || 'Active'}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ))}
+        </nav>
+
+        {/* Logout */}
+        <div className="ap-sidebar-footer">
+          <button
+            type="button"
+            className="ap-logout-btn"
+            onClick={() => { window.actorAuthService.logout(); window.location.reload(); }}
+          >
+            Sign out
+          </button>
+        </div>
+      </aside>
+
+      {/* ── Main content ── */}
+      <main className="ap-content">
+        {renderContent()}
+      </main>
+    </div>
+  );
 }
 
 function VolunteerPortalView() {
