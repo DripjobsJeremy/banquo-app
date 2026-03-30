@@ -225,75 +225,33 @@ const MentionTextarea = ({ value, onChange, onBlur, placeholder, rows, castMembe
   );
 };
 
-// Returns cast members for a scene, merging characterIds + legacy characters arrays with casting data.
-// Always reads fresh from localStorage to avoid stale closure data.
+// Returns cast members for a scene. Reads fresh from localStorage on every call.
+// Uses exact character name match against production.characters[].actorId — same
+// logic as the verified console trace. No name-based fallbacks that could misfire.
 const getCastMembers = (production, scene) => {
-  const allActors = (() => {
-    try { return JSON.parse(localStorage.getItem('showsuite_actors') || '[]'); } catch { return []; }
-  })();
+  const allActors = JSON.parse(localStorage.getItem('showsuite_actors') || '[]');
+  const allProds = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
+  const freshProd = allProds.find(p => p.id === production.id) || production;
+  const sceneChars = scene?.characters || [];
 
-  // Read fresh production data to ensure casting is current
-  const freshProd = (() => {
-    try {
-      const allProds = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
-      return allProds.find(p => p.id === production.id) || production;
-    } catch { return production; }
-  })();
-
-  const allChars = freshProd.characters || [];
-  const casting = freshProd.casting || {};
-
-  // Two-step actor lookup: ID first, then word-based name fallback.
-  const resolveActor = (actorId, charName) => {
-    let actor = actorId ? allActors.find(a => a.id === actorId) : null;
-    if (!actor && charName) {
-      const charWords = charName.split(/[\s/]+/).map(w => w.trim().toLowerCase()).filter(Boolean);
-      actor = allActors.find(a => {
-        const actorFirst = a.firstName?.toLowerCase();
-        const actorLast = a.lastName?.toLowerCase();
-        return charWords.includes(actorFirst) || charWords.includes(actorLast);
-      }) || null;
-    }
-    return actor;
-  };
-
-  const results = [];
-  const seen = new Set();
-
-  // Modern: characterIds
-  (scene.characterIds || []).forEach(charId => {
-    const char = allChars.find(c => c.id === charId);
-    if (!char || seen.has(char.name)) return;
-    seen.add(char.name);
-    const actorId = casting[char.name] || char.actorId;
-    const actor = resolveActor(actorId, char.name);
-    const actorDisplayName = actor ? `${actor.firstName || ''} ${actor.lastName || ''}`.trim() : null;
-    results.push({
-      id: actor?.id || char.id,
-      name: actorDisplayName || char.name,
-      character: char.name,
-      actorId: actor?.id || null,
-      actorDisplayName,
-    });
-  });
-
-  // Legacy: scene.characters (string names)
-  (scene.characters || []).filter(n => n && n !== 'Full Company').forEach(charName => {
-    if (seen.has(charName)) return;
-    seen.add(charName);
-    const actorId = casting[charName];
-    const actor = resolveActor(actorId, charName);
-    const actorDisplayName = actor ? `${actor.firstName || ''} ${actor.lastName || ''}`.trim() : null;
-    results.push({
-      id: actor?.id || charName,
-      name: actorDisplayName || charName,
-      character: charName,
-      actorId: actor?.id || null,
-      actorDisplayName,
-    });
-  });
-
-  return results.filter(m => m.name);
+  return sceneChars
+    .filter(c => c !== 'Full Company')
+    .map(charName => {
+      const charObj = (freshProd.characters || []).find(c => c.name === charName);
+      const actorId = charObj?.actorId || null;
+      const actor = actorId ? allActors.find(a => a.id === actorId) : null;
+      const actorDisplayName = actor
+        ? `${actor.firstName || ''} ${actor.lastName || ''}`.trim()
+        : null;
+      return {
+        id: actor?.id || charName,
+        name: actorDisplayName || charName,
+        character: charName,
+        actorId: actor?.id || null,
+        actorDisplayName,
+      };
+    })
+    .filter(m => m.name);
 };
 window.getCastMembers = getCastMembers;
 
