@@ -6,6 +6,14 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
   const [replyBody, setReplyBody] = React.useState('');
   const replyRef = React.useRef(null);
 
+  // Auto-resize textarea as content grows
+  React.useEffect(() => {
+    if (replyRef.current) {
+      replyRef.current.style.height = 'auto';
+      replyRef.current.style.height = Math.min(replyRef.current.scrollHeight, 150) + 'px';
+    }
+  }, [replyBody]);
+
   // currentUser shape: { id, name, role }
   // Derive from props or localStorage if not passed
   const me = React.useMemo(() => {
@@ -275,10 +283,10 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
                   }
                 }}
                 placeholder="Write a message... (Enter to send, Shift+Enter for new line)"
-                rows={2}
                 style={{ flex: 1, padding: '10px 12px', borderRadius: '8px', fontSize: '13px',
                   border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg-elevated)',
-                  color: 'var(--color-text-primary)', resize: 'none', lineHeight: '1.5' }}
+                  color: 'var(--color-text-primary)', resize: 'none', lineHeight: '1.5',
+                  height: '40px', minHeight: '40px', maxHeight: '150px', overflowY: 'auto' }}
               />
               <button type="button" onClick={handleSendReply}
                 disabled={!replyBody.trim()}
