@@ -21,6 +21,7 @@ function ActorSelfProfileEditor({ actor, onSave, onCancel }) {
       vocalRange: '',
       specialSkills: [],
       resume: null,
+      profilePhotoUrl: '',
       headshots: [],
       auditionVideos: [],
       sizeCard: {
@@ -113,6 +114,16 @@ function ActorSelfProfileEditor({ actor, onSave, onCancel }) {
       actorProfile: {
         ...formData.actorProfile,
         headshots: updated
+      }
+    });
+  };
+
+  const handleSetProfilePhoto = (dataUrl) => {
+    setFormData({
+      ...formData,
+      actorProfile: {
+        ...formData.actorProfile,
+        profilePhotoUrl: dataUrl
       }
     });
   };
@@ -464,33 +475,40 @@ function ActorSelfProfileEditor({ actor, onSave, onCancel }) {
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-3">Headshots</h3>
                   <div className="grid grid-cols-3 gap-4 mb-4">
-                    {formData.actorProfile.headshots.map(headshot => (
-                      <div key={headshot.id} className="relative border border-gray-200 rounded-lg overflow-hidden">
-                        <img src={headshot.data} alt="Headshot" className="w-full h-40 object-cover" />
-                        <div className="absolute top-2 right-2 flex gap-1">
-                          {!headshot.isPrimary && (
+                    {formData.actorProfile.headshots.map(headshot => {
+                      const isProfilePhoto = formData.actorProfile.profilePhotoUrl === headshot.data;
+                      return (
+                        <div key={headshot.id} className="relative border border-gray-200 rounded-lg overflow-hidden">
+                          <img src={headshot.data} alt="Headshot" className="w-full h-40 object-cover" />
+                          <div className="absolute top-2 right-2 flex gap-1">
+                            {!headshot.isPrimary && (
+                              <button
+                                type="button"
+                                onClick={() => handleSetPrimaryHeadshot(headshot.id)}
+                                className="px-2 py-1 bg-blue-600 text-white text-xs rounded"
+                                title="Set as primary"
+                              >
+                                Primary
+                              </button>
+                            )}
                             <button
-                              onClick={() => handleSetPrimaryHeadshot(headshot.id)}
-                              className="px-2 py-1 bg-blue-600 text-white text-xs rounded"
-                              title="Set as primary"
+                              type="button"
+                              onClick={() => handleDeleteHeadshot(headshot.id)}
+                              className="px-2 py-1 bg-red-600 text-white text-xs rounded"
                             >
-                              Primary
+                              Delete
                             </button>
-                          )}
+                          </div>
                           <button
-                            onClick={() => handleDeleteHeadshot(headshot.id)}
-                            className="px-2 py-1 bg-red-600 text-white text-xs rounded"
+                            type="button"
+                            onClick={() => handleSetProfilePhoto(isProfilePhoto ? '' : headshot.data)}
+                            className={`absolute bottom-0 left-0 right-0 text-xs text-center py-1 text-white border-none cursor-pointer ${isProfilePhoto ? 'bg-purple-600' : 'bg-gray-800 bg-opacity-60'}`}
                           >
-                            Delete
+                            {isProfilePhoto ? '★ Profile Photo' : 'Set as Profile Photo'}
                           </button>
                         </div>
-                        {headshot.isPrimary && (
-                          <div className="absolute bottom-0 left-0 right-0 bg-blue-600 text-white text-xs text-center py-1">
-                            Primary
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                   <label className="cursor-pointer px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
                     Add Headshot

@@ -90,9 +90,23 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
 
         {/* Actor identity */}
         <div className="ap-sidebar-actor">
-          <div className="ap-sidebar-avatar">
-            {currentActor.firstName?.charAt(0)}{currentActor.lastName?.charAt(0)}
-          </div>
+          {(() => {
+            const profilePhoto = currentActor.actorProfile?.profilePhotoUrl || null;
+            const initials = `${currentActor.firstName?.charAt(0) || ''}${currentActor.lastName?.charAt(0) || ''}`.toUpperCase();
+            return (
+              <div className="ap-sidebar-avatar">
+                {profilePhoto && (
+                  <img src={profilePhoto} alt={initials}
+                    className="ap-sidebar-avatar-photo"
+                    onError={e => { e.target.style.display = 'none'; }}
+                  />
+                )}
+                {!profilePhoto && (
+                  <span className="ap-sidebar-avatar-initials">{initials}</span>
+                )}
+              </div>
+            );
+          })()}
           <div className="ap-sidebar-name">{currentActor.firstName} {currentActor.lastName}</div>
           <div className="ap-sidebar-email">{currentActor.email}</div>
         </div>

@@ -259,9 +259,18 @@ function ActorSelfDashboard({ actor, onEditProfile, onViewRehearsalNotes }) {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Welcome back, {actor.firstName}!</h1>
-        <p className="text-sm text-gray-500 mt-1">{actor.email}</p>
+      <div className="flex items-center gap-4">
+        {actor.actorProfile?.profilePhotoUrl && (
+          <img
+            src={actor.actorProfile.profilePhotoUrl}
+            alt={`${actor.firstName} ${actor.lastName}`}
+            className="w-20 h-20 rounded-full object-cover border-2 border-purple-600 flex-shrink-0"
+          />
+        )}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Welcome back, {actor.firstName}!</h1>
+          <p className="text-sm text-gray-500 mt-1">{actor.email}</p>
+        </div>
       </div>
 
       {/* Recent Rehearsal Notes preview */}

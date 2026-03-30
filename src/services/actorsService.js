@@ -26,6 +26,7 @@
   function defaultActorProfile() {
     return {
       resume: null,
+      profilePhotoUrl: '',
       headshots: [],
       auditionVideos: [],
       sizeCard: {
