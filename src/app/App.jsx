@@ -165,8 +165,7 @@ function getNavigationTabs(userRole) {
 
   if (userRole === 'actor') {
     return [
-      { id: 'actor-portal', label: 'Actor Portal',  icon: '🎭', path: '/actor-portal' },
-      { id: 'productions',  label: 'Productions',   icon: '🎬', path: '/productions' },
+      { id: 'actor-portal', label: 'Actor Portal', icon: '🎭', path: '/actor-portal' },
     ];
   }
 

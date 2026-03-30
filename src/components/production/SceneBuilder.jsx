@@ -521,7 +521,10 @@ function SceneBuilder({ productionId: propId }) {
   };
 
   const canAccessTab = (tabId) => {
-    if (tabId === 'scenes') return true;   // Everyone can see scenes (read-only for dept roles)
+    // Actors can only see their own tab and the calendar
+    if (currentRole.id === 'actor') return ['actors', 'calendar'].includes(tabId);
+
+    if (tabId === 'scenes') return true;   // Everyone else can see scenes (read-only for dept roles)
     if (tabId === 'calendar') return true; // Everyone can view the calendar
 
     // Test Manager sees all tabs
