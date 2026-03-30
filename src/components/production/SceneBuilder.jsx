@@ -143,16 +143,17 @@ const MentionTextarea = ({ value, onChange, onBlur, placeholder, rows, castMembe
   };
 
   const insertMention = (member) => {
+    const nameToInsert = member.actorDisplayName || member.name;
     const before = (value || '').slice(0, mentionStart);
     const after = (value || '').slice(mentionStart + mentionQuery.length + 1);
-    const newVal = before + '@' + member.name + ' ' + after;
+    const newVal = before + '@' + nameToInsert + ' ' + after;
     onChange(newVal);
     setMentionOpen(false);
     setMentionQuery('');
     setMentionStart(-1);
     setTimeout(() => {
       if (textareaRef.current) {
-        const newPos = mentionStart + member.name.length + 2;
+        const newPos = mentionStart + nameToInsert.length + 2;
         textareaRef.current.focus();
         textareaRef.current.setSelectionRange(newPos, newPos);
       }
@@ -200,12 +201,15 @@ const MentionTextarea = ({ value, onChange, onBlur, placeholder, rows, castMembe
             className: 'mention-item',
             onMouseDown: (e) => { e.preventDefault(); insertMention(member); },
           },
-          React.createElement('div', { className: 'mention-avatar' }, member.name.charAt(0).toUpperCase()),
+          React.createElement('div', { className: 'mention-avatar' }, (member.actorDisplayName || member.name).charAt(0).toUpperCase()),
           React.createElement(
             'div',
             null,
-            React.createElement('div', { className: 'mention-item-name' }, member.name),
-            member.character && React.createElement('div', { className: 'mention-item-role' }, 'as ', member.character)
+            React.createElement('div', { className: 'mention-item-name' }, member.actorDisplayName || member.name),
+            member.character && member.character !== (member.actorDisplayName || member.name) &&
+              React.createElement('div', { className: 'mention-item-role' }, 'as ', member.character),
+            !member.actorId &&
+              React.createElement('div', { className: 'mention-item-uncast' }, 'Uncast \u2014 note won\u2019t be sent')
           )
         )
       ),
@@ -222,22 +226,32 @@ const MentionTextarea = ({ value, onChange, onBlur, placeholder, rows, castMembe
 };
 
 // Returns cast members for a scene, merging characterIds + legacy characters arrays with casting data.
+// Always reads fresh from localStorage to avoid stale closure data.
 const getCastMembers = (production, scene) => {
-  const allChars = production.characters || [];
-  const casting = production.casting || {};
   const allActors = (() => {
     try { return JSON.parse(localStorage.getItem('showsuite_actors') || '[]'); } catch { return []; }
   })();
 
-  // Two-step actor lookup: ID first, then name-based fallback.
+  // Read fresh production data to ensure casting is current
+  const freshProd = (() => {
+    try {
+      const allProds = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
+      return allProds.find(p => p.id === production.id) || production;
+    } catch { return production; }
+  })();
+
+  const allChars = freshProd.characters || [];
+  const casting = freshProd.casting || {};
+
+  // Two-step actor lookup: ID first, then word-based name fallback.
   const resolveActor = (actorId, charName) => {
     let actor = actorId ? allActors.find(a => a.id === actorId) : null;
     if (!actor && charName) {
-      const charLower = charName.toLowerCase();
-      const charFirst = charName.split(/[\s/]/).map(w => w.trim()).filter(Boolean)[0]?.toLowerCase();
+      const charWords = charName.split(/[\s/]+/).map(w => w.trim().toLowerCase()).filter(Boolean);
       actor = allActors.find(a => {
-        const full = `${a.firstName} ${a.lastName}`.toLowerCase();
-        return full === charLower || a.firstName?.toLowerCase() === charFirst;
+        const actorFirst = a.firstName?.toLowerCase();
+        const actorLast = a.lastName?.toLowerCase();
+        return charWords.includes(actorFirst) || charWords.includes(actorLast);
       }) || null;
     }
     return actor;
@@ -253,11 +267,13 @@ const getCastMembers = (production, scene) => {
     seen.add(char.name);
     const actorId = casting[char.name] || char.actorId;
     const actor = resolveActor(actorId, char.name);
+    const actorDisplayName = actor ? `${actor.firstName || ''} ${actor.lastName || ''}`.trim() : null;
     results.push({
       id: actor?.id || char.id,
-      name: actor ? `${actor.firstName} ${actor.lastName}`.trim() : char.name,
+      name: actorDisplayName || char.name,
       character: char.name,
       actorId: actor?.id || null,
+      actorDisplayName,
     });
   });
 
@@ -267,11 +283,13 @@ const getCastMembers = (production, scene) => {
     seen.add(charName);
     const actorId = casting[charName];
     const actor = resolveActor(actorId, charName);
+    const actorDisplayName = actor ? `${actor.firstName || ''} ${actor.lastName || ''}`.trim() : null;
     results.push({
       id: actor?.id || charName,
-      name: actor ? `${actor.firstName} ${actor.lastName}`.trim() : charName,
+      name: actorDisplayName || charName,
       character: charName,
       actorId: actor?.id || null,
+      actorDisplayName,
     });
   });
 
