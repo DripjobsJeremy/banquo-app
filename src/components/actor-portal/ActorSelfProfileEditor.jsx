@@ -236,7 +236,15 @@ function ActorSelfProfileEditor({ actor, onSave, onCancel }) {
     { value: 'professional', label: '🟠 Professional' }
   ];
 
-  const unionOptions = ['AEA', 'SAG-AFTRA', 'AGMA', 'AGVA', 'Non-Union'];
+  const unionOptions = [
+    { value: 'AEA',               label: "AEA (Actors' Equity Association)" },
+    { value: 'AEA-EMC',           label: 'EMC (Equity Membership Candidate)' },
+    { value: 'SAG-AFTRA',         label: 'SAG-AFTRA' },
+    { value: 'SAG-AFTRA-Eligible', label: 'SAG-AFTRA Eligible' },
+    { value: 'AGMA',              label: 'AGMA (American Guild of Musical Artists)' },
+    { value: 'AGVA',              label: 'AGVA (American Guild of Variety Artists)' },
+    { value: 'Non-Union',         label: 'Non-Union' },
+  ];
 
   const contractOptions = [
     { value: 'union-only', label: 'Union Only' },
@@ -412,16 +420,16 @@ function ActorSelfProfileEditor({ actor, onSave, onCancel }) {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Union Affiliation</label>
                   <div className="flex flex-wrap gap-2 mt-1">
-                    {unionOptions.map(union => (
-                      <label key={union} className="flex items-center gap-1">
+                    {unionOptions.map(({ value, label }) => (
+                      <label key={value} className="flex items-center gap-1">
                         <input
                           type="checkbox"
-                          checked={(formData.actorProfile.unionAffiliation || []).includes(union)}
+                          checked={(formData.actorProfile.unionAffiliation || []).includes(value)}
                           onChange={(e) => {
                             const current = formData.actorProfile.unionAffiliation || [];
                             const updated = e.target.checked
-                              ? [...current, union]
-                              : current.filter(u => u !== union);
+                              ? [...current, value]
+                              : current.filter(u => u !== value);
                             setFormData({
                               ...formData,
                               actorProfile: { ...formData.actorProfile, unionAffiliation: updated }
@@ -429,7 +437,7 @@ function ActorSelfProfileEditor({ actor, onSave, onCancel }) {
                           }}
                           className="rounded"
                         />
-                        <span className="text-sm">{union}</span>
+                        <span className="text-sm">{label}</span>
                       </label>
                     ))}
                   </div>
