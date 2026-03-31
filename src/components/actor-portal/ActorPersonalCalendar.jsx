@@ -201,9 +201,11 @@ function ActorPersonalCalendar({ actor, onBack }) {
       try {
         const actorCalKey = `actor_calendar_${actor.id}`;
         const actorPersonalEvents = JSON.parse(localStorage.getItem(actorCalKey) || '[]');
+        // Build set of all invitationThreadIds already loaded from production calendars
+        const loadedThreadIds = new Set(allEvents.map(e => e.invitationThreadId).filter(Boolean));
         actorPersonalEvents.forEach(ev => {
-          // Avoid duplication if actor is now cast and event also appears via production calendar
-          const alreadyAdded = allEvents.some(e => e.invitationThreadId && e.invitationThreadId === ev.invitationThreadId);
+          // Skip if this invitation thread already appears via production calendar
+          const alreadyAdded = ev.invitationThreadId && loadedThreadIds.has(ev.invitationThreadId);
           if (!alreadyAdded) {
             const startDate = ev.date || (ev.start ? ev.start.split('T')[0] : null);
             const startTime = ev.time || (ev.start && ev.start.includes('T') ? ev.start.split('T')[1].substring(0, 5) : null);

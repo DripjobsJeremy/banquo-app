@@ -209,55 +209,63 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
       if (!inv?.productionId) {
         console.error('[handleInvitationResponse] inv.productionId is missing — cannot write calendar event', inv);
       } else {
+        const startDateTime = `${slot.date}T${slot.time}:00`;
+        const endDateTime = new Date(new Date(startDateTime).getTime() + slot.duration * 60000).toISOString().slice(0, 16);
+
+        // Write to production calendar — CalendarView reads from calendar_events_[prodId]
         try {
-          const startDateTime = `${slot.date}T${slot.time}:00`;
-          const startMs = new Date(startDateTime).getTime();
-          const endMs = startMs + (slot.duration * 60 * 1000);
-          const auditionEvent = {
-            id: Date.now(),
-            type: 'audition',
-            title: `Audition — ${me.name}`,
-            start: startDateTime,
-            end: new Date(endMs).toISOString().slice(0, 16),
-            date: slot.date,
-            time: slot.time,
-            location: inv.location || '',
-            notes: inv.notes || '',
-            productionId: inv.productionId,
-            attendees: [{ id: me.id, name: me.name, role: 'actor' }],
-            invitationThreadId: thread.id,
-            createdAt: new Date().toISOString(),
-          };
-          const prods = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
-          const prodIdx = prods.findIndex(p => p.id === inv.productionId);
-          if (prodIdx !== -1) {
-            if (!Array.isArray(prods[prodIdx].calendar)) prods[prodIdx].calendar = [];
-            const alreadyExists = prods[prodIdx].calendar.some(e =>
-              e.invitationThreadId === thread.id &&
-              Array.isArray(e.attendees) && e.attendees.some(a => a.id === me.id)
-            );
-            if (!alreadyExists) {
-              prods[prodIdx].calendar.push(auditionEvent);
-              localStorage.setItem('showsuite_productions', JSON.stringify(prods));
-              console.log('[handleInvitationResponse] wrote to production.calendar[]', auditionEvent);
-              window.dispatchEvent(new CustomEvent('productionUpdated', { detail: { id: inv.productionId } }));
-            } else {
-              console.log('[handleInvitationResponse] duplicate — skipped');
-            }
+          const calKey = `calendar_events_${inv.productionId}`;
+          const existingCalEvents = JSON.parse(localStorage.getItem(calKey) || '[]');
+          const alreadyInProdCal = existingCalEvents.some(e =>
+            e.invitationThreadId === thread.id && e.attendees?.some(a => a.id === me.id)
+          );
+          if (!alreadyInProdCal) {
+            const auditionEvent = {
+              id: 'cal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+              type: 'audition',
+              title: `Audition — ${me.name}`,
+              start: startDateTime,
+              end: endDateTime,
+              date: slot.date,
+              time: slot.time,
+              duration: slot.duration,
+              location: inv.location || '',
+              notes: inv.notes || '',
+              status: 'scheduled',
+              productionId: inv.productionId,
+              scenes: [], charactersNeeded: [], propsNeeded: [], costumesNeeded: [], attendance: {},
+              attendees: [{ id: me.id, name: me.name, role: 'actor' }],
+              invitationThreadId: thread.id,
+              createdAt: new Date().toISOString(),
+            };
+            localStorage.setItem(calKey, JSON.stringify([...existingCalEvents, auditionEvent]));
+            window.dispatchEvent(new CustomEvent('productionUpdated', { detail: { id: inv.productionId } }));
+            console.log('[handleInvitationResponse] wrote to', calKey);
           } else {
-            console.error('[handleInvitationResponse] production not found:', inv.productionId);
+            console.log('[handleInvitationResponse] prod cal duplicate — skipped');
           }
+          // Clean up any stale entries written by old code to production.calendar[]
+          try {
+            const prods = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
+            const prodIdx = prods.findIndex(p => p.id === inv.productionId);
+            if (prodIdx !== -1 && Array.isArray(prods[prodIdx].calendar)) {
+              const before = prods[prodIdx].calendar.length;
+              prods[prodIdx].calendar = prods[prodIdx].calendar.filter(e => !(e.type === 'audition' && e.invitationThreadId));
+              if (prods[prodIdx].calendar.length !== before) {
+                localStorage.setItem('showsuite_productions', JSON.stringify(prods));
+              }
+            }
+          } catch {}
         } catch (e) {
           console.error('[handleInvitationResponse] calendar write failed:', e);
         }
 
-        // Also write to actor's personal calendar key (visible even if not yet cast)
+        // Write to actor's personal calendar — visible even if actor is not yet cast
         try {
           const actorCalKey = `actor_calendar_${me.id}`;
           const actorEvents = JSON.parse(localStorage.getItem(actorCalKey) || '[]');
           const actorAlreadyExists = actorEvents.some(e => e.invitationThreadId === thread.id);
           if (!actorAlreadyExists) {
-            const startDateTime = `${slot.date}T${slot.time}:00`;
             const actorEvent = {
               id: 'actor_evt_' + Date.now(),
               type: 'audition',
@@ -265,7 +273,7 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
               productionId: inv.productionId,
               productionTitle: inv.productionTitle,
               start: startDateTime,
-              end: new Date(new Date(startDateTime).getTime() + slot.duration * 60000).toISOString().slice(0, 16),
+              end: endDateTime,
               date: slot.date,
               time: slot.time,
               duration: slot.duration,
@@ -277,6 +285,8 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
             localStorage.setItem(actorCalKey, JSON.stringify([...actorEvents, actorEvent]));
             window.dispatchEvent(new CustomEvent('actorCalendarUpdated', { detail: { actorId: me.id } }));
             console.log('[handleInvitationResponse] wrote to actor calendar:', actorCalKey);
+          } else {
+            console.log('[handleInvitationResponse] actor cal duplicate — skipped');
           }
         } catch (e) {
           console.error('[handleInvitationResponse] actor calendar write failed:', e);
