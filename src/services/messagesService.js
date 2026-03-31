@@ -145,6 +145,19 @@
     return thread.messages.filter(m => !m.readBy.includes(userId)).length;
   };
 
+  // Mark the last message in a thread as unread for a user
+  const markThreadUnread = (threadId, userId) => {
+    const data = load();
+    const thread = data.threads[threadId];
+    if (!thread) return;
+    const msgs = thread.messages;
+    if (msgs.length > 0) {
+      msgs[msgs.length - 1].readBy = msgs[msgs.length - 1].readBy.filter(id => id !== userId);
+    }
+    data.threads[threadId] = thread;
+    save(data);
+  };
+
   // Delete a thread (super_admin only)
   const deleteThread = (threadId) => {
     const data = load();
@@ -179,6 +192,7 @@
     createThread,
     sendMessage,
     markThreadRead,
+    markThreadUnread,
     getThreadsForUser,
     getUnreadCount,
     getThreadUnreadCount,

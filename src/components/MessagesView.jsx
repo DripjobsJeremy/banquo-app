@@ -70,12 +70,22 @@ const InvitationCard = ({ msg, me, onRespond }) => {
           </div>
         )}
 
-        {/* Notes */}
+        {/* Audition prep notes */}
         {inv.notes && (
           <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)',
             padding: '8px 10px', borderRadius: '6px', backgroundColor: 'var(--color-bg-elevated)',
-            marginBottom: '12px', lineHeight: '1.5' }}>
-            {inv.notes}
+            marginBottom: '8px', lineHeight: '1.5' }}>
+            📋 {inv.notes}
+          </div>
+        )}
+
+        {/* Personal note from sender */}
+        {msg.body && msg.body !== `You have been invited to audition for ${inv.productionTitle}.` && (
+          <div style={{ fontSize: '13px', color: 'var(--color-text-primary)',
+            padding: '8px 10px', borderRadius: '6px', fontStyle: 'italic',
+            borderLeft: '3px solid var(--color-primary)', marginBottom: '12px',
+            backgroundColor: 'var(--color-bg-elevated)' }}>
+            "{msg.body}"
           </div>
         )}
 
@@ -116,6 +126,7 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [replyBody, setReplyBody] = React.useState('');
   const [textareaKey, setTextareaKey] = React.useState(0);
+  const [threadMenuId, setThreadMenuId] = React.useState(null);
   const replyRef = React.useRef(null);
 
   // currentUser shape: { id, name, role }
@@ -154,6 +165,14 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
     }
   }, [activeThreadId, me.id]);
 
+  // Close thread menu on outside click
+  React.useEffect(() => {
+    if (!threadMenuId) return;
+    const close = () => setThreadMenuId(null);
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [threadMenuId]);
+
   const activeThread = React.useMemo(() =>
     threads.find(t => t.id === activeThreadId) || null,
     [threads, activeThreadId]
@@ -182,7 +201,7 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
       : `${me.name} declined the audition invitation.`;
     window.messagesService.sendMessage({ threadId: thread.id, senderUser: me, body: replyText });
 
-    // 3. If accepted — write event to production calendar
+    // 3. If accepted — write event to production.calendar[] in showsuite_productions
     if (status === 'accepted' && slot) {
       const inv = msg.invitation;
       console.log('[handleInvitationResponse] inv:', inv, 'status:', status, 'slot:', slot);
@@ -191,51 +210,55 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
         console.error('[handleInvitationResponse] inv.productionId is missing — cannot write calendar event', inv);
       } else {
         try {
-          const calKey = `calendar_events_${inv.productionId}`;
-          const existingEvents = JSON.parse(localStorage.getItem(calKey) || '[]');
-          const alreadyExists = existingEvents.some(
-            e => e.invitationThreadId === thread.id && e.attendees?.some(a => a.id === me.id)
-          );
-          if (!alreadyExists) {
-            const startDateTime = `${slot.date}T${slot.time}:00`;
-            const endMs = new Date(startDateTime).getTime() + slot.duration * 60 * 1000;
-            const auditionEvent = {
-              id: 'cal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-              type: 'audition',
-              title: `Audition — ${me.name}`,
-              start: startDateTime,
-              end: new Date(endMs).toISOString().slice(0, 16),
-              date: slot.date,
-              location: inv.location || '',
-              notes: inv.notes || '',
-              status: 'scheduled',
-              productionId: inv.productionId,
-              scenes: [],
-              charactersNeeded: [],
-              propsNeeded: [],
-              costumesNeeded: [],
-              attendees: [{ id: me.id, name: me.name, role: 'actor' }],
-              attendance: {},
-              invitationThreadId: thread.id,
-              createdAt: new Date().toISOString(),
-            };
-            localStorage.setItem(calKey, JSON.stringify([...existingEvents, auditionEvent]));
-            console.log('[handleInvitationResponse] wrote audition event to', calKey, auditionEvent);
-            window.dispatchEvent(new CustomEvent('productionUpdated', { detail: { id: inv.productionId } }));
+          const startDateTime = `${slot.date}T${slot.time}:00`;
+          const startMs = new Date(startDateTime).getTime();
+          const endMs = startMs + (slot.duration * 60 * 1000);
+          const auditionEvent = {
+            id: Date.now(),
+            type: 'audition',
+            title: `Audition — ${me.name}`,
+            start: startDateTime,
+            end: new Date(endMs).toISOString().slice(0, 16),
+            date: slot.date,
+            time: slot.time,
+            location: inv.location || '',
+            notes: inv.notes || '',
+            productionId: inv.productionId,
+            attendees: [{ id: me.id, name: me.name, role: 'actor' }],
+            invitationThreadId: thread.id,
+            createdAt: new Date().toISOString(),
+          };
+          const prods = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
+          const prodIdx = prods.findIndex(p => p.id === inv.productionId);
+          if (prodIdx !== -1) {
+            if (!Array.isArray(prods[prodIdx].calendar)) prods[prodIdx].calendar = [];
+            const alreadyExists = prods[prodIdx].calendar.some(e =>
+              e.invitationThreadId === thread.id &&
+              Array.isArray(e.attendees) && e.attendees.some(a => a.id === me.id)
+            );
+            if (!alreadyExists) {
+              prods[prodIdx].calendar.push(auditionEvent);
+              localStorage.setItem('showsuite_productions', JSON.stringify(prods));
+              console.log('[handleInvitationResponse] wrote to production.calendar[]', auditionEvent);
+              window.dispatchEvent(new CustomEvent('productionUpdated', { detail: { id: inv.productionId } }));
+            } else {
+              console.log('[handleInvitationResponse] duplicate — skipped');
+            }
           } else {
-            console.log('[handleInvitationResponse] duplicate — event already exists in', calKey);
+            console.error('[handleInvitationResponse] production not found:', inv.productionId);
           }
         } catch (e) {
-          console.error('Failed to write audition event to calendar:', e);
+          console.error('[handleInvitationResponse] calendar write failed:', e);
         }
       }
 
-      // Resolve production title for toast (inv.productionTitle stored at compose time; fallback to localStorage)
-      let prodTitle = inv?.productionTitle || '';
-      if (!prodTitle && inv?.productionId) {
+      // Resolve production title for toast
+      const inv2 = msg.invitation;
+      let prodTitle = inv2?.productionTitle || '';
+      if (!prodTitle && inv2?.productionId) {
         try {
           const allProds = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
-          prodTitle = allProds.find(p => p.id === inv.productionId)?.title || '';
+          prodTitle = allProds.find(p => p.id === inv2.productionId)?.title || '';
         } catch {}
       }
 
@@ -334,7 +357,7 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
                   borderBottom: '1px solid var(--color-border)',
                   backgroundColor: isActive ? 'var(--color-primary-surface)' : 'transparent',
                   borderLeft: isActive ? '3px solid var(--color-primary)' : '3px solid transparent',
-                  transition: 'background-color 0.1s',
+                  transition: 'background-color 0.1s', position: 'relative',
                 }}
                 onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated)'; }}
                 onMouseLeave={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'; }}
@@ -345,7 +368,7 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {others.map(p => p.name).join(', ') || 'You'}
                   </span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
                     {unread > 0 && (
                       <span style={{ backgroundColor: 'var(--color-primary)', color: '#fff',
                         fontSize: '10px', fontWeight: 700, padding: '2px 6px', borderRadius: '99px',
@@ -356,6 +379,44 @@ const MessagesView = ({ currentUser, contacts, productions, userRole }) => {
                     <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
                       {fmtTime(thread.updatedAt)}
                     </span>
+                    {/* ⋮ menu button */}
+                    <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
+                      <button type="button"
+                        onClick={e => { e.stopPropagation(); setThreadMenuId(threadMenuId === thread.id ? null : thread.id); }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px 5px',
+                          color: 'var(--color-text-muted)', fontSize: '15px', borderRadius: '4px',
+                          lineHeight: 1 }}>
+                        ⋮
+                      </button>
+                      {threadMenuId === thread.id && (
+                        <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 30,
+                          backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)',
+                          borderRadius: '6px', padding: '4px', minWidth: '168px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+                          <button type="button"
+                            onClick={() => { window.messagesService.markThreadUnread(thread.id, me.id); setThreadMenuId(null); loadThreads(); }}
+                            style={{ display: 'block', width: '100%', textAlign: 'left', padding: '7px 12px',
+                              background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px',
+                              color: 'var(--color-text-primary)', borderRadius: '4px' }}>
+                            Mark as unread
+                          </button>
+                          <button type="button"
+                            onClick={() => { window.messagesService.markThreadRead(thread.id, me.id); setThreadMenuId(null); loadThreads(); }}
+                            style={{ display: 'block', width: '100%', textAlign: 'left', padding: '7px 12px',
+                              background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px',
+                              color: 'var(--color-text-primary)', borderRadius: '4px' }}>
+                            Mark as read
+                          </button>
+                          <button type="button"
+                            onClick={() => { if (window.confirm('Delete this conversation?')) { window.messagesService.deleteThread(thread.id); if (activeThreadId === thread.id) setActiveThreadId(null); setThreadMenuId(null); loadThreads(); } }}
+                            style={{ display: 'block', width: '100%', textAlign: 'left', padding: '7px 12px',
+                              background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px',
+                              color: 'var(--color-danger)', borderRadius: '4px' }}>
+                            Delete conversation
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div style={{ fontSize: '12px', fontWeight: unread > 0 ? 600 : 400,
