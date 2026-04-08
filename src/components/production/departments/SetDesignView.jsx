@@ -125,6 +125,7 @@ function SetDesignView({ production, onSave }) {
   const [filterAct, setFilterAct] = useState('');
   const [selectedPieces, setSelectedPieces] = useState([]);
   const [checklistMode, setChecklistMode] = useState(false);
+  const [ghostLightMode, setGhostLightMode] = useState(false);
   const [checklistStatus, setChecklistStatus] = useState({});
   const [viewMode, setViewMode] = React.useState('scenes'); // 'scenes' or 'schedule'
   const [showWorkflow, setShowWorkflow] = React.useState(false);
@@ -779,9 +780,9 @@ function SetDesignView({ production, onSave }) {
         React.createElement(
           'button',
           {
-            onClick: () => setChecklistMode(false),
+            onClick: () => { setChecklistMode(false); setGhostLightMode(false); },
             className: `px-4 py-2 text-sm font-medium rounded transition-colors ${
-              !checklistMode 
+              !checklistMode && !ghostLightMode
                 ? 'bg-violet-600 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`
@@ -791,20 +792,64 @@ function SetDesignView({ production, onSave }) {
         React.createElement(
           'button',
           {
-            onClick: () => setChecklistMode(true),
+            onClick: () => { setChecklistMode(true); setGhostLightMode(false); },
             className: `px-4 py-2 text-sm font-medium rounded transition-colors ${
-              checklistMode 
+              checklistMode && !ghostLightMode
                 ? 'bg-violet-600 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`
           },
           '✓ Checklist View'
+        ),
+        React.createElement(
+          'button',
+          {
+            onClick: () => setGhostLightMode(true),
+            style: ghostLightMode
+              ? { background: '#1a1a2e', color: '#b78aff', border: '1px solid rgba(147,97,255,0.4)' }
+              : { background: '', color: '' },
+            className: `px-4 py-2 text-sm font-medium rounded transition-colors ${
+              ghostLightMode
+                ? ''
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`
+          },
+          '🕯️ Ghost Light'
         )
       )
     ),
     
-    // Conditional rendering: Manager View vs Checklist View
-    checklistMode ? 
+    // Conditional rendering: Ghost Light / Manager View / Checklist View
+    ghostLightMode ?
+      (() => {
+        const features = [
+          { title: '📐 Measurements & Space Calculator', desc: 'Calculate sight lines, clearances, and fly space' },
+          { title: '🏗️ Set Visualizer', desc: 'Generate 3D visualization of your set design' },
+          { title: '🗓️ Build Planner', desc: 'Plan your build schedule based on your tools, crew, and timeline' }
+        ];
+        return React.createElement(
+          'div',
+          { style: { background: '#1a1a2e', borderRadius: '12px', padding: '32px', minHeight: '400px', position: 'relative', overflow: 'hidden' } },
+          React.createElement('div', { style: { position: 'absolute', right: '24px', bottom: '24px', fontSize: '120px', opacity: 0.05, userSelect: 'none', lineHeight: 1, pointerEvents: 'none' } }, '🕯️'),
+          React.createElement('div', { style: { marginBottom: '32px' } },
+            React.createElement('h2', { style: { fontSize: '22px', fontWeight: '700', color: '#f5f0e8', marginBottom: '8px', marginTop: '0' } }, '🕯️ The Ghost Light'),
+            React.createElement('p', { style: { color: '#9b8fa8', fontSize: '14px', margin: '0' } }, 'AI-powered tools for theatre professionals — coming soon')
+          ),
+          React.createElement(
+            'div',
+            { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' } },
+            features.map((feature, i) =>
+              React.createElement('div', { key: i, style: { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '24px', position: 'relative' } },
+                React.createElement('div', { style: { position: 'absolute', top: '12px', right: '16px', fontSize: '24px', opacity: 0.15 } }, '🕯️'),
+                React.createElement('h3', { style: { fontSize: '15px', fontWeight: '600', color: '#f5f0e8', marginBottom: '8px', marginTop: '0', paddingRight: '32px' } }, feature.title),
+                React.createElement('p', { style: { fontSize: '13px', color: '#9b8fa8', lineHeight: '1.5', marginBottom: '16px', marginTop: '0' } }, feature.desc),
+                React.createElement('span', { style: { display: 'inline-block', padding: '3px 10px', background: 'rgba(147,97,255,0.15)', border: '1px solid rgba(147,97,255,0.35)', borderRadius: '20px', fontSize: '11px', fontWeight: '500', color: '#b78aff', letterSpacing: '0.5px' } }, 'Coming Soon')
+              )
+            )
+          )
+        );
+      })()
+    : checklistMode ?
       // CHECKLIST VIEW
       React.createElement(
         'div',
