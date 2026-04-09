@@ -432,6 +432,34 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
         </div>
       )}
 
+      {/* Ghost Light — AI Tools for Board & Leadership */}
+      {(() => {
+        const features = [
+          { title: '✍️ Grant Writing Assistant', desc: 'Generate grant applications tailored to your organization\'s mission and financials' },
+          { title: '📄 Document Generator', desc: 'Create board reports, donor impact statements, and funding proposals' },
+          { title: '🔎 Donor Intelligence', desc: 'AI-powered insights on donor giving patterns and retention risk' }
+        ];
+        return (
+          <div style={{ background: '#1a1a2e', borderRadius: '12px', padding: '32px', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', right: '24px', bottom: '24px', fontSize: '120px', opacity: 0.05, userSelect: 'none', lineHeight: 1, pointerEvents: 'none' }}>🕯️</div>
+            <div style={{ marginBottom: '32px' }}>
+              <h2 style={{ fontSize: '22px', fontWeight: '700', color: '#f5f0e8', marginBottom: '8px', marginTop: '0' }}>🕯️ The Ghost Light</h2>
+              <p style={{ color: '#9b8fa8', fontSize: '14px', margin: '0' }}>AI-powered tools for theatre professionals — coming soon</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
+              {features.map((feature, i) => (
+                <div key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '24px', position: 'relative' }}>
+                  <div style={{ position: 'absolute', top: '12px', right: '16px', fontSize: '24px', opacity: 0.15 }}>🕯️</div>
+                  <h3 style={{ fontSize: '15px', fontWeight: '600', color: '#f5f0e8', marginBottom: '8px', marginTop: '0', paddingRight: '32px' }}>{feature.title}</h3>
+                  <p style={{ fontSize: '13px', color: '#9b8fa8', lineHeight: '1.5', marginBottom: '16px', marginTop: '0' }}>{feature.desc}</p>
+                  <span style={{ display: 'inline-block', padding: '3px 10px', background: 'rgba(147,97,255,0.15)', border: '1px solid rgba(147,97,255,0.35)', borderRadius: '20px', fontSize: '11px', fontWeight: '500', color: '#b78aff', letterSpacing: '0.5px' }}>Coming Soon</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Add Donation Modal */}
       {showAddDonationModal && (() => {
         const DonationModal = window.AddDonationModal;
