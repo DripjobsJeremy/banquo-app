@@ -675,7 +675,7 @@ function App() {
           >
             ☰
           </button>
-          <h1 className="text-xl font-bold text-brand">SceneStave</h1>
+          <h1 className="text-xl font-bold text-brand">Banquo</h1>
           <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${roleInfo.cls}`}>
             {roleInfo.label}
           </span>

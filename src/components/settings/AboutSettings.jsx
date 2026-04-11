@@ -103,7 +103,7 @@
     };
 
     const handleFeatureRequest = () => {
-      const message = 'What feature would you like to see in SceneStave?';
+      const message = 'What feature would you like to see in Banquo?';
       prompt(message);
     };
 
@@ -116,7 +116,7 @@
       React.createElement(
         'div',
         { className: 'section-header mb-6' },
-        React.createElement('h2', { className: 'text-2xl font-bold mb-1 text-gray-900' }, 'About SceneStave'),
+        React.createElement('h2', { className: 'text-2xl font-bold mb-1 text-gray-900' }, 'About Banquo'),
         React.createElement('p', { className: 'text-sm text-gray-600' }, 'Version information and system details')
       ),
 
@@ -131,7 +131,7 @@
           React.createElement(
             'div',
             { className: 'flex-1' },
-            React.createElement('h1', { className: 'text-3xl font-bold mb-2 text-gray-900' }, 'SceneStave'),
+            React.createElement('h1', { className: 'text-3xl font-bold mb-2 text-gray-900' }, 'Banquo'),
             React.createElement('p', { className: 'text-lg text-gray-600 mb-3' }, 'Theatre Management CRM'),
             React.createElement(
               'div',
@@ -184,10 +184,10 @@
         React.createElement(
           'div',
           { className: 'resources-list space-y-2' },
-          React.createElement(ResourceLink, { icon: '📖', title: 'User Guide', description: 'Learn how to use SceneStave effectively', onClick: () => handleOpenUserGuide() }),
+          React.createElement(ResourceLink, { icon: '📖', title: 'User Guide', description: 'Learn how to use Banquo effectively', onClick: () => handleOpenUserGuide() }),
           React.createElement(ResourceLink, { icon: '❓', title: 'Help & Support', description: 'Get help with common questions', onClick: () => handleOpenSupport() }),
           React.createElement(ResourceLink, { icon: '🐛', title: 'Report an Issue', description: 'Found a bug? Let us know', onClick: () => handleReportIssue() }),
-          React.createElement(ResourceLink, { icon: '💡', title: 'Request a Feature', description: 'Suggest improvements to SceneStave', onClick: () => handleFeatureRequest() })
+          React.createElement(ResourceLink, { icon: '💡', title: 'Request a Feature', description: 'Suggest improvements to Banquo', onClick: () => handleFeatureRequest() })
         )
       ),
 
@@ -201,7 +201,7 @@
           { className: 'text-sm text-gray-700 space-y-2' },
           React.createElement('p', null, React.createElement('strong', null, 'Built with:'), ' React, Tailwind CSS, Babel Standalone'),
           React.createElement('p', null, React.createElement('strong', null, 'Libraries:'), ' PapaParse (CSV), SheetJS (Excel)'),
-          React.createElement('p', { className: 'text-gray-600 mt-4' }, 'SceneStave is designed for theatre organizations of all sizes. All data is stored locally in your browser for privacy and security.')
+          React.createElement('p', { className: 'text-gray-600 mt-4' }, 'Banquo is designed for theatre organizations of all sizes. All data is stored locally in your browser for privacy and security.')
         )
       ),
 
@@ -209,7 +209,7 @@
       React.createElement(
         'div',
         { className: 'legal-section text-center text-xs text-gray-600' },
-        React.createElement('p', null, '© 2025 SceneStave. All rights reserved.'),
+        React.createElement('p', null, '© 2025 Banquo. All rights reserved.'),
         React.createElement(
           'p',
           { className: 'mt-1' },
