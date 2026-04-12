@@ -649,7 +649,7 @@ function App() {
               <div className="text-xs text-gray-300 truncate mb-1.5">👤 {staffName}</div>
             )}
             <div className="flex items-center justify-between">
-              <div className="text-xs text-white opacity-40">SceneStave v1.0</div>
+              <div className="text-xs text-white opacity-40">Banquo v1.0</div>
               <button
                 type="button"
                 title={themeMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
