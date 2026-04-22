@@ -604,7 +604,7 @@ function App() {
                   />
                 )}
                 <h1 className="text-xl font-bold truncate">
-                  {orgInfo.name || 'SceneStave'}
+                  {orgInfo.name || 'Banquo'}
                 </h1>
               </div>
             )}

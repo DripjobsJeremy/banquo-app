@@ -5,28 +5,31 @@
 const OrganizationService = (() => {
     const STORAGE_KEY = 'showsuite_organization';
 
-    // SceneStave placeholder logo — purple-gradient theatrical masks
-    const SHOWSUITE_LOGO_SVG = 'data:image/svg+xml;base64,' + btoa(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">' +
-        '<defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">' +
-        '<stop offset="0%" style="stop-color:#7C3AED"/>' +
-        '<stop offset="100%" style="stop-color:#4F46E5"/>' +
-        '</linearGradient></defs>' +
-        '<circle cx="100" cy="100" r="95" fill="url(#g)" opacity="0.1"/>' +
-        '<ellipse cx="72" cy="95" rx="38" ry="44" fill="url(#g)"/>' +
-        '<ellipse cx="60" cy="87" rx="5" ry="8" fill="white"/>' +
-        '<ellipse cx="84" cy="87" rx="5" ry="8" fill="white"/>' +
-        '<circle cx="60" cy="89" r="3" fill="#1F2937"/>' +
-        '<circle cx="84" cy="89" r="3" fill="#1F2937"/>' +
-        '<path d="M 57,105 Q 72,118 87,105" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-        '<ellipse cx="138" cy="105" rx="38" ry="44" fill="url(#g)"/>' +
-        '<ellipse cx="126" cy="97" rx="5" ry="8" fill="white"/>' +
-        '<ellipse cx="150" cy="97" rx="5" ry="8" fill="white"/>' +
-        '<circle cx="126" cy="99" r="3" fill="#1F2937"/>' +
-        '<circle cx="150" cy="99" r="3" fill="#1F2937"/>' +
-        '<path d="M 123,118 Q 138,108 153,118" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-        '<circle cx="30" cy="30" r="3" fill="#10B981" opacity="0.7"/>' +
-        '<circle cx="170" cy="170" r="3" fill="#10B981" opacity="0.7"/>' +
+    // Banquo ghost-candle logo — matches landing page wordmark-flame aesthetic.
+    // Static SVG (no animation, since it renders as an img src). The flame uses
+    // a radial gradient from ghost-glow (#f5d97c) through crimson-bright to
+    // transparent, sitting on a small parchment candle stub.
+    const BANQUO_LOGO_SVG = 'data:image/svg+xml;base64,' + btoa(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">' +
+        '<defs>' +
+          '<radialGradient id="flame" cx="50%" cy="55%" r="50%">' +
+            '<stop offset="0%" stop-color="#fff9d6"/>' +
+            '<stop offset="30%" stop-color="#f5d97c"/>' +
+            '<stop offset="70%" stop-color="#a6282f"/>' +
+            '<stop offset="100%" stop-color="#7a1f24" stop-opacity="0"/>' +
+          '</radialGradient>' +
+          '<radialGradient id="glow" cx="50%" cy="35%" r="70%">' +
+            '<stop offset="0%" stop-color="#f5d97c" stop-opacity="0.45"/>' +
+            '<stop offset="100%" stop-color="#f5d97c" stop-opacity="0"/>' +
+          '</radialGradient>' +
+        '</defs>' +
+        '<circle cx="20" cy="14" r="16" fill="url(#glow)"/>' +
+        '<path d="M 20 4 C 16 10, 15 14, 16 18 C 17 21, 19 22, 20 22 C 21 22, 23 21, 24 18 C 25 14, 24 10, 20 4 Z" fill="url(#flame)"/>' +
+        '<ellipse cx="18.5" cy="13" rx="1.1" ry="1.8" fill="#fff9d6" opacity="0.85"/>' +
+        '<rect x="19.3" y="22" width="1.4" height="3" fill="#2a1f1d"/>' +
+        '<rect x="15" y="25" width="10" height="11" rx="1" fill="#f4ede2"/>' +
+        '<rect x="15" y="25" width="10" height="2" fill="#cfc6b3" opacity="0.6"/>' +
+        '<ellipse cx="20" cy="36" rx="9" ry="1.5" fill="#2a1f1d" opacity="0.5"/>' +
         '</svg>'
     );
 
@@ -35,7 +38,7 @@ const OrganizationService = (() => {
     // purple Tailwind utility overrides). secondaryColor drives gradient end and
     // --color-secondary. accentColor is reserved for success/confirmation states.
     const DEFAULT_BRANDING = {
-        logoUrl:         SHOWSUITE_LOGO_SVG,
+        logoUrl:         BANQUO_LOGO_SVG,
         primaryColor:    '#7a1f24',  // crimson (var --crimson on landing)
         secondaryColor:  '#a6282f',  // crimson-bright (hover / gradient end)
         accentColor:     '#c9a14a',  // gold (var --gold on landing — used for labels and accents)
@@ -88,7 +91,7 @@ const OrganizationService = (() => {
 
     // Branding migration version — bump this when DEFAULT_BRANDING changes and
     // existing users need their cached branding refreshed.
-    const BRANDING_VERSION = 'banquo-v1';
+    const BRANDING_VERSION = 'banquo-v2';  // v2 adds logo migration
     const BRANDING_VERSION_KEY = 'showsuite_branding_version';
 
     const migrateBrandingToBanquo = (org) => {
@@ -129,7 +132,16 @@ const OrganizationService = (() => {
 
             return {
                 ...org,
-                branding: { ...b, ...DEFAULT_BRANDING, logoUrl: b.logoUrl || DEFAULT_BRANDING.logoUrl },
+                branding: {
+                    ...b,
+                    ...DEFAULT_BRANDING,
+                    // Only force the new logo if the user is still on the old
+                    // SceneStave logo (data URL starting with the identifiable purple
+                    // marker). Custom-uploaded logos are preserved.
+                    logoUrl: (b.logoUrl && !b.logoUrl.includes('PHN2ZyB4bWxuczSU') && !b.logoUrl.includes('7C3AED'))
+                             ? b.logoUrl
+                             : BANQUO_LOGO_SVG
+                },
                 updatedAt: new Date().toISOString()
             };
         }
@@ -539,7 +551,7 @@ const OrganizationService = (() => {
         DEFAULT_BTN_THEME,
         DEFAULT_ORGANIZATION,
         DEFAULT_BRANDING,
-        SHOWSUITE_LOGO_SVG
+        BANQUO_LOGO_SVG
     };
 })();
 
