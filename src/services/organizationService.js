@@ -5,31 +5,38 @@
 const OrganizationService = (() => {
     const STORAGE_KEY = 'showsuite_organization';
 
-    // Banquo ghost-candle logo — matches landing page wordmark-flame aesthetic.
-    // Static SVG (no animation, since it renders as an img src). The flame uses
-    // a radial gradient from ghost-glow (#f5d97c) through crimson-bright to
-    // transparent, sitting on a small parchment candle stub.
+    // Banquo ghost-candle logo v2 — tapered flame with pointed tip, brighter
+    // inner core, and subtle cylindrical shading on the candle body. Designed
+    // to match the silhouette of a real candle flame rather than a lightbulb.
     const BANQUO_LOGO_SVG = 'data:image/svg+xml;base64,' + btoa(
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">' +
         '<defs>' +
-          '<radialGradient id="flame" cx="50%" cy="55%" r="50%">' +
+          '<radialGradient id="flame" cx="50%" cy="70%" r="55%">' +
             '<stop offset="0%" stop-color="#fff9d6"/>' +
-            '<stop offset="30%" stop-color="#f5d97c"/>' +
-            '<stop offset="70%" stop-color="#a6282f"/>' +
+            '<stop offset="25%" stop-color="#f5d97c"/>' +
+            '<stop offset="65%" stop-color="#c9a14a"/>' +
+            '<stop offset="90%" stop-color="#a6282f"/>' +
             '<stop offset="100%" stop-color="#7a1f24" stop-opacity="0"/>' +
           '</radialGradient>' +
-          '<radialGradient id="glow" cx="50%" cy="35%" r="70%">' +
-            '<stop offset="0%" stop-color="#f5d97c" stop-opacity="0.45"/>' +
+          '<radialGradient id="glow" cx="50%" cy="45%" r="75%">' +
+            '<stop offset="0%" stop-color="#f5d97c" stop-opacity="0.4"/>' +
+            '<stop offset="100%" stop-color="#f5d97c" stop-opacity="0"/>' +
+          '</radialGradient>' +
+          '<radialGradient id="innercore" cx="50%" cy="65%" r="30%">' +
+            '<stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>' +
+            '<stop offset="60%" stop-color="#fff9d6" stop-opacity="0.3"/>' +
             '<stop offset="100%" stop-color="#f5d97c" stop-opacity="0"/>' +
           '</radialGradient>' +
         '</defs>' +
-        '<circle cx="20" cy="14" r="16" fill="url(#glow)"/>' +
-        '<path d="M 20 4 C 16 10, 15 14, 16 18 C 17 21, 19 22, 20 22 C 21 22, 23 21, 24 18 C 25 14, 24 10, 20 4 Z" fill="url(#flame)"/>' +
-        '<ellipse cx="18.5" cy="13" rx="1.1" ry="1.8" fill="#fff9d6" opacity="0.85"/>' +
-        '<rect x="19.3" y="22" width="1.4" height="3" fill="#2a1f1d"/>' +
-        '<rect x="15" y="25" width="10" height="11" rx="1" fill="#f4ede2"/>' +
-        '<rect x="15" y="25" width="10" height="2" fill="#cfc6b3" opacity="0.6"/>' +
-        '<ellipse cx="20" cy="36" rx="9" ry="1.5" fill="#2a1f1d" opacity="0.5"/>' +
+        '<circle cx="20" cy="16" r="17" fill="url(#glow)"/>' +
+        '<path d="M 20 3 C 21 8, 24 12, 24.5 17 C 25 21, 23 23.5, 20 24 C 17 23.5, 15 21, 15.5 17 C 16 12, 19 8, 20 3 Z" fill="url(#flame)"/>' +
+        '<ellipse cx="20" cy="18" rx="2" ry="4" fill="url(#innercore)"/>' +
+        '<ellipse cx="18.8" cy="19" rx="0.6" ry="1.2" fill="#ffffff" opacity="0.7"/>' +
+        '<line x1="20" y1="24" x2="20" y2="26" stroke="#2a1f1d" stroke-width="0.8" stroke-linecap="round"/>' +
+        '<rect x="15" y="26" width="10" height="10" rx="0.5" fill="#f4ede2"/>' +
+        '<rect x="15" y="26" width="10" height="1.5" fill="#cfc6b3"/>' +
+        '<rect x="15" y="26" width="1.2" height="10" fill="#cfc6b3" opacity="0.5"/>' +
+        '<ellipse cx="20" cy="36.5" rx="8.5" ry="1.2" fill="#2a1f1d" opacity="0.55"/>' +
         '</svg>'
     );
 
@@ -91,7 +98,7 @@ const OrganizationService = (() => {
 
     // Branding migration version — bump this when DEFAULT_BRANDING changes and
     // existing users need their cached branding refreshed.
-    const BRANDING_VERSION = 'banquo-v2';  // v2 adds logo migration
+    const BRANDING_VERSION = 'banquo-v3';  // v3 iterates the flame path
     const BRANDING_VERSION_KEY = 'showsuite_branding_version';
 
     const migrateBrandingToBanquo = (org) => {
@@ -138,9 +145,21 @@ const OrganizationService = (() => {
                     // Only force the new logo if the user is still on the old
                     // SceneStave logo (data URL starting with the identifiable purple
                     // marker). Custom-uploaded logos are preserved.
-                    logoUrl: (b.logoUrl && !b.logoUrl.includes('PHN2ZyB4bWxuczSU') && !b.logoUrl.includes('7C3AED'))
-                             ? b.logoUrl
-                             : BANQUO_LOGO_SVG
+                    // Detect old logos and replace with latest. Preserves
+                    // user-uploaded custom logos. Each fingerprint is a short
+                    // base64 substring that is deterministically present in a
+                    // specific prior logo version's encoded SVG:
+                    //   'PHN2ZyB4bWxuczSU' / '7C3AED' → old SceneStave purple masks
+                    //   'Y3g9IjUwJSIgY3k9IjM1JSI=' → v1 candle (glow cy="35%")
+                    //   'Y3g9IjUwJSIgY3k9IjQ1JSI=' → v2 candle (glow cy="45%") — current block
+                    // Any other value is treated as a user-custom logo and kept.
+                    logoUrl: (
+                        b.logoUrl &&
+                        !b.logoUrl.includes('PHN2ZyB4bWxuczSU') &&
+                        !b.logoUrl.includes('7C3AED') &&
+                        !b.logoUrl.includes('Y3g9IjUwJSIgY3k9IjM1JSI') &&
+                        !b.logoUrl.includes('Y3g9IjUwJSIgY3k9IjQ1JSI')
+                    ) ? b.logoUrl : BANQUO_LOGO_SVG
                 },
                 updatedAt: new Date().toISOString()
             };
