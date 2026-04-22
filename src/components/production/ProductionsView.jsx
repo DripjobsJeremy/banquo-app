@@ -113,13 +113,14 @@ const ProductionsView = () => {
   };
 
   const getStatusColor = (status) => {
+    const base = 'prod-status-badge';
     switch (status) {
-      case 'Planning': return 'bg-blue-100 text-blue-800';
-      case 'In Rehearsal': return 'bg-yellow-100 text-yellow-800';
-      case 'Active': return 'bg-green-100 text-green-800';
-      case 'Completed': return 'bg-purple-100 text-purple-800';
-      case 'Archived': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'Planning':     return base + ' prod-status-badge--planning';
+      case 'In Rehearsal': return base + ' prod-status-badge--rehearsal';
+      case 'Active':       return base + ' prod-status-badge--active';
+      case 'Completed':    return base + ' prod-status-badge--completed';
+      case 'Archived':     return base + ' prod-status-badge--archived';
+      default:             return base + ' prod-status-badge--archived';
     }
   };
 

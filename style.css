@@ -1571,3 +1571,100 @@ body.bg-gray-50 {
 .bg-white:not(input):not(textarea):not(select) *:not([class*="text-"]) {
   color: var(--color-text-primary);
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Phase 2c -- production status badges, active-card button readability,
+   grain overlay. All additive; no existing rules touched.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* -- Production status badges -----------------------------------------
+   getStatusColor() in ProductionsView.jsx emits these class names
+   instead of raw Tailwind bg-*-100 / text-*-800 pairs. Consumed by
+   the poster card overlay, thumbnail card footer, and list row title
+   row. The base rule carries shape and typography, modifiers carry color. */
+.prod-status-badge {
+  display: inline-flex; align-items: center;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  border: 1px solid transparent;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+.prod-status-badge--planning {
+  background: rgba(201, 161, 74, 0.12);
+  color: #e6c87a;
+  border-color: rgba(201, 161, 74, 0.32);
+}
+.prod-status-badge--rehearsal {
+  background: rgba(201, 161, 74, 0.18);
+  color: #f5d97c;
+  border-color: rgba(201, 161, 74, 0.45);
+}
+.prod-status-badge--active {
+  background: rgba(122, 31, 36, 0.28);
+  color: #f4c9a0;
+  border-color: rgba(201, 161, 74, 0.55);
+  box-shadow: 0 0 12px rgba(201, 161, 74, 0.18);
+}
+.prod-status-badge--completed {
+  background: rgba(244, 237, 226, 0.08);
+  color: #cfc4b0;
+  border-color: rgba(244, 237, 226, 0.18);
+}
+.prod-status-badge--archived {
+  background: rgba(244, 237, 226, 0.04);
+  color: #8a8172;
+  border-color: rgba(244, 237, 226, 0.10);
+}
+
+/* Status badges sitting on a light surface (thumbnail card footer is a white
+   card body) need slightly stronger color so they read without the ink context. */
+.prod-thumb-card .prod-status-badge--planning   { color: #8a6b1f; background: rgba(201, 161, 74, 0.18); }
+.prod-thumb-card .prod-status-badge--rehearsal  { color: #7a5a14; background: rgba(201, 161, 74, 0.26); }
+.prod-thumb-card .prod-status-badge--active     { color: #7a1f24; background: rgba(122, 31, 36, 0.14); border-color: rgba(122, 31, 36, 0.35); }
+.prod-thumb-card .prod-status-badge--completed  { color: #4b4336; background: rgba(10, 7, 6, 0.06); border-color: rgba(10, 7, 6, 0.14); }
+.prod-thumb-card .prod-status-badge--archived   { color: #6b6357; background: rgba(10, 7, 6, 0.04); border-color: rgba(10, 7, 6, 0.10); }
+
+/* -- Active-card button readability -----------------------------------
+   .prod-card-btn--primary is a transparent ghost button with a gold-dim
+   border. Inside .prod-poster-card--active and .prod-list-row--active the
+   card itself already glows gold, so the ghost border camouflages. Scope
+   a brighter treatment only inside active cards. */
+.prod-poster-card--active .prod-card-btn--primary,
+.prod-list-row--active   .prod-card-btn--primary {
+  background: rgba(201, 161, 74, 0.14);
+  border-color: #c9a14a;
+  color: #f5d97c;
+}
+.prod-poster-card--active .prod-card-btn--primary:hover,
+.prod-list-row--active   .prod-card-btn--primary:hover {
+  background: rgba(201, 161, 74, 0.22);
+  border-color: #e6c87a;
+  color: #fff4d6;
+}
+
+/* -- Grain overlay ----------------------------------------------------
+   Matches the banquo-wizard landing page recipe exactly. fractalNoise SVG
+   painted fixed across the viewport, mix-blend-mode overlay so it warms
+   the ink surface without dirtying cards. z-index 1 keeps it below modals
+   (which sit at 9999+) and below the sidebar (which paints its own stack
+   context). pointer-events none so it never intercepts clicks. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.05;
+  z-index: 1;
+  mix-blend-mode: overlay;
+}
+
+/* Light mode: grain is too visible on parchment surfaces, dial it back
+   and switch blend mode so it reads as paper texture, not noise. */
+html[data-theme="light"] body::before {
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+}
