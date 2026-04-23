@@ -19,12 +19,12 @@ function RevenueBudget({ budget, summary, productionId, productionTitle, onUpdat
     return (
         <div className="space-y-6">
             {/* Revenue Summary */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Total Revenue</h3>
-                <div className="text-4xl font-bold text-green-600 mb-2">
+            <div className="rounded-lg p-6" style={{ background: 'linear-gradient(135deg, rgba(201,161,74,0.1) 0%, rgba(139,26,43,0.08) 100%)', border: '1px solid rgba(201,161,74,0.25)' }}>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Total Revenue</h3>
+                <div className="text-4xl font-bold mb-2" style={{ color: 'var(--color-accent-gold)' }}>
                     ${summary.totalRevenue.toLocaleString()}
                 </div>
-                <div className="flex gap-4 text-sm text-gray-600">
+                <div className="flex gap-4 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                     <div>Net Income: <span className={`font-semibold ${summary.netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         ${summary.netIncome.toLocaleString()}
                     </span></div>
@@ -35,7 +35,7 @@ function RevenueBudget({ budget, summary, productionId, productionTitle, onUpdat
             {/* Revenue Sources */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {REVENUE_SOURCES.map(source => (
-                    <div key={source.id} className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div key={source.id} className="rounded-lg p-6" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
                         <div className="flex items-center gap-3 mb-4">
                             <span className="text-3xl">{source.icon}</span>
                             <h4 className="font-semibold text-gray-900">{source.label}</h4>
@@ -47,7 +47,8 @@ function RevenueBudget({ budget, summary, productionId, productionTitle, onUpdat
                                 type="number"
                                 value={revenueData[source.id] || ''}
                                 onChange={(e) => handleUpdate(source.id, e.target.value)}
-                                className="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-xl font-semibold"
+                                className="w-full pl-8 pr-3 py-3 rounded-lg focus:ring-2 focus:ring-amber-500 text-xl font-semibold"
+                                style={{ background: 'var(--color-bg-base)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)' }}
                                 placeholder="0.00"
                                 step="0.01"
                             />
@@ -68,7 +69,8 @@ function RevenueBudget({ budget, summary, productionId, productionTitle, onUpdat
                     <button
                         type="button"
                         onClick={() => setShowAllocationManager(true)}
-                        className="px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-semibold transition-colors"
+                        className="px-6 py-3 text-white rounded-lg font-semibold transition-colors hover:opacity-90"
+                        style={{ background: '#8B1A2B' }}
                     >
                         💸 Allocate Donations to This Production
                     </button>
@@ -92,13 +94,16 @@ function RevenueBudget({ budget, summary, productionId, productionTitle, onUpdat
                                 <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                                     <div
                                         className={`h-full rounded-full ${
-                                            source.color === 'purple' ? 'bg-purple-500' :
                                             source.color === 'green' ? 'bg-green-500' :
                                             source.color === 'blue' ? 'bg-blue-500' :
-                                            source.color === 'indigo' ? 'bg-indigo-500' :
+                                            source.color === 'purple' || source.color === 'indigo' ? '' :
                                             'bg-gray-500'
                                         }`}
-                                        style={{ width: `${percentage}%` }}
+                                        style={{
+                                            width: `${percentage}%`,
+                                            ...(source.color === 'purple' ? { background: 'var(--color-accent-gold)' } :
+                                                source.color === 'indigo' ? { background: 'var(--color-accent-crimson)' } : {})
+                                        }}
                                     />
                                 </div>
                             </div>
