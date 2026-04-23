@@ -422,7 +422,7 @@ function ActorProfileViewModal({ actor, onClose }) {
                 {(profile.specialSkills || []).length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {profile.specialSkills.map((skill, idx) => (
-                      <span key={idx} className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
+                      <span key={idx} className="px-3 py-1 rounded-full text-sm" style={{ background: 'rgba(201,161,74,0.15)', color: 'var(--color-accent-gold)', border: '1px solid rgba(201,161,74,0.3)' }}>
                         {skill}
                       </span>
                     ))}

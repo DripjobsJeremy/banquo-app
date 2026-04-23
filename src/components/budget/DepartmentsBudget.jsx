@@ -252,13 +252,19 @@ function DepartmentsBudget({ budget, summary, departments, productionId, canEdit
                     return (
                         <div
                             key={dept.id}
-                            className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                                selectedDept === dept.id
-                                    ? 'border-green-600 bg-green-50'
+                            className="border-2 rounded-lg p-4 cursor-pointer transition-all"
+                            style={{
+                                borderColor: selectedDept === dept.id
+                                    ? 'var(--color-accent-gold)'
                                     : isLocked
-                                    ? 'border-yellow-300 bg-yellow-50'
-                                    : 'border-gray-200 hover:border-gray-300'
-                            }`}
+                                    ? 'rgba(201,161,74,0.35)'
+                                    : 'var(--color-border)',
+                                background: selectedDept === dept.id
+                                    ? 'rgba(201,161,74,0.08)'
+                                    : isLocked
+                                    ? 'rgba(201,161,74,0.04)'
+                                    : 'transparent'
+                            }}
                             onClick={() => setSelectedDept(dept.id)}
                         >
                             {/* Card Header */}
@@ -266,7 +272,7 @@ function DepartmentsBudget({ budget, summary, departments, productionId, canEdit
                                 <div className="flex items-center gap-2">
                                     <span className="text-2xl">{dept.icon}</span>
                                     <div>
-                                        <div className="font-semibold text-gray-900">{dept.name}</div>
+                                        <div className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{dept.name}</div>
                                         <div className="text-xs text-gray-500">{deptSummary?.itemCount || 0} items</div>
                                     </div>
                                 </div>
@@ -317,7 +323,12 @@ function DepartmentsBudget({ budget, summary, departments, productionId, canEdit
                                         }
                                     }}
                                     onClick={(e) => e.stopPropagation()}
-                                    className={`w-full mb-2 accent-green-600 ${sliderDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                    className={`w-full mb-2 rl-slider ${sliderDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                    style={{ '--rl-progress': currentPct + '%' }}
+                                    onInput={e => {
+                                        const pct = (e.target.value - e.target.min) / (e.target.max - e.target.min) * 100;
+                                        e.target.style.setProperty('--rl-progress', pct + '%');
+                                    }}
                                     title={`${dept.name}: ${currentPct.toFixed(1)}% of total budget`}
                                 />
                                 <div className="relative">
@@ -331,7 +342,8 @@ function DepartmentsBudget({ budget, summary, departments, productionId, canEdit
                                         }}
                                         onClick={(e) => e.stopPropagation()}
                                         readOnly={inputDisabled}
-                                        className={`w-full pl-6 pr-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-500 ${inputDisabled ? 'opacity-60 cursor-not-allowed bg-gray-50' : ''}`}
+                                        className={`w-full pl-6 pr-2 py-1 rounded text-sm rl-number-input ${inputDisabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        style={{ background: 'var(--color-bg-base)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)' }}
                                         placeholder="0.00"
                                         step="0.01"
                                     />
@@ -412,9 +424,12 @@ function DepartmentsBudget({ budget, summary, departments, productionId, canEdit
                                                 <span className={`px-2 py-1 text-xs rounded ${
                                                     item.status === 'paid' ? 'bg-green-100 text-green-700' :
                                                     item.status === 'ordered' ? 'bg-blue-100 text-blue-700' :
-                                                    item.status === 'received' ? 'bg-purple-100 text-purple-700' :
+                                                    item.status === 'received' ? '' :
                                                     'bg-gray-100 text-gray-700'
-                                                }`}>
+                                                }`}
+                                                style={item.status === 'received'
+                                                    ? { background: 'rgba(201,161,74,0.15)', color: 'var(--color-accent-gold)', border: '1px solid rgba(201,161,74,0.3)' }
+                                                    : {}}>
                                                     {item.status}
                                                 </span>
                                             </td>

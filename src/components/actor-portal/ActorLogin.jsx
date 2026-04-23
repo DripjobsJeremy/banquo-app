@@ -147,12 +147,21 @@ function ActorLogin({ onLoginSuccess }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--color-bg-base)' }}>
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-center">
-          <h1 className="text-3xl font-bold text-white mb-2">🎭 SceneStave</h1>
-          <p className="text-purple-100">Actor Portal</p>
+        <div className="p-6 text-center" style={{ background: 'linear-gradient(135deg, #7a1f24 0%, #1c1413 100%)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '8px' }}>
+            <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="50" cy="88" rx="22" ry="6" fill="rgba(201,161,74,0.25)"/>
+              <path d="M50 82 C50 82 28 65 28 42 C28 26 38 14 50 8 C62 14 72 26 72 42 C72 65 50 82 50 82Z" fill="#c9a14a"/>
+              <path d="M50 82 C50 82 34 67 34 44 C34 30 41 19 50 13 C59 19 66 30 66 44 C66 67 50 82 50 82Z" fill="#f5d97c"/>
+              <path d="M50 82 C50 82 40 68 40 46 C40 36 44 27 50 22 C56 27 60 36 60 46 C60 68 50 82 50 82Z" fill="#fff8e7"/>
+              <ellipse cx="50" cy="85" rx="8" ry="3" fill="rgba(201,161,74,0.4)"/>
+            </svg>
+            <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'Fraunces, serif', margin: 0 }}>Banquo</h1>
+          </div>
+          <p className="text-white" style={{ opacity: 0.7 }}>Actor Portal</p>
         </div>
 
         {/* Tab Navigation */}
@@ -165,9 +174,10 @@ function ActorLogin({ onLoginSuccess }) {
             }}
             className={`flex-1 py-3 text-center font-medium transition-colors ${
               mode === 'login'
-                ? 'text-purple-600 border-b-2 border-purple-600'
+                ? 'border-b-2'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
+            style={mode === 'login' ? { color: 'var(--color-accent-gold)', borderColor: 'var(--color-accent-gold)' } : {}}
           >
             Login
           </button>
@@ -179,9 +189,10 @@ function ActorLogin({ onLoginSuccess }) {
             }}
             className={`flex-1 py-3 text-center font-medium transition-colors ${
               mode === 'signup'
-                ? 'text-purple-600 border-b-2 border-purple-600'
+                ? 'border-b-2'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
+            style={mode === 'signup' ? { color: 'var(--color-accent-gold)', borderColor: 'var(--color-accent-gold)' } : {}}
           >
             Sign Up
           </button>
@@ -214,7 +225,7 @@ function ActorLogin({ onLoginSuccess }) {
                   type="email"
                   value={loginData.email}
                   onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   placeholder="your.email@example.com"
                   required
                 />
@@ -228,7 +239,7 @@ function ActorLogin({ onLoginSuccess }) {
                   type="password"
                   value={loginData.password}
                   onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   placeholder="••••••••"
                   required
                 />
@@ -237,7 +248,8 @@ function ActorLogin({ onLoginSuccess }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ background: '#8B1A2B' }}
               >
                 {loading ? 'Logging in...' : 'Login'}
               </button>
@@ -260,7 +272,7 @@ function ActorLogin({ onLoginSuccess }) {
                     type="text"
                     value={signupData.firstName}
                     onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     placeholder="First"
                     required
                   />
@@ -274,7 +286,7 @@ function ActorLogin({ onLoginSuccess }) {
                     type="text"
                     value={signupData.lastName}
                     onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     placeholder="Last"
                     required
                   />
@@ -289,7 +301,7 @@ function ActorLogin({ onLoginSuccess }) {
                   type="email"
                   value={signupData.email}
                   onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   placeholder="your.email@example.com"
                   required
                 />
@@ -303,7 +315,7 @@ function ActorLogin({ onLoginSuccess }) {
                   type="tel"
                   value={signupData.phone}
                   onChange={(e) => setSignupData({ ...signupData, phone: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   placeholder="(555) 123-4567"
                 />
               </div>
@@ -319,7 +331,7 @@ function ActorLogin({ onLoginSuccess }) {
                     setSignupData({ ...signupData, password: e.target.value });
                     checkPasswordStrength(e.target.value);
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   placeholder="••••••••"
                   required
                 />
@@ -357,7 +369,7 @@ function ActorLogin({ onLoginSuccess }) {
                   type="password"
                   value={signupData.confirmPassword}
                   onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   placeholder="••••••••"
                   required
                 />
@@ -366,7 +378,8 @@ function ActorLogin({ onLoginSuccess }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ background: '#8B1A2B' }}
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
               </button>
@@ -392,9 +405,10 @@ function ActorLogin({ onLoginSuccess }) {
               }
               window.location.replace(window.location.origin + '/');
             }}
-            className="text-sm text-purple-600 hover:text-purple-700 font-medium bg-transparent border-0 cursor-pointer p-0"
+            className="text-sm font-medium bg-transparent border-0 cursor-pointer p-0"
+            style={{ color: 'var(--color-accent-gold)' }}
           >
-            ← Back to SceneStave
+            ← Back to Banquo
           </button>
         </div>
       </div>

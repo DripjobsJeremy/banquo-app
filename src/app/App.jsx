@@ -106,7 +106,7 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
         {/* Exit to main app — only shown when an admin is previewing the actor portal */}
         {onExitToApp && (
           <button type="button" className="ap-exit-btn" onClick={onExitToApp}>
-            ← Back to SceneStave
+            ← Back to Banquo
           </button>
         )}
 
@@ -567,7 +567,7 @@ function App() {
             className="ap-admin-banner-btn"
             onClick={() => handleRoleChange('admin')}
           >
-            ← Exit to SceneStave
+            ← Exit to Banquo
           </button>
         </div>
       )}
@@ -902,7 +902,8 @@ function App() {
                       <button
                         type="button"
                         onClick={() => { window.location.hash = '/donor-login'; }}
-                        className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors"
+                        className="px-6 py-3 text-white rounded-lg font-semibold transition-colors"
+                        style={{ background: '#8B1A2B' }}
                       >
                         💎 Open Donor Login
                       </button>

@@ -1491,9 +1491,9 @@ html[data-theme="light"] .prod-card-btn--primary:hover {
 
 /* ── GhostLight AI button shimmer ─────────────────────────────────────── */
 @keyframes ghostlight-pulse {
-  0%   { box-shadow: 0 0 4px rgba(96, 165, 250, 0.3);  border-color: rgba(96, 165, 250, 0.5); }
-  50%  { box-shadow: 0 0 16px rgba(96, 165, 250, 0.9); border-color: rgba(96, 165, 250, 1); }
-  100% { box-shadow: 0 0 8px rgba(96, 165, 250, 0.6);  border-color: rgba(96, 165, 250, 0.8); }
+  0%   { box-shadow: 0 0 4px rgba(201, 161, 74, 0.3);  border-color: rgba(201, 161, 74, 0.5); }
+  50%  { box-shadow: 0 0 16px rgba(201, 161, 74, 0.9); border-color: rgba(201, 161, 74, 1); }
+  100% { box-shadow: 0 0 8px rgba(201, 161, 74, 0.6);  border-color: rgba(201, 161, 74, 0.8); }
 }
 
 .ghostlight-btn {
@@ -1507,8 +1507,8 @@ html[data-theme="light"] .prod-card-btn--primary:hover {
 
 .ghostlight-btn:hover {
   animation: ghostlight-pulse 1.8s ease-in-out 1 forwards;
-  border-color: rgba(96, 165, 250, 0.8);
-  box-shadow: 0 0 8px rgba(96, 165, 250, 0.6);
+  border-color: rgba(201, 161, 74, 0.8);
+  box-shadow: 0 0 8px rgba(201, 161, 74, 0.6);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
