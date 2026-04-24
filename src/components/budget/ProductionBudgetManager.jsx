@@ -731,6 +731,12 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
 
                                     <p className="text-xs italic text-[var(--color-text-muted)]">{METHOD_NOTES[ct]}</p>
 
+                                    {window.RoyaltyBreakdownChart && (
+                                        <window.RoyaltyBreakdownChart
+                                            royaltyCalc={royaltyCalc}
+                                        />
+                                    )}
+
                                     {canEditBudget && (
                                         <div className="flex flex-col gap-2">
                                             <button
