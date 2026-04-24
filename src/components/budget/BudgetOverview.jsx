@@ -114,6 +114,16 @@ function BudgetOverview({ budget, summary, canEditBudget = true, onUpdateTotalBu
                             />
                         </div>
                     </div>
+                    <div style={{ marginTop: '24px' }}>
+                        {window.BudgetHealthDoughnut && (
+                            <window.BudgetHealthDoughnut
+                                spent={summary.totalSpent}
+                                remaining={summary.remaining}
+                                isOverBudget={summary.isOverBudget}
+                                totalBudget={budget.totalBudget}
+                            />
+                        )}
+                    </div>
                 </div>
 
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -160,6 +170,13 @@ function BudgetOverview({ budget, summary, canEditBudget = true, onUpdateTotalBu
                             </div>
                         </div>
                     ))}
+                </div>
+                <div style={{ marginTop: '24px' }}>
+                    {window.DepartmentBreakdownChart && (
+                        <window.DepartmentBreakdownChart
+                            departments={summary.departments}
+                        />
+                    )}
                 </div>
             </div>
         </div>
