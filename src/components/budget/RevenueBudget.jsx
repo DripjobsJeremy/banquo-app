@@ -41,16 +41,44 @@ function RevenueBudget({ budget, summary, productionId, productionTitle, onUpdat
                             <h4 className="font-semibold text-gray-900">{source.label}</h4>
                         </div>
 
+                        {/* Slider */}
+                        <input
+                            type="range"
+                            min="0"
+                            max={Math.max((revenueData[source.id] || 0) * 2, 10000)}
+                            step="1"
+                            value={revenueData[source.id] || 0}
+                            onChange={(e) => handleUpdate(source.id, e.target.value)}
+                            onInput={(e) => {
+                                const pct = ((e.target.value - e.target.min) / (e.target.max - e.target.min)) * 100;
+                                e.target.style.setProperty('--rl-progress', pct + '%');
+                            }}
+                            style={{ '--rl-progress': (() => {
+                                const val = revenueData[source.id] || 0;
+                                const max = Math.max(val * 2, 10000);
+                                return ((val / max) * 100) + '%';
+                            })() }}
+                            className="w-full mb-3 rl-slider"
+                            title={`${source.label} amount`}
+                        />
+
+                        {/* Number input */}
                         <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                            <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', fontSize: '14px' }}>$</span>
                             <input
                                 type="number"
-                                value={revenueData[source.id] || ''}
-                                onChange={(e) => handleUpdate(source.id, e.target.value)}
-                                className="w-full pl-8 pr-3 py-3 rounded-lg focus:ring-2 focus:ring-amber-500 text-xl font-semibold"
-                                style={{ background: 'var(--color-bg-base)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)' }}
-                                placeholder="0.00"
+                                min="0"
                                 step="0.01"
+                                value={revenueData[source.id] || 0}
+                                onChange={(e) => handleUpdate(source.id, e.target.value)}
+                                title={`${source.label} amount`}
+                                placeholder="0.00"
+                                className="w-full pl-7 pr-3 py-2 rounded-lg text-sm rl-number-input"
+                                style={{
+                                    background: 'var(--color-bg-base)',
+                                    border: '1px solid var(--color-border)',
+                                    color: 'var(--color-text-primary)'
+                                }}
                             />
                         </div>
 
