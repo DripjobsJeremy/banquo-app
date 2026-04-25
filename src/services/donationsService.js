@@ -23,7 +23,7 @@
   const DONATION_TYPES = new Set(['monetary', 'in-kind']);
   const RECURRING_TYPES = new Set(['One-Time', 'Monthly', 'Quarterly', 'Annual']);
   const CAMPAIGN_TYPES = new Set(['production', 'general', 'building', 'scholarship', 'custom']);
-  const PAYMENT_METHODS = new Set(['Check', 'Cash', 'Credit Card', 'Wire Transfer', 'Online Platform']);
+  const PAYMENT_METHODS = new Set(['Check', 'Cash', 'Credit Card', 'Wire Transfer', 'Online Platform', 'Debit Card', 'PayPal', 'Venmo', 'Bank Transfer']);
   const IN_KIND_CATEGORIES = new Set(['Equipment', 'Services', 'Materials', 'Other']);
   const ACK_METHODS = new Set(['Email', 'Letter', 'Phone Call']);
 
