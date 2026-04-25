@@ -28,6 +28,8 @@ function SendDonationModal({ donor, onClose, onSuccess }) {
             return;
         }
 
+        const productions = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
+
         const donation = {
             contactId: donor.id,
             amount: parseFloat(amount),
@@ -39,6 +41,9 @@ function SendDonationModal({ donor, onClose, onSuccess }) {
             restrictionType: restrictionType,
             restrictionPurpose: restrictionType === 'restricted' ? restrictionPurpose : null,
             designatedProductionId: restrictionType === 'production-specific' ? designatedProductionId : null,
+            designatedProductionTitle: restrictionType === 'production-specific'
+                ? (productions.find(p => p.id === designatedProductionId)?.title || null)
+                : null,
             allocations: []
         };
 
@@ -308,7 +313,8 @@ function DonorDashboard({ donor, stats, donations, events, onNavigate }) {
                                     </div>
                                     <div className="text-sm text-gray-600">
                                         {new Date(donation.date).toLocaleDateString()}
-                                        {donation.campaignName && ` • ${donation.campaignName}`}
+                                        {(donation.designatedProductionTitle || donation.campaignName) &&
+                                            ` • ${donation.designatedProductionTitle || donation.campaignName}`}
                                     </div>
                                 </div>
                                 <span className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">
