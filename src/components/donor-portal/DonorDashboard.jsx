@@ -45,7 +45,7 @@ function SendDonationModal({ donor, onClose, onSuccess }) {
             pathFields = {
                 donationType: 'monetary',
                 campaignType: 'production',
-                campaignId: selectedCampaignId || selectedProductionId,
+                campaignId: selectedCampaignId || null,
                 campaignName: selectedCampaign?.name || selectedProduction?.title || null,
                 restrictionType: 'production-specific',
                 designatedProductionId: selectedProductionId,
