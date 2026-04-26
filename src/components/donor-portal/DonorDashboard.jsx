@@ -7,7 +7,9 @@ function SendDonationModal({ donor, onClose, onSuccess }) {
     const [restrictionPurpose, setRestrictionPurpose] = React.useState('');
     const [designatedProductionId, setDesignatedProductionId] = React.useState('');
 
-    const campaigns = JSON.parse(localStorage.getItem('tld_campaign_categories_v1') || '[]');
+    const campaigns = window.CampaignsService
+        ? window.CampaignsService.getActiveCampaigns()
+        : (console.warn('CampaignsService unavailable — campaign dropdown disabled'), []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
