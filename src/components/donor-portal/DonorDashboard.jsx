@@ -407,8 +407,7 @@ function DonorDashboard({ donor, stats, donations, events, onNavigate }) {
                                     </div>
                                     <div className="text-sm text-gray-600">
                                         {new Date(donation.date).toLocaleDateString()}
-                                        {(donation.designatedProductionTitle || donation.campaignName) &&
-                                            ` • ${donation.designatedProductionTitle || donation.campaignName}`}
+                                        {` • ${donation.campaignName || donation.designatedProductionTitle || '—'}`}
                                     </div>
                                 </div>
                                 <span className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">
