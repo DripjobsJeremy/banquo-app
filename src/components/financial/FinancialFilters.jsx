@@ -186,7 +186,7 @@
     // UI
     return React.createElement(
       'div',
-      { className: 'financial-filters border border-gray-200 rounded-lg p-4 bg-gray-50 text-gray-900' },
+      { className: 'financial-filters border border-gray-200 rounded-lg p-4 pb-6 bg-gray-50 text-gray-900' },
       React.createElement(
         'div',
         { className: 'filters-header flex items-center justify-between mb-4' },
