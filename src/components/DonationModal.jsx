@@ -199,20 +199,10 @@
                     const campaignTypeRaw = formData.campaignType;
                     const campaignType = mapCampaignType[campaignTypeRaw] || campaignTypeRaw;
 
-                    // Derive campaignName when custom selected and campaignId chosen
-                    let campaignName = null;
-                    if (campaignType && campaignType !== 'production') {
-                        if (campaignType === 'general') {
-                            campaignName = 'General Operating Fund';
-                        } else if (campaignType === 'custom') {
-                            const match = (campaigns || []).find(c => c.id === formData.campaignId);
-                            campaignName = match ? match.name : (formData.campaignName || null);
-                        } else if (campaignType === 'building') {
-                            campaignName = 'Building Renovation Fund';
-                        } else if (campaignType === 'scholarship') {
-                            campaignName = 'Scholarship Fund';
-                        }
-                    }
+                    const selectedCampaign = formData.campaignId
+                        ? (campaigns || []).find(c => c.id === formData.campaignId)
+                        : null;
+                    const campaignName = selectedCampaign ? selectedCampaign.name : null;
 
                     return {
                         donationType: formData.type === 'in-kind' ? 'in-kind' : 'monetary',
@@ -221,7 +211,7 @@
                         date: formData.date,
                         recurringType: recurringType || null,
                         campaignType: campaignType || null,
-                        campaignId: campaignType === 'production' ? (formData.campaignId || null) : null,
+                        campaignId: formData.campaignId || null,
                         campaignName,
                         paymentMethod: paymentMethod || null,
                         transactionNumber: formData.transactionNumber || null,
