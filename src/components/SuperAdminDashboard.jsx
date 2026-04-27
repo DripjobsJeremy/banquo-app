@@ -8,6 +8,9 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [showAddDonationModal, setShowAddDonationModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [ghostlightCollapsed, setGhostlightCollapsed] = useState(() => {
+    try { return localStorage.getItem('banquo_dashboard_ghostlight_collapsed') !== 'false'; } catch { return true; }
+  });
 
   useEffect(() => {
     loadDashboardData();
@@ -110,6 +113,15 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
     };
   };
 
+  const statusBadge = (status) => {
+    const s = (status || '').toLowerCase();
+    if (s === 'running' || s === 'open') return 'bg-green-100 text-green-800';
+    if (s === 'tech week') return 'bg-orange-100 text-orange-800';
+    if (s === 'in rehearsal') return 'bg-amber-100 text-amber-800';
+    if (s === 'active' || s === 'in production') return 'bg-blue-100 text-blue-800';
+    return 'bg-gray-100 text-gray-700';
+  };
+
   const eventTypeBadge = (type) => {
     const map = {
       show: 'bg-purple-100 text-purple-700',
@@ -179,7 +191,12 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
             <span className="text-3xl">🎬</span>
           </div>
           <div className="text-3xl font-bold mb-1">{metrics.approvedActors.length}</div>
-          {metrics.pendingActors.length > 0 ? (
+          {metrics.approvedActors.length === 0 ? (
+            <p
+              className="text-sm font-semibold text-amber-300 cursor-pointer hover:underline"
+              onClick={(e) => { e.stopPropagation(); window.location.hash = '#/actors'; }}
+            >Add your first actor →</p>
+          ) : metrics.pendingActors.length > 0 ? (
             <p className="text-sm font-semibold text-amber-300">{metrics.pendingActors.length} pending approval</p>
           ) : (
             <p className="text-sm opacity-75">0 pending approval</p>
@@ -261,6 +278,111 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
           </div>
         );
       })()}
+
+      {/* Active Productions */}
+      {metrics.activeProductions.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Active Productions</h2>
+          <div className="grid gap-4">
+            {metrics.activeProductions.map(prod => {
+              const nextShow = prod.calendar
+                ?.filter(e => {
+                  const dateStr = (e.start || e.date || '').split('T')[0];
+                  return e.type === 'show' && dateStr >= metrics.todayStr;
+                })
+                .sort((a, b) => {
+                  const da = (a.start || a.date || '').split('T')[0];
+                  const db = (b.start || b.date || '').split('T')[0];
+                  return da.localeCompare(db);
+                })[0];
+
+              const rehearsalCount = prod.calendar?.filter(e => e.type === 'rehearsal').length || 0;
+              const nextShowDate = nextShow
+                ? (() => {
+                    const { month, day } = formatDate(nextShow.start || nextShow.date);
+                    return `${month} ${day}`;
+                  })()
+                : null;
+
+              return (
+                <div
+                  key={prod.id}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                  onClick={() => { window.location.hash = `#/productions/${prod.id}`; }}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-semibold text-gray-900">{prod.title}</h3>
+                      {prod.status && (
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${statusBadge(prod.status)}`}>
+                          {prod.status}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-0.5">
+                      {prod.startDate
+                        ? `Opens: ${new Date(prod.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+                        : 'No opening date set'}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      {prod.author && `by ${prod.author} • `}
+                      {rehearsalCount} rehearsals scheduled
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 flex-shrink-0">
+                    {nextShowDate && (
+                      <div className="text-right">
+                        <div className="text-sm text-gray-500">Next Show</div>
+                        <div className="font-semibold text-purple-600">{nextShowDate}</div>
+                      </div>
+                    )}
+                    <span className="text-sm text-red-800 font-medium hover:underline whitespace-nowrap">&rarr; View Production</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Quick Actions */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <button
+            type="button"
+            onClick={() => window.location.hash = '/productions'}
+            className="flex flex-col items-center gap-2 p-5 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-200 cursor-pointer"
+          >
+            <span className="text-3xl">🎭</span>
+            <span className="text-sm font-medium text-gray-900">Productions</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowAddDonationModal(true)}
+            className="flex flex-col items-center gap-2 p-5 bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200 cursor-pointer"
+          >
+            <span className="text-3xl">💰</span>
+            <span className="text-sm font-medium text-gray-900">Log Donation</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => window.location.hash = '/actors'}
+            className="flex flex-col items-center gap-2 p-5 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200 cursor-pointer"
+          >
+            <span className="text-3xl">🎬</span>
+            <span className="text-sm font-medium text-gray-900">Actors</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => window.location.hash = '/donors'}
+            className="flex flex-col items-center gap-2 p-5 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-200 cursor-pointer"
+          >
+            <span className="text-3xl">👥</span>
+            <span className="text-sm font-medium text-gray-900">Donors</span>
+          </button>
+        </div>
+      </div>
 
       {/* Upcoming Events + Recent Donations */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -358,119 +480,47 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
         </div>
       )}
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button
-            type="button"
-            onClick={() => window.location.hash = '/productions'}
-            className="flex flex-col items-center gap-2 p-5 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-200 cursor-pointer"
-          >
-            <span className="text-3xl">🎭</span>
-            <span className="text-sm font-medium text-gray-900">Productions</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowAddDonationModal(true)}
-            className="flex flex-col items-center gap-2 p-5 bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200 cursor-pointer"
-          >
-            <span className="text-3xl">💰</span>
-            <span className="text-sm font-medium text-gray-900">Log Donation</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => window.location.hash = '/actors'}
-            className="flex flex-col items-center gap-2 p-5 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200 cursor-pointer"
-          >
-            <span className="text-3xl">🎬</span>
-            <span className="text-sm font-medium text-gray-900">Actors</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => window.location.hash = '/donors'}
-            className="flex flex-col items-center gap-2 p-5 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-200 cursor-pointer"
-          >
-            <span className="text-3xl">👥</span>
-            <span className="text-sm font-medium text-gray-900">Donors</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Active Productions */}
-      {metrics.activeProductions.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Active Productions</h2>
-          <div className="grid gap-4">
-            {metrics.activeProductions.map(prod => {
-              const nextShow = prod.calendar
-                ?.filter(e => {
-                  const dateStr = (e.start || e.date || '').split('T')[0];
-                  return e.type === 'show' && dateStr >= metrics.todayStr;
-                })
-                .sort((a, b) => {
-                  const da = (a.start || a.date || '').split('T')[0];
-                  const db = (b.start || b.date || '').split('T')[0];
-                  return da.localeCompare(db);
-                })[0];
-
-              const rehearsalCount = prod.calendar?.filter(e => e.type === 'rehearsal').length || 0;
-              const nextShowDate = nextShow
-                ? (() => {
-                    const { month, day } = formatDate(nextShow.start || nextShow.date);
-                    return `${month} ${day}`;
-                  })()
-                : null;
-
-              return (
-                <div key={prod.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{prod.title}</h3>
-                    <div className="text-sm text-gray-600 mt-1">
-                      {prod.author && `by ${prod.author} \u2022 `}
-                      {rehearsalCount} rehearsals scheduled
-                    </div>
-                  </div>
-                  {nextShowDate && (
-                    <div className="text-right">
-                      <div className="text-sm text-gray-500">Next Show</div>
-                      <div className="font-semibold text-purple-600">{nextShowDate}</div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
       {/* Ghost Light — AI Tools for Board & Leadership */}
-      {(() => {
-        const features = [
-          { title: '✍️ Grant Writing Assistant', desc: 'Generate grant applications tailored to your organization\'s mission and financials' },
-          { title: '📄 Document Generator', desc: 'Create board reports, donor impact statements, and funding proposals' },
-          { title: '🔎 Donor Intelligence', desc: 'AI-powered insights on donor giving patterns and retention risk' }
-        ];
-        return (
-          <div style={{ background: '#1a1a2e', borderRadius: '12px', padding: '32px', position: 'relative', overflow: 'hidden' }}>
-            <img src="assets/ghostlight/ghostlight-brand.png" alt="" style={{ position: 'absolute', right: '24px', bottom: '24px', height: '40px', objectFit: 'contain', opacity: 0.25, pointerEvents: 'none' }} />
-            <div style={{ marginBottom: '32px' }}>
-              <img src="assets/ghostlight/ghostlight-brand.png" alt="GhostLight" style={{ height: '56px', objectFit: 'contain', marginBottom: '8px' }} />
-              <p style={{ color: '#9b8fa8', fontSize: '14px', margin: '0' }}>AI-powered tools for theatre professionals — coming soon</p>
+      <div>
+        <button
+          type="button"
+          onClick={() => {
+            const next = !ghostlightCollapsed;
+            setGhostlightCollapsed(next);
+            try { localStorage.setItem('banquo_dashboard_ghostlight_collapsed', String(next)); } catch {}
+          }}
+          className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-700"
+        >
+          <span>GhostLight — Coming Soon</span>
+          <span>{ghostlightCollapsed ? '▾' : '▴'}</span>
+        </button>
+        {!ghostlightCollapsed && (() => {
+          const features = [
+            { title: '✍️ Grant Writing Assistant', desc: 'Generate grant applications tailored to your organization\'s mission and financials' },
+            { title: '📄 Document Generator', desc: 'Create board reports, donor impact statements, and funding proposals' },
+            { title: '🔎 Donor Intelligence', desc: 'AI-powered insights on donor giving patterns and retention risk' }
+          ];
+          return (
+            <div style={{ background: '#1a1a2e', borderRadius: '0 0 12px 12px', padding: '32px', position: 'relative', overflow: 'hidden', marginTop: '-1px' }}>
+              <img src="assets/ghostlight/ghostlight-brand.png" alt="" style={{ position: 'absolute', right: '24px', bottom: '24px', height: '40px', objectFit: 'contain', opacity: 0.25, pointerEvents: 'none' }} />
+              <div style={{ marginBottom: '32px' }}>
+                <img src="assets/ghostlight/ghostlight-brand.png" alt="GhostLight" style={{ height: '56px', objectFit: 'contain', marginBottom: '8px' }} />
+                <p style={{ color: '#9b8fa8', fontSize: '14px', margin: '0' }}>AI-powered tools for theatre professionals — coming soon</p>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
+                {features.map((feature, i) => (
+                  <div key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '24px', position: 'relative' }}>
+                    <h3 style={{ fontSize: '15px', fontWeight: '600', color: '#f5f0e8', marginBottom: '8px', marginTop: '0', paddingRight: '32px' }}>{feature.title}</h3>
+                    <p style={{ fontSize: '13px', color: '#9b8fa8', lineHeight: '1.5', marginBottom: '16px', marginTop: '0' }}>{feature.desc}</p>
+                    <span style={{ display: 'inline-block', padding: '3px 10px', background: 'rgba(147,97,255,0.15)', border: '1px solid rgba(147,97,255,0.35)', borderRadius: '20px', fontSize: '11px', fontWeight: '500', color: '#b78aff', letterSpacing: '0.5px' }}>Coming Soon</span>
+                    <img src="assets/ghostlight/ghostlight-brand.png" alt="" style={{ position: 'absolute', bottom: '10px', right: '10px', height: '28px', objectFit: 'contain', opacity: 0.25 }} />
+                  </div>
+                ))}
+              </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
-              {features.map((feature, i) => (
-                <div key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '24px', position: 'relative' }}>
-                  <h3 style={{ fontSize: '15px', fontWeight: '600', color: '#f5f0e8', marginBottom: '8px', marginTop: '0', paddingRight: '32px' }}>{feature.title}</h3>
-                  <p style={{ fontSize: '13px', color: '#9b8fa8', lineHeight: '1.5', marginBottom: '16px', marginTop: '0' }}>{feature.desc}</p>
-                  <span style={{ display: 'inline-block', padding: '3px 10px', background: 'rgba(147,97,255,0.15)', border: '1px solid rgba(147,97,255,0.35)', borderRadius: '20px', fontSize: '11px', fontWeight: '500', color: '#b78aff', letterSpacing: '0.5px' }}>Coming Soon</span>
-                  <img src="assets/ghostlight/ghostlight-brand.png" alt="" style={{ position: 'absolute', bottom: '10px', right: '10px', height: '28px', objectFit: 'contain', opacity: 0.25 }} />
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
+      </div>
 
       {/* Add Donation Modal */}
       {showAddDonationModal && (() => {
