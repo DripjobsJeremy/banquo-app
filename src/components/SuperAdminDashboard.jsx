@@ -125,7 +125,7 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Welcome back! Here's what's happening with your theatre.</p>
+        <p className="text-gray-600 mt-1">The house is open. Here's where your production stands.</p>
       </div>
 
       {/* Key Metrics */}
@@ -145,7 +145,7 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
 
         <div
           className="bg-gradient-to-br from-green-500 to-green-700 rounded-lg shadow-lg p-6 text-white cursor-pointer hover:ring-2 hover:ring-yellow-500 hover:ring-offset-1 hover:shadow-xl transition-all duration-150"
-          title="Go to Financial Dashboard"
+          title="January 1 – today. Visit Financial for Fiscal Year view."
           onClick={() => { window.location.hash = '#/financial?view=donations'; }}
         >
           <div className="flex items-center justify-between mb-4">
@@ -153,7 +153,7 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
             <span className="text-3xl">💰</span>
           </div>
           <div className="text-3xl font-bold mb-1">${metrics.totalThisYear.toLocaleString()}</div>
-          <p className="text-sm opacity-75">{metrics.donationsThisYear.length} donations this year</p>
+          <p className="text-sm opacity-75">{metrics.donationsThisYear.length} donations · Calendar YTD</p>
         </div>
 
         <div
@@ -302,7 +302,7 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
           ) : (
             <div className="text-center py-8 text-gray-400">
               <div className="text-4xl mb-2">📅</div>
-              <p>No upcoming events scheduled</p>
+              <p>No events scheduled — <a href="#/calendar" className="text-red-800 hover:underline font-medium">Add one in Calendar →</a></p>
             </div>
           )}
         </div>
@@ -314,26 +314,34 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
             <span className="text-2xl">💵</span>
           </div>
           {metrics.recentDonations.length > 0 ? (
-            <div className="space-y-3">
-              {metrics.recentDonations.map((donation, idx) => {
-                const donor = donors.find(d => d.id === donation.donorId || d.id === donation.contactId);
-                return (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900 truncate">
-                        {donor ? `${donor.firstName || ''} ${donor.lastName || ''}`.trim() || donor.name || 'Anonymous' : 'Anonymous'}
+            <>
+              <div className="space-y-3">
+                {metrics.recentDonations.map((donation, idx) => {
+                  const donor = donors.find(d => d.id === donation.donorId || d.id === donation.contactId);
+                  return (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-gray-900 truncate">
+                          {donor ? `${donor.firstName || ''} ${donor.lastName || ''}`.trim() || donor.name || 'Anonymous' : 'Anonymous'}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {new Date(donation.date).toLocaleDateString()}
+                        </div>
+                        {donation.campaignName && (
+                          <div className="text-xs text-gray-400">{donation.campaignName}</div>
+                        )}
                       </div>
-                      <div className="text-sm text-gray-600">
-                        {new Date(donation.date).toLocaleDateString()}
+                      <div className="text-lg font-bold text-green-600">
+                        ${parseFloat(donation.amount || 0).toLocaleString()}
                       </div>
                     </div>
-                    <div className="text-lg font-bold text-green-600">
-                      ${parseFloat(donation.amount || 0).toLocaleString()}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+              <div className="mt-3 text-right">
+                <a href="#/financial" className="text-sm text-red-800 hover:underline font-medium">View all donations →</a>
+              </div>
+            </>
           ) : (
             <div className="text-center py-8 text-gray-400">
               <div className="text-4xl mb-2">💵</div>

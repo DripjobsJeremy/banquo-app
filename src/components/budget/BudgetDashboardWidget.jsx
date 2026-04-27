@@ -140,7 +140,10 @@ function BudgetDashboardWidget({ userRole }) {
             ) : (
                 <div className="text-center py-8 text-gray-400">
                     <div className="text-4xl mb-2">💰</div>
-                    <p>No active production budgets</p>
+                    <p className="font-medium text-gray-700">No budgets created yet.</p>
+                    <p className="text-sm mt-1">Your active productions don't have budgets set up —{' '}
+                        <a className="text-red-800 hover:underline font-medium" onClick={() => { window.location.hash = '#/financial'; }} href="#/financial">Set one up in Financial →</a>
+                    </p>
                 </div>
             )}
         </div>
