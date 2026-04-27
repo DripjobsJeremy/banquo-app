@@ -163,7 +163,7 @@ function GlobalCalendar() {
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white mb-1">📅 Global Calendar</h1>
-          <p className="text-gray-400">
+          <p className="text-[var(--color-text-muted)]">
             All productions — {allEvents.length} event{allEvents.length !== 1 ? 's' : ''} across {productions.length} production{productions.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -176,7 +176,7 @@ function GlobalCalendar() {
               className={`px-4 py-2 rounded text-sm font-medium ${
                 viewMode === mode
                   ? 'bg-violet-600 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-overlay)]'
               }`}
             >
               {label}
@@ -186,14 +186,14 @@ function GlobalCalendar() {
       </div>
 
       {/* Filters bar */}
-      <div className="banquo-card flex flex-wrap gap-4 mb-6 p-4 bg-surface rounded-lg border border-gray-700">
+      <div className="banquo-card flex flex-wrap gap-4 mb-6 p-4 bg-surface rounded-lg border border-[var(--color-border)]">
         <div>
-          <label className="block text-xs text-gray-400 mb-1">Production</label>
+          <label className="block text-xs text-[var(--color-text-muted)] mb-1">Production</label>
           <select
             title="Filter by production"
             value={filterProduction}
             onChange={e => setFilterProduction(e.target.value)}
-            className="bg-gray-700 text-white px-3 py-1.5 rounded border border-gray-600 text-sm"
+            className="bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] px-3 py-1.5 rounded border border-[var(--color-border)] text-sm"
           >
             <option value="all">All Productions</option>
             {productions.map(p => (
@@ -202,12 +202,12 @@ function GlobalCalendar() {
           </select>
         </div>
         <div>
-          <label className="block text-xs text-gray-400 mb-1">Event Type</label>
+          <label className="block text-xs text-[var(--color-text-muted)] mb-1">Event Type</label>
           <select
             title="Filter by event type"
             value={filterType}
             onChange={e => setFilterType(e.target.value)}
-            className="bg-gray-700 text-white px-3 py-1.5 rounded border border-gray-600 text-sm"
+            className="bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] px-3 py-1.5 rounded border border-[var(--color-border)] text-sm"
           >
             <option value="all">All Types</option>
             <option value="audition">Auditions</option>
@@ -231,7 +231,7 @@ function GlobalCalendar() {
           </div>
         )}
         <div className="flex items-end ml-auto">
-          <span className="text-xs text-gray-500 pb-2">
+          <span className="text-xs text-[var(--color-text-muted)] pb-2">
             {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
             {(filterProduction !== 'all' || filterType !== 'all') ? ' matching' : ''}
           </span>
@@ -242,7 +242,7 @@ function GlobalCalendar() {
       {filterProduction === 'all' && productionsWithEvents.length > 0 && (
         <div className="flex flex-wrap gap-4 mb-5">
           {productionsWithEvents.map(p => (
-            <div key={p.id} className="flex items-center gap-1.5 text-xs text-gray-300">
+            <div key={p.id} className="flex items-center gap-1.5 text-xs text-[var(--color-text-secondary)]">
               <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} />
               <span>{p.title}</span>
             </div>
@@ -252,22 +252,22 @@ function GlobalCalendar() {
 
       {/* Empty state */}
       {productions.length === 0 && (
-        <div className="banquo-card bg-surface rounded-lg border border-gray-700 p-16 text-center">
+        <div className="banquo-card bg-surface rounded-lg border border-[var(--color-border)] p-16 text-center">
           <div className="text-5xl mb-4">🎬</div>
           <h3 className="text-xl font-semibold text-white mb-2">No Productions Yet</h3>
-          <p className="text-gray-400 text-sm">Create productions and add calendar events to see them here.</p>
+          <p className="text-[var(--color-text-muted)] text-sm">Create productions and add calendar events to see them here.</p>
         </div>
       )}
 
       {/* ── Month view ── */}
       {productions.length > 0 && viewMode === 'month' && (
-        <div className="banquo-card bg-surface rounded-lg border border-gray-700 overflow-hidden">
+        <div className="banquo-card bg-surface rounded-lg border border-[var(--color-border)] overflow-hidden">
           {/* Month nav */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border)]">
             <button
               type="button"
               onClick={prevMonth}
-              className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+              className="p-1.5 text-[var(--color-text-muted)] hover:text-white hover:bg-[var(--color-bg-elevated)] rounded transition-colors"
               title="Previous month"
             >
               ‹
@@ -285,7 +285,7 @@ function GlobalCalendar() {
             <button
               type="button"
               onClick={nextMonth}
-              className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+              className="p-1.5 text-[var(--color-text-muted)] hover:text-white hover:bg-[var(--color-bg-elevated)] rounded transition-colors"
               title="Next month"
             >
               ›
@@ -293,9 +293,9 @@ function GlobalCalendar() {
           </div>
 
           {/* Day-of-week headers */}
-          <div className="grid grid-cols-7 border-b border-gray-700">
+          <div className="grid grid-cols-7 border-b border-[var(--color-border)]">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-              <div key={d} className="py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              <div key={d} className="py-2 text-center text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide">
                 {d}
               </div>
             ))}
@@ -309,7 +309,7 @@ function GlobalCalendar() {
               return (
                 <div
                   key={i}
-                  className={`min-h-[90px] p-1.5 border-b border-r border-gray-700 ${
+                  className={`min-h-[90px] p-1.5 border-b border-r border-[var(--color-border)] ${
                     !day ? 'bg-gray-850' : ''
                   }`}
                 >
@@ -318,7 +318,7 @@ function GlobalCalendar() {
                       <div className={`text-xs font-semibold mb-1 w-6 h-6 flex items-center justify-center rounded-full ${
                         today_
                           ? 'bg-violet-600 text-white'
-                          : 'text-gray-400'
+                          : 'text-[var(--color-text-muted)]'
                       }`}>
                         {day.getDate()}
                       </div>
@@ -334,7 +334,7 @@ function GlobalCalendar() {
                           </div>
                         ))}
                         {dayEvents.length > 3 && (
-                          <div className="text-xs text-gray-500 pl-1">
+                          <div className="text-xs text-[var(--color-text-muted)] pl-1">
                             +{dayEvents.length - 3} more
                           </div>
                         )}
@@ -352,21 +352,21 @@ function GlobalCalendar() {
       {productions.length > 0 && viewMode === 'list' && (
         <div className="space-y-6">
           {filteredEvents.length === 0 ? (
-            <div className="banquo-card bg-surface rounded-lg border border-gray-700 p-12 text-center">
+            <div className="banquo-card bg-surface rounded-lg border border-[var(--color-border)] p-12 text-center">
               <div className="text-4xl mb-3">🔍</div>
-              <p className="text-gray-400">No events match the current filters.</p>
+              <p className="text-[var(--color-text-muted)]">No events match the current filters.</p>
             </div>
           ) : (
             Object.entries(groupedByMonth).map(([monthKey, events]) => (
               <div key={monthKey}>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                <h3 className="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-3">
                   {monthKey}
                 </h3>
                 <div className="space-y-2">
                   {events.map((ev, i) => (
                     <div
                       key={i}
-                      className="banquo-card--flat flex items-start gap-3 p-3 bg-surface rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
+                      className="banquo-card--flat flex items-start gap-3 p-3 bg-surface rounded-lg border border-[var(--color-border)] hover:border-[var(--color-border)] transition-colors"
                     >
                       {/* Color dot */}
                       <div
@@ -376,7 +376,7 @@ function GlobalCalendar() {
                       />
                       {/* Date */}
                       <div className="w-16 flex-shrink-0 text-center">
-                        <div className="text-xs text-gray-500 uppercase">
+                        <div className="text-xs text-[var(--color-text-muted)] uppercase">
                           {ev._date.toLocaleString('default', { month: 'short' })}
                         </div>
                         <div className="text-xl font-bold text-white leading-tight">
@@ -388,23 +388,23 @@ function GlobalCalendar() {
                         <div className="font-medium text-white text-sm truncate">
                           {ev.title || ev.type || 'Event'}
                         </div>
-                        <div className="text-xs text-gray-400 mt-0.5 flex flex-wrap gap-2">
+                        <div className="text-xs text-[var(--color-text-muted)] mt-0.5 flex flex-wrap gap-2">
                           <span>{ev.productionTitle}</span>
                           {ev.type && (
-                            <span className="text-gray-600">·</span>
+                            <span className="text-[var(--color-text-muted)]">·</span>
                           )}
                           {ev.type && (
                             <span>{TYPE_LABELS[normalizeType(ev.type)] || ev.type}</span>
                           )}
                           {(ev.startTime || ev.time) && (
                             <>
-                              <span className="text-gray-600">·</span>
+                              <span className="text-[var(--color-text-muted)]">·</span>
                               <span>{ev.startTime || ev.time}</span>
                             </>
                           )}
                           {ev.location && (
                             <>
-                              <span className="text-gray-600">·</span>
+                              <span className="text-[var(--color-text-muted)]">·</span>
                               <span>📍 {ev.location}</span>
                             </>
                           )}
