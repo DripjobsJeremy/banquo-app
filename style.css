@@ -1747,3 +1747,140 @@ html[data-theme="light"] body::before {
   opacity: 0.035;
   mix-blend-mode: multiply;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BANQUO UNIFIED CARD HOVER SYSTEM
+   Single source of truth for all card/container hover interactions.
+   Gold flame border + soft depth shadow + subtle lift on interactive cards.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── CSS variables for hover system ─────────────────────────────────────── */
+:root {
+  --card-hover-shadow:     0 8px 24px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(201, 161, 74, 0.12);
+  --card-hover-border:     rgba(201, 161, 74, 0.55);
+  --card-hover-transition: transform 200ms ease-in-out,
+                           box-shadow 200ms ease-in-out,
+                           border-color 200ms ease-in-out;
+  --card-active-shadow:    0 4px 12px rgba(0, 0, 0, 0.35), 0 1px 4px rgba(201, 161, 74, 0.08);
+}
+
+/* ── .banquo-card — reusable hover utility ───────────────────────────────
+   Apply this class to any card/container that should respond to hover.
+   Adds lift (scale) + gold border + depth shadow.                        */
+.banquo-card {
+  transition: var(--card-hover-transition);
+  transform-origin: center;
+  will-change: transform, box-shadow;
+}
+.banquo-card:hover {
+  transform: scale(1.02);
+  box-shadow: var(--card-hover-shadow);
+  border-color: var(--card-hover-border) !important;
+}
+.banquo-card:active {
+  transform: scale(1.005);
+  box-shadow: var(--card-active-shadow);
+}
+
+/* ── .banquo-card--flat — border+shadow only, no lift ────────────────────
+   Use for list rows and tightly packed containers where scale causes
+   layout shift.                                                           */
+.banquo-card--flat {
+  transition: var(--card-hover-transition);
+  will-change: box-shadow;
+}
+.banquo-card--flat:hover {
+  box-shadow: var(--card-hover-shadow);
+  border-color: var(--card-hover-border) !important;
+}
+
+/* ── Base .card gets hover system ──────────────────────────────────────── */
+.card {
+  transition: var(--card-hover-transition);
+  transform-origin: center;
+  will-change: transform, box-shadow;
+}
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: var(--card-hover-shadow);
+  border-color: var(--card-hover-border) !important;
+}
+.card:active {
+  transform: scale(1.005);
+}
+
+/* ── Production poster cards — lift ─────────────────────────────────────  */
+.prod-poster-card {
+  transition: var(--card-hover-transition);
+  transform-origin: center;
+  will-change: transform, box-shadow;
+}
+.prod-poster-card:hover {
+  transform: scale(1.025);
+  box-shadow: var(--card-hover-shadow);
+  border-color: var(--card-hover-border) !important;
+}
+.prod-poster-card:active {
+  transform: scale(1.01);
+}
+
+/* ── Production thumbnail cards — lift ──────────────────────────────────  */
+.prod-thumb-card {
+  transition: var(--card-hover-transition);
+  transform-origin: center;
+  will-change: transform, box-shadow;
+}
+.prod-thumb-card:hover {
+  transform: scale(1.02);
+  box-shadow: var(--card-hover-shadow);
+  border-color: var(--card-hover-border) !important;
+}
+
+/* ── Production list rows — flat (no lift, prevents layout shift) ────────  */
+.prod-list-row {
+  transition: var(--card-hover-transition);
+}
+.prod-list-row:hover {
+  box-shadow: var(--card-hover-shadow);
+  border-color: var(--card-hover-border) !important;
+}
+
+/* ── Stat / KPI cards (Tailwind shadow-sm pattern) ───────────────────────
+   Targets dynamically rendered stat cards that use shadow-sm or shadow-md
+   combined with cursor-pointer.                                           */
+.shadow-sm.cursor-pointer,
+.shadow-md.cursor-pointer {
+  transition: var(--card-hover-transition);
+  transform-origin: center;
+  will-change: transform, box-shadow;
+}
+.shadow-sm.cursor-pointer:hover,
+.shadow-md.cursor-pointer:hover {
+  transform: scale(1.02);
+  box-shadow: var(--card-hover-shadow);
+  border-color: var(--card-hover-border) !important;
+}
+
+/* ── Light-mode overrides — softer gold on parchment surfaces ────────────  */
+html[data-theme="light"] {
+  --card-hover-shadow:  0 6px 20px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(201, 161, 74, 0.18);
+  --card-hover-border:  rgba(180, 135, 50, 0.65);
+}
+
+/* ── Accessibility — respect reduced motion preference ───────────────────  */
+@media (prefers-reduced-motion: reduce) {
+  .banquo-card,
+  .banquo-card--flat,
+  .card,
+  .prod-poster-card,
+  .prod-thumb-card,
+  .prod-list-row,
+  .shadow-sm.cursor-pointer,
+  .shadow-md.cursor-pointer {
+    transition: box-shadow 200ms ease-in-out, border-color 200ms ease-in-out;
+    transform: none !important;
+  }
+}
+/* ══════════════════════════════════════════════════════════════════════════
+   END BANQUO UNIFIED CARD HOVER SYSTEM
+   ══════════════════════════════════════════════════════════════════════════ */
