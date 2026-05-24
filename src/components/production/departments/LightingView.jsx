@@ -45,10 +45,10 @@ function LightingView({ production, onUpdateScene }) {
   if (!localProduction?.acts?.length) {
     return React.createElement(
       'div',
-      { className: 'text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300' },
-      React.createElement('p', { className: 'text-gray-500 text-lg mb-2' }, '💡 Lighting Department'),
-      React.createElement('p', { className: 'text-gray-400 text-sm' }, 'No scenes have been created yet.'),
-      React.createElement('p', { className: 'text-gray-400 text-sm' }, 'Add acts and scenes in the Scenes tab first.')
+      { className: 'text-center py-12 rounded-lg border-2 border-dashed border-gray-300', style: { backgroundColor: 'var(--color-bg-elevated)' } },
+      React.createElement('p', { className: 'text-lg mb-2', style: { color: 'var(--color-text-muted)' } }, '💡 Lighting Department'),
+      React.createElement('p', { className: 'text-sm', style: { color: 'var(--color-text-muted)' } }, 'No scenes have been created yet.'),
+      React.createElement('p', { className: 'text-sm', style: { color: 'var(--color-text-muted)' } }, 'Add acts and scenes in the Scenes tab first.')
     );
   }
 
@@ -65,12 +65,12 @@ function LightingView({ production, onUpdateScene }) {
     localProduction.acts.map((act, actIndex) =>
       React.createElement(
         'div',
-        { key: actIndex, className: 'bg-white rounded-lg border border-gray-200 overflow-hidden' },
+        { key: actIndex, className: 'rounded-lg border border-gray-200 overflow-hidden', style: { backgroundColor: 'var(--color-bg-surface)' } },
         // Act header
         React.createElement(
           'div',
           { 
-            className: 'flex items-center justify-between p-4 bg-gray-50 cursor-pointer hover:bg-gray-100',
+            className: 'flex items-center justify-between p-4 cursor-pointer hover:bg-gray-100', style: { backgroundColor: 'var(--color-bg-elevated)' },
             onClick: () => toggleAct(actIndex)
           },
           React.createElement(
@@ -78,13 +78,13 @@ function LightingView({ production, onUpdateScene }) {
             { className: 'flex items-center gap-3' },
             React.createElement(
               'span',
-              { className: 'text-gray-400 transition-transform ' + (expandedActs[actIndex] ? 'rotate-90' : '') },
+              { className: 'transition-transform ' + (expandedActs[actIndex] ? 'rotate-90' : ''), style: { color: 'var(--color-text-muted)' } },
               '▶'
             ),
-            React.createElement('span', { className: 'font-semibold text-gray-800' }, act.name || 'Act ' + (actIndex + 1)),
+            React.createElement('span', { className: 'font-semibold', style: { color: 'var(--color-text-primary)' } }, act.name || 'Act ' + (actIndex + 1)),
             React.createElement(
               'span',
-              { className: 'text-sm text-gray-500' },
+              { className: 'text-sm', style: { color: 'var(--color-text-muted)' } },
               (act.scenes?.length || 0) + ' scene' + ((act.scenes?.length || 0) !== 1 ? 's' : '')
             )
           )
@@ -109,17 +109,17 @@ function LightingView({ production, onUpdateScene }) {
                     ),
                     scene.label && scene.label !== 'Custom' && React.createElement(
                       'span',
-                      { className: 'text-sm text-gray-600' },
+                      { className: 'text-sm', style: { color: 'var(--color-text-secondary)' } },
                       scene.label
                     ),
                     scene.label === 'Custom' && scene.customLabel && React.createElement(
                       'span',
-                      { className: 'text-sm text-gray-600' },
+                      { className: 'text-sm', style: { color: 'var(--color-text-secondary)' } },
                       scene.customLabel
                     ),
                     scene.name && React.createElement(
                       'span',
-                      { className: 'text-sm font-medium text-gray-800' },
+                      { className: 'text-sm font-medium', style: { color: 'var(--color-text-primary)' } },
                       scene.name
                     ),
                     scene.time && React.createElement(
@@ -130,7 +130,7 @@ function LightingView({ production, onUpdateScene }) {
                     // Character count
                     scene.characterIds?.length > 0 && React.createElement(
                       'span',
-                      { className: 'text-xs text-gray-500' },
+                      { className: 'text-xs', style: { color: 'var(--color-text-muted)' } },
                       '(' + scene.characterIds.length + ' characters)'
                     )
                   ),
@@ -142,7 +142,7 @@ function LightingView({ production, onUpdateScene }) {
                     React.createElement(
                       'div',
                       null,
-                      React.createElement('label', { className: 'block text-xs text-gray-500 mb-1' }, 'Cue #'),
+                      React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-muted)' } }, 'Cue #'),
                       React.createElement('input', {
                         type: 'text',
                         value: scene.lightingCue || '',
@@ -155,7 +155,7 @@ function LightingView({ production, onUpdateScene }) {
                     React.createElement(
                       'div',
                       null,
-                      React.createElement('label', { className: 'block text-xs text-gray-500 mb-1' }, 'Mood'),
+                      React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-muted)' } }, 'Mood'),
                       window.SmartDropdown
                         ? React.createElement(window.SmartDropdown, {
                             field: 'lightingMood',
@@ -176,7 +176,7 @@ function LightingView({ production, onUpdateScene }) {
                     React.createElement(
                       'div',
                       null,
-                      React.createElement('label', { className: 'block text-xs text-gray-500 mb-1' }, 'Color'),
+                      React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-muted)' } }, 'Color'),
                       React.createElement('input', {
                         type: 'text',
                         value: scene.lightingColor || '',
@@ -189,7 +189,7 @@ function LightingView({ production, onUpdateScene }) {
                     React.createElement(
                       'div',
                       null,
-                      React.createElement('label', { className: 'block text-xs text-gray-500 mb-1' }, 'Intensity'),
+                      React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-muted)' } }, 'Intensity'),
                       React.createElement('input', {
                         type: 'text',
                         value: scene.lightingIntensity || '',
@@ -203,7 +203,7 @@ function LightingView({ production, onUpdateScene }) {
                   React.createElement(
                     'div',
                     { className: 'mt-3' },
-                    React.createElement('label', { className: 'block text-xs text-gray-500 mb-1' }, 'Lighting Notes'),
+                    React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-muted)' } }, 'Lighting Notes'),
                     React.createElement('textarea', {
                       value: scene.lightingNotes || '',
                       onChange: (e) => handleLightingUpdate(actIndex, sceneIndex, 'lightingNotes', e.target.value),
@@ -217,7 +217,7 @@ function LightingView({ production, onUpdateScene }) {
             )
           : React.createElement(
               'div',
-              { className: 'p-4 text-center text-gray-500 text-sm' },
+              { className: 'p-4 text-center text-sm', style: { color: 'var(--color-text-muted)' } },
               'No scenes in this act'
             )
         )
@@ -238,23 +238,23 @@ function LightingView({ production, onUpdateScene }) {
 
   const budgetPanel = React.createElement(
     'div',
-    { className: 'bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4' },
+    { className: 'border border-amber-200 rounded-lg p-4 mb-4', style: { backgroundColor: 'var(--color-warning-surface)' } },
     React.createElement(
       'div',
       { className: 'flex items-center justify-between' },
       React.createElement(
         'div',
         null,
-        React.createElement('h3', { className: 'font-semibold text-amber-900' }, '💡 Lighting Budget'),
-        React.createElement('p', { className: 'text-sm text-amber-700' },
+        React.createElement('h3', { className: 'font-semibold', style: { color: 'var(--color-warning)' } }, '💡 Lighting Budget'),
+        React.createElement('p', { className: 'text-sm', style: { color: 'var(--color-warning)' } },
           lightingBudget.itemCount + ' fixture' + (lightingBudget.itemCount !== 1 ? 's' : '') + ' with cost data'
         )
       ),
       React.createElement(
         'div',
         { className: 'text-right' },
-        React.createElement('div', { className: 'text-2xl font-bold text-amber-900' }, '$' + lightingBudget.spent.toFixed(2)),
-        React.createElement('div', { className: 'text-sm text-amber-700' },
+        React.createElement('div', { className: 'text-2xl font-bold', style: { color: 'var(--color-warning)' } }, '$' + lightingBudget.spent.toFixed(2)),
+        React.createElement('div', { className: 'text-sm', style: { color: 'var(--color-warning)' } },
           lightingBudget.allocated > 0 ? 'of $' + lightingBudget.allocated.toFixed(2) + ' allocated' : 'No budget allocated'
         )
       )
@@ -270,7 +270,7 @@ function LightingView({ production, onUpdateScene }) {
           style: { width: Math.min(100, (lightingBudget.spent / lightingBudget.allocated) * 100) + '%' }
         })
       ),
-      React.createElement('div', { className: 'text-xs text-amber-700 mt-1' },
+      React.createElement('div', { className: 'text-xs mt-1', style: { color: 'var(--color-warning)' } },
         lightingBudget.spent > lightingBudget.allocated
           ? 'Over budget'
           : '$' + (lightingBudget.allocated - lightingBudget.spent).toFixed(2) + ' remaining'
@@ -313,8 +313,8 @@ function LightingView({ production, onUpdateScene }) {
       'div',
       { className: 'flex items-center justify-between mb-4' },
       React.createElement('div', { className: 'flex items-baseline gap-2' },
-        React.createElement('h3', { className: 'text-lg font-semibold text-gray-900' }, '💡 Lighting Design'),
-        React.createElement('span', { className: 'text-xs text-gray-500 font-normal' },
+        React.createElement('h3', { className: 'text-lg font-semibold', style: { color: 'var(--color-text-primary)' } }, '💡 Lighting Design'),
+        React.createElement('span', { className: 'text-xs font-normal', style: { color: 'var(--color-text-muted)' } },
           scenesWithLighting + ' / ' + totalScenes + ' scenes with data'
         )
       ),

@@ -52,7 +52,10 @@ const ProductionsView = () => {
   const [staffContactId, setStaffContactId] = useState(() => localStorage.getItem('showsuite_staff_contact_id') || '');
 
   const BUDGET_ROLES = ['super_admin', 'venue_manager', 'admin', 'client_admin', 'board_member', 'accounting_manager'];
-  const canEditBudget = BUDGET_ROLES.includes(localStorage.getItem('showsuite_user_role') || 'admin');
+  const DEPT_ROLES = ['lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager'];
+  const userRole = localStorage.getItem('showsuite_user_role') || 'admin';
+  const canEditBudget = BUDGET_ROLES.includes(userRole);
+  const isDeptManager = DEPT_ROLES.includes(userRole);
 
   const loadProductions = () => {
     const allProductions = window.productionsService.getAll();
@@ -160,8 +163,8 @@ const ProductionsView = () => {
     React.createElement(
       'div',
       null,
-      React.createElement('h1', { className: 'text-3xl font-bold text-gray-900' }, 'Productions'),
-      React.createElement('p', { className: 'text-gray-600 mt-1' }, 'Manage your theatre productions')
+      React.createElement('h1', { className: 'text-3xl font-bold', style: { color: 'var(--color-text-primary)' } }, 'Productions'),
+      React.createElement('p', { className: 'mt-1', style: { color: 'var(--color-text-secondary)' } }, 'Manage your theatre productions')
     ),
     React.createElement(
       'div',
@@ -229,38 +232,48 @@ const ProductionsView = () => {
     React.createElement('p', { className: 'text-amber-600 text-sm' }, 'You have no productions assigned to this staff member yet. Add assignments in Contacts → Staff & Crew.')
   );
 
-  const renderCardActions = (production) => React.createElement(
-    'div',
-    { className: 'prod-card-actions' + (canEditBudget ? '' : ' prod-card-actions--2col'), onClick: e => e.stopPropagation() },
-    React.createElement(
-      'button',
-      {
-        type: 'button',
-        onClick: (e) => { e.stopPropagation(); setEditingProduction(production); setShowEditModal(true); },
-        className: 'prod-card-btn prod-card-btn--ghost',
-        title: 'Edit production title and dates',
-      },
-      '✏️ Details'
-    ),
-    React.createElement(
+  const renderCardActions = (production) => {
+    const actionsClass = 'prod-card-actions' + (
+      isDeptManager ? ' prod-card-actions--1col' :
+      canEditBudget ? '' : ' prod-card-actions--2col'
+    );
+    const productionLink = React.createElement(
       Link,
       {
         to: '/productions/' + production.id,
         onClick: (e) => e.stopPropagation(),
         className: 'prod-card-btn prod-card-btn--primary',
       },
-      '🎬 Scenes'
-    ),
-    canEditBudget ? React.createElement(
-      'button',
-      {
-        type: 'button',
-        onClick: (e) => { e.stopPropagation(); setBudgetProduction(production); setShowBudgetManager(true); },
-        className: 'prod-card-btn prod-card-btn--primary',
-      },
-      '💰 Budget'
-    ) : null
-  );
+      '🎬 Production'
+    );
+    if (isDeptManager) {
+      return React.createElement('div', { className: actionsClass, onClick: e => e.stopPropagation() }, productionLink);
+    }
+    return React.createElement(
+      'div',
+      { className: actionsClass, onClick: e => e.stopPropagation() },
+      React.createElement(
+        'button',
+        {
+          type: 'button',
+          onClick: (e) => { e.stopPropagation(); setEditingProduction(production); setShowEditModal(true); },
+          className: 'prod-card-btn prod-card-btn--ghost',
+          title: 'Edit production title and dates',
+        },
+        '✏️ Details'
+      ),
+      productionLink,
+      canEditBudget ? React.createElement(
+        'button',
+        {
+          type: 'button',
+          onClick: (e) => { e.stopPropagation(); setBudgetProduction(production); setShowBudgetManager(true); },
+          className: 'prod-card-btn prod-card-btn--primary',
+        },
+        '💰 Budget'
+      ) : null
+    );
+  };
 
   const renderPosterCard = (production) => {
     const isActive = production.id === activeProductionId;
@@ -430,11 +443,17 @@ window.ProductionsView = ProductionsView;
 
 function EditProductionModal({ production, onSave, onClose }) {
   const [title, setTitle] = useState(production.title || '');
+  const [localProduction, setLocalProduction] = useState(production);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title.trim()) { alert('Title is required'); return; }
-    onSave({ ...production, title: title.trim() });
+    onSave({ ...localProduction, title: title.trim() });
+  };
+
+  const handleCastUpdate = (updatedProduction) => {
+    setLocalProduction(updatedProduction);
+    window.productionsService?.updateProduction?.(updatedProduction.id, updatedProduction);
   };
 
   return (
@@ -442,51 +461,68 @@ function EditProductionModal({ production, onSave, onClose }) {
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
-      <div
-        className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl"
+      <form
+        className="bg-white rounded-lg w-full shadow-xl flex flex-col edit-modal-form"
         onClick={(e) => e.stopPropagation()}
+        onSubmit={handleSubmit}
       >
-        <h2 className="text-xl font-bold text-gray-900 mb-5">Edit Production Details</h2>
+        <div className="edit-modal-body">
+          <h2 className="text-xl font-bold text-gray-900 mb-5">Edit Production Details</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Production Title <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-              placeholder="e.g., TOOTSIE"
-              autoFocus
-              required
-            />
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Production Title <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                placeholder="e.g., TOOTSIE"
+                autoFocus
+                required
+              />
+            </div>
+
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-700">
+                💡 Rehearsal and show dates are calculated automatically from events in the Calendar tab.
+              </p>
+            </div>
           </div>
 
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-700">
-              💡 Rehearsal and show dates are calculated automatically from events in the Calendar tab.
-            </p>
+          <hr className="edit-modal-section-hr" />
+          <div className="edit-modal-section-label">
+            🎭 Cast List
           </div>
+          <p className="edit-modal-section-hint">
+            Cast members added here will be available for selection within the Scene Builder.
+          </p>
+          <div className="cast-list-scroll-wrapper">
+            {window.CharacterCastList && React.createElement(window.CharacterCastList, {
+              production: localProduction,
+              onUpdate: handleCastUpdate,
+            })}
+          </div>
+        </div>
 
-          <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-colors"
-            >
-              Save Changes
-            </button>
-          </div>
-        </form>
-      </div>
+        <div className="flex gap-3 px-6 py-4 border-t border-gray-100">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="flex-1 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-colors"
+          >
+            Save Changes
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

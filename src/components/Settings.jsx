@@ -90,8 +90,8 @@
       React.createElement(
         'div',
         { className: 'sidebar-header mb-6' },
-        React.createElement('h1', { className: 'text-2xl font-bold text-gray-900 mb-1' }, '⚙️ Settings'),
-        React.createElement('p', { className: 'text-sm text-gray-600' }, 'Configure Banquo')
+        React.createElement('h1', { className: 'text-2xl font-bold mb-1', style: { color: 'var(--color-text-primary)' } }, '⚙️ Settings'),
+        React.createElement('p', { className: 'text-sm', style: { color: 'var(--color-text-secondary)' } }, 'Configure Banquo')
       ),
       
       // Navigation Groups
@@ -108,7 +108,8 @@
               'button',
               {
                 onClick: () => toggleGroup(group.id),
-                className: 'nav-group-header w-full flex items-center justify-between text-sm font-semibold text-gray-700 mb-2 hover:text-gray-900 transition-colors'
+                className: 'nav-group-header w-full flex items-center justify-between text-sm font-semibold mb-2 transition-colors',
+                style: { color: 'var(--color-text-secondary)' }
               },
               React.createElement(
                 'span',
@@ -118,7 +119,7 @@
               ),
               React.createElement(
                 'span',
-                { className: 'text-gray-500 text-xs' },
+                { className: 'text-xs', style: { color: 'var(--color-text-muted)' } },
                 expandedGroups.includes(group.id) ? '▼' : '▶'
               )
             ),
@@ -136,8 +137,9 @@
                     className: `nav-item w-full text-left px-3 py-2 rounded-lg text-sm transition-colors relative ${
                       activeSection === item.id
                         ? 'bg-violet-600 text-white font-medium'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                    }`
+                        : 'hover:bg-gray-100'
+                    }`,
+                    style: activeSection === item.id ? {} : { color: 'var(--color-text-secondary)' }
                   },
                   React.createElement('span', { className: 'mr-2' }, item.icon),
                   item.label
@@ -295,26 +297,28 @@
         React.createElement(
           'div',
           { className: 'relative' },
-          React.createElement('span', { className: 'absolute left-3 top-2.5 text-gray-600' }, '🔍'),
+          React.createElement('span', { className: 'absolute left-3 top-2.5', style: { color: 'var(--color-text-secondary)' } }, '🔍'),
           React.createElement('input', {
             type: 'text',
             value: searchQuery,
             onChange: (e) => setSearchQuery(e.target.value),
             placeholder: 'Search settings... (Ctrl+K)',
-            className: 'w-full pl-10 pr-10 py-2 rounded-lg bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-violet-600'
+            className: 'w-full pl-10 pr-10 py-2 rounded-lg border border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-violet-600',
+            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
           }),
           searchQuery && React.createElement(
             'button',
             {
               onClick: () => setSearchQuery(''),
-              className: 'absolute right-3 top-2.5 text-gray-600 hover:text-gray-900'
+              className: 'absolute right-3 top-2.5',
+              style: { color: 'var(--color-text-secondary)' }
             },
             '✕'
           )
         ),
         (searchResults && searchResults.length > 0) && React.createElement(
           'div',
-          { className: 'search-results absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto' },
+          { className: 'search-results absolute top-full left-0 right-0 mt-2 border border-gray-200 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto', style: { backgroundColor: 'var(--color-bg-surface)' } },
           searchResults.map((result, index) => (
             React.createElement(
               'button',
@@ -326,7 +330,7 @@
                   setSearchResults([]);
                   setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
                 },
-                className: 'w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-200 last:border-b-0'
+                className: 'w-full text-left px-4 py-3 hover:bg-gray-100 border-b border-gray-200 last:border-b-0'
               },
               React.createElement(
                 'div',
@@ -335,10 +339,10 @@
                 React.createElement(
                   'div',
                   { className: 'flex-1' },
-                  React.createElement('div', { className: 'font-medium text-sm text-gray-900' }, result.title),
-                  React.createElement('div', { className: 'text-xs text-gray-600' }, result.description)
+                  React.createElement('div', { className: 'font-medium text-sm', style: { color: 'var(--color-text-primary)' } }, result.title),
+                  React.createElement('div', { className: 'text-xs', style: { color: 'var(--color-text-secondary)' } }, result.description)
                 ),
-                React.createElement('div', { className: 'text-xs text-gray-500' }, result.section)
+                React.createElement('div', { className: 'text-xs', style: { color: 'var(--color-text-muted)' } }, result.section)
               )
             )
           ))
@@ -347,14 +351,15 @@
       !searchQuery && (showQuickActions 
         ? React.createElement(
             'div',
-            { className: 'quick-actions mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50' },
+            { className: 'quick-actions mt-4 p-4 border border-gray-200 rounded-lg', style: { backgroundColor: 'var(--color-bg-elevated)' } },
             React.createElement(
               'div',
               { className: 'flex items-center justify-between mb-3' },
-              React.createElement('h3', { className: 'font-semibold text-sm text-gray-900' }, '⚡ Quick Actions'),
+              React.createElement('h3', { className: 'font-semibold text-sm', style: { color: 'var(--color-text-primary)' } }, '⚡ Quick Actions'),
               React.createElement('button', {
                 onClick: () => setShowQuickActions(false),
-                className: 'text-xs text-gray-600 hover:text-gray-900'
+                className: 'text-xs',
+                style: { color: 'var(--color-text-secondary)' }
               }, 'Hide')
             ),
             React.createElement(
@@ -428,7 +433,7 @@
         { className: 'settings-content flex-1 min-w-0' },
         React.createElement(
           'div',
-          { className: 'content-container bg-white rounded-lg p-6 min-h-[600px]' },
+          { className: 'content-container rounded-lg p-6 min-h-[600px]', style: { backgroundColor: 'var(--color-bg-surface)' } },
           activeSection === 'overview' && SettingsOverviewComponent &&
             React.createElement(SettingsOverviewComponent, {
               onNavigate: (section) => handleSectionChange(section)
@@ -481,10 +486,11 @@
       'button',
       {
         onClick,
-        className: 'quick-action-btn flex flex-col items-center gap-2 p-3 border border-gray-200 rounded bg-white hover:bg-gray-50 hover:shadow transition'
+        className: 'quick-action-btn flex flex-col items-center gap-2 p-3 border border-gray-200 rounded hover:shadow transition',
+        style: { backgroundColor: 'var(--color-bg-surface)' }
       },
       React.createElement('span', { className: 'text-2xl' }, icon),
-      React.createElement('span', { className: 'text-xs font-medium text-center text-gray-900' }, label)
+      React.createElement('span', { className: 'text-xs font-medium text-center', style: { color: 'var(--color-text-primary)' } }, label)
     )
   );
 

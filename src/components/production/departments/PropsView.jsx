@@ -801,8 +801,8 @@ function PropsView({ production, onSave, onUpdateScene }) {
       'div',
       { className: 'flex items-center justify-between mb-4' },
       React.createElement('div', { className: 'flex items-baseline gap-2' },
-        React.createElement('h3', { className: 'text-lg font-semibold text-gray-900' }, '🎭 Props Manager'),
-        lastSaved && React.createElement('span', { className: 'text-xs text-gray-500 font-normal' },
+        React.createElement('h3', { className: 'text-lg font-semibold', style: { color: 'var(--color-text-primary)' } }, '🎭 Props Manager'),
+        lastSaved && React.createElement('span', { className: 'text-xs font-normal', style: { color: 'var(--color-text-muted)' } },
           'Last saved: ' + lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         )
       ),
@@ -816,7 +816,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
             className: `px-4 py-2 text-sm font-medium rounded transition-colors ${
               !checklistMode && !ghostLightMode
                 ? 'bg-violet-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-gray-200 hover:bg-gray-300'
             }`
           },
           '📋 Manager View'
@@ -828,7 +828,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
             className: `px-4 py-2 text-sm font-medium rounded transition-colors ${
               checklistMode && !ghostLightMode
                 ? 'bg-violet-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-gray-200 hover:bg-gray-300'
             }`
           },
           '✓ Checklist View'
@@ -843,7 +843,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
             className: `ghostlight-btn px-4 py-2 text-sm font-medium rounded transition-colors ${
               ghostLightMode
                 ? ''
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-gray-200 hover:bg-gray-300'
             }`
           },
           React.createElement('span', {
@@ -897,9 +897,9 @@ function PropsView({ production, onSave, onUpdateScene }) {
         // Checklist Title
         React.createElement(
           'div',
-          { className: 'p-4 bg-blue-50 border border-blue-200 rounded-lg' },
-          React.createElement('h2', { className: 'text-2xl font-bold text-blue-900 mb-1' }, '✓ Props Checklist'),
-          React.createElement('p', { className: 'text-sm text-blue-700' }, `${production.title || 'Production'} - ${allScenes.length} scenes`)
+          { className: 'p-4 border border-blue-200 rounded-lg', style: { backgroundColor: 'var(--color-info-surface)' } },
+          React.createElement('h2', { className: 'text-2xl font-bold mb-1', style: { color: 'var(--color-info)' } }, '✓ Props Checklist'),
+          React.createElement('p', { className: 'text-sm', style: { color: 'var(--color-info)' } }, `${production.title || 'Production'} - ${allScenes.length} scenes`)
         ),
         // Checklist Controls
         React.createElement(
@@ -935,14 +935,14 @@ function PropsView({ production, onSave, onUpdateScene }) {
               null,
               React.createElement(
                 'tr',
-                { className: 'border-b-2 border-gray-300 bg-gray-100' },
-                React.createElement('th', { className: 'p-3 text-left font-semibold text-gray-700 w-10' }, '#'),
-                React.createElement('th', { className: 'p-3 text-left font-semibold text-gray-700' }, 'Scene'),
-                React.createElement('th', { className: 'p-3 text-left font-semibold text-gray-700' }, 'Prop Name'),
-                React.createElement('th', { className: 'p-3 text-left font-semibold text-gray-700' }, 'Character'),
-                React.createElement('th', { className: 'p-3 text-center font-semibold text-gray-700 w-20' }, 'Ready'),
-                React.createElement('th', { className: 'p-3 text-center font-semibold text-gray-700 w-20' }, 'On Stage'),
-                React.createElement('th', { className: 'p-3 text-center font-semibold text-gray-700 w-20' }, 'Returned')
+                { className: 'border-b-2 border-gray-300', style: { backgroundColor: 'var(--color-bg-elevated)' } },
+                React.createElement('th', { className: 'p-3 text-left font-semibold w-10', style: { color: 'var(--color-text-secondary)' } }, '#'),
+                React.createElement('th', { className: 'p-3 text-left font-semibold', style: { color: 'var(--color-text-secondary)' } }, 'Scene'),
+                React.createElement('th', { className: 'p-3 text-left font-semibold', style: { color: 'var(--color-text-secondary)' } }, 'Prop Name'),
+                React.createElement('th', { className: 'p-3 text-left font-semibold', style: { color: 'var(--color-text-secondary)' } }, 'Character'),
+                React.createElement('th', { className: 'p-3 text-center font-semibold w-20', style: { color: 'var(--color-text-secondary)' } }, 'Ready'),
+                React.createElement('th', { className: 'p-3 text-center font-semibold w-20', style: { color: 'var(--color-text-secondary)' } }, 'On Stage'),
+                React.createElement('th', { className: 'p-3 text-center font-semibold w-20', style: { color: 'var(--color-text-secondary)' } }, 'Returned')
               )
             ),
             // Table Body
@@ -960,12 +960,12 @@ function PropsView({ production, onSave, onUpdateScene }) {
                     },
                     React.createElement(
                       'td',
-                      { className: 'p-3 text-sm text-gray-600' },
+                      { className: 'p-3 text-sm', style: { color: 'var(--color-text-secondary)' } },
                       propIdx + 1
                     ),
                     React.createElement(
                       'td',
-                      { className: 'p-3 text-sm font-semibold text-gray-800 whitespace-nowrap' },
+                      { className: 'p-3 text-sm font-semibold whitespace-nowrap', style: { color: 'var(--color-text-primary)' } },
                       (() => {
                         const actLabel = scene.act || 'Act ?';
                         const sceneLabel = scene.name || scene.title || `Scene ${scene.number || sceneIdx + 1}`;
@@ -974,12 +974,12 @@ function PropsView({ production, onSave, onUpdateScene }) {
                     ),
                     React.createElement(
                       'td',
-                      { className: 'p-3 text-sm text-gray-800 font-medium' },
+                      { className: 'p-3 text-sm font-medium', style: { color: 'var(--color-text-primary)' } },
                       prop.name
                     ),
                     React.createElement(
                       'td',
-                      { className: 'p-3 text-sm text-gray-600' },
+                      { className: 'p-3 text-sm', style: { color: 'var(--color-text-secondary)' } },
                       prop.character || '-'
                     ),
                     React.createElement(
@@ -1034,10 +1034,10 @@ function PropsView({ production, onSave, onUpdateScene }) {
         React.createElement(
           'div',
           null,
-          React.createElement('h3', { className: 'text-lg font-semibold text-gray-800 mb-1' }, '💰 Props Budget'),
+          React.createElement('h3', { className: 'text-lg font-semibold mb-1', style: { color: 'var(--color-text-primary)' } }, '💰 Props Budget'),
           React.createElement(
             'div',
-            { className: 'flex items-center gap-4 text-sm text-gray-600' },
+            { className: 'flex items-center gap-4 text-sm', style: { color: 'var(--color-text-secondary)' } },
             React.createElement(
               'span',
               null,
@@ -1061,7 +1061,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
             { className: 'text-3xl font-bold text-green-700' },
             `$${propsBudget.spent.toFixed(2)}`
           ),
-          React.createElement('div', { className: 'text-xs text-gray-500' },
+          React.createElement('div', { className: 'text-xs', style: { color: 'var(--color-text-muted)' } },
             propsBudget.allocated > 0 ? 'of $' + propsBudget.allocated.toFixed(2) + ' allocated' : 'Total Props Cost'
           )
         )
@@ -1101,7 +1101,8 @@ function PropsView({ production, onSave, onUpdateScene }) {
           'button',
           {
             onClick: deselectAllProps,
-            className: 'px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50'
+            className: 'px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50',
+            style: { backgroundColor: 'var(--color-bg-surface)', color: 'var(--color-text-primary)' }
           },
           'Deselect All'
         ),
@@ -1119,7 +1120,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
     // Search and Filter Bar
     React.createElement(
       'div',
-      { className: 'mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg' },
+      { className: 'mb-4 p-4 border border-gray-200 rounded-lg', style: { backgroundColor: 'var(--color-bg-elevated)' } },
       React.createElement(
         'div',
         { className: 'grid grid-cols-1 md:grid-cols-4 gap-3 mb-3' },
@@ -1132,7 +1133,8 @@ function PropsView({ production, onSave, onUpdateScene }) {
             placeholder: '🔍 Search props by name, description, character, or category...',
             value: searchQuery,
             onChange: (e) => setSearchQuery(e.target.value),
-            className: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent'
+            className: 'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent',
+            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
           })
         ),
         // Status Filter
@@ -1141,7 +1143,8 @@ function PropsView({ production, onSave, onUpdateScene }) {
           {
             value: filterStatus,
             onChange: (e) => setFilterStatus(e.target.value),
-            className: 'px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 bg-white'
+            className: 'px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500',
+            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
           },
           React.createElement('option', { value: '' }, 'All Statuses'),
           uniqueStatuses.map(status =>
@@ -1154,7 +1157,8 @@ function PropsView({ production, onSave, onUpdateScene }) {
           {
             value: filterCategory,
             onChange: (e) => setFilterCategory(e.target.value),
-            className: 'px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 bg-white'
+            className: 'px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500',
+            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
           },
           React.createElement('option', { value: '' }, 'All Categories'),
           uniqueCategories.map(category =>
@@ -1171,7 +1175,8 @@ function PropsView({ production, onSave, onUpdateScene }) {
           {
             value: filterAct,
             onChange: (e) => setFilterAct(e.target.value),
-            className: 'px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 bg-white'
+            className: 'px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500',
+            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
           },
           React.createElement('option', { value: '' }, 'All Acts'),
           uniqueActs.map(act =>
@@ -1209,7 +1214,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
         // Show filter indicator if filters active
         hasActiveFilters && React.createElement(
           'span',
-          { className: 'px-3 py-1.5 text-sm bg-blue-50 text-blue-700 border border-blue-200 rounded' },
+          { className: 'px-3 py-1.5 text-sm border border-blue-200 rounded', style: { backgroundColor: 'var(--color-info-surface)', color: 'var(--color-info)' } },
           'Filters Active'
         )
       ),
@@ -1266,28 +1271,28 @@ function PropsView({ production, onSave, onUpdateScene }) {
     // Filter indicator message
     hasActiveFilters && React.createElement(
       'div',
-      { className: 'mb-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800' },
+      { className: 'mb-3 p-3 border border-blue-200 rounded text-sm', style: { backgroundColor: 'var(--color-info-surface)', color: 'var(--color-info)' } },
       'ℹ️ Export will include only the filtered props currently visible'
     ),
     
     // Props by scene
     allScenes.length === 0 && React.createElement(
       'div',
-      { className: 'bg-gray-50 border border-gray-200 rounded-lg p-8 text-center' },
-      React.createElement('p', { className: 'text-gray-600' }, 'No scenes defined yet. Add scenes in the Scenes tab first.')
+      { className: 'border border-gray-200 rounded-lg p-8 text-center', style: { backgroundColor: 'var(--color-bg-elevated)' } },
+      React.createElement('p', { style: { color: 'var(--color-text-secondary)' } }, 'No scenes defined yet. Add scenes in the Scenes tab first.')
     ),
     
     allScenes.map((scene, idx) =>
       React.createElement(
         'div',
-        { key: idx, className: 'bg-white border border-gray-200 rounded-lg p-4' },
+        { key: idx, className: 'border border-gray-200 rounded-lg p-4', style: { backgroundColor: 'var(--color-bg-surface)' } },
         // Scene header
         React.createElement(
           'div',
           { className: 'flex flex-wrap items-start justify-between gap-2 mb-3' },
           React.createElement(
             'h4',
-            { className: 'font-semibold text-gray-900' },
+            { className: 'font-semibold', style: { color: 'var(--color-text-primary)' } },
             `${scene.act} - Scene ${scene.number || scene.sceneIndex + 1}` +
             (scene.name ? `: ${scene.name}` : '')
           ),
@@ -1296,7 +1301,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
             { className: 'flex items-center gap-2 flex-shrink-0' },
             scene.props?.items && scene.props.items.length > 0 && React.createElement(
               'span',
-              { className: 'text-sm text-gray-600' },
+              { className: 'text-sm', style: { color: 'var(--color-text-secondary)' } },
               `${filterProps(scene.props.items, scene.act).length} prop${filterProps(scene.props.items, scene.act).length !== 1 ? 's' : ''}`
             ),
             scene.props?.items && calculateSceneCost(scene.props.items) > 0 && React.createElement(
@@ -1318,7 +1323,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
         // Props list
         (!scene.props?.items || scene.props.items.length === 0) && React.createElement(
           'p',
-          { className: 'text-gray-500 text-sm italic' },
+          { className: 'text-sm italic', style: { color: 'var(--color-text-muted)' } },
           'No props for this scene yet.'
         ),
 
@@ -1328,7 +1333,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
           filterProps(scene.props.items, scene.act).map(prop =>
             React.createElement(
               'div',
-              { key: prop.id, className: 'flex flex-col gap-2 p-3 bg-gray-50 rounded border border-gray-200' },
+              { key: prop.id, className: 'flex flex-col gap-2 p-3 rounded border border-gray-200', style: { backgroundColor: 'var(--color-bg-elevated)' } },
               // Top row: checkbox, name, cost badge, delete
               React.createElement(
                 'div',
@@ -1344,8 +1349,9 @@ function PropsView({ production, onSave, onUpdateScene }) {
                   type: 'text',
                   value: prop.name || '',
                   onChange: (e) => handleUpdatePropAndSave(scene.actIndex, scene.sceneIndex, prop.id, 'name', e.target.value),
-                  className: 'flex-1 min-w-0 px-2 py-1 border border-gray-300 rounded text-sm font-medium',
-                  placeholder: 'Prop name'
+                  className: 'flex-1 min-w-0 px-2 py-1 border rounded text-sm font-medium',
+                  placeholder: 'Prop name',
+                  style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                 }),
                 prop.cost && !isNaN(parseFloat(prop.cost)) && React.createElement(
                   'span',
@@ -1365,7 +1371,8 @@ function PropsView({ production, onSave, onUpdateScene }) {
                       e.stopPropagation();
                       handleDeleteProp(scene.actIndex, scene.sceneIndex, prop.id);
                     },
-                    className: 'flex-shrink-0 text-gray-400 hover:text-red-600 transition-colors p-0'
+                    className: 'flex-shrink-0 hover:text-red-600 transition-colors p-0',
+                    style: { color: 'var(--color-text-muted)' }
                   },
                   '🗑️'
                 )
@@ -1379,8 +1386,9 @@ function PropsView({ production, onSave, onUpdateScene }) {
                   type: 'text',
                   value: prop.description || '',
                   onChange: (e) => handleUpdatePropAndSave(scene.actIndex, scene.sceneIndex, prop.id, 'description', e.target.value),
-                  className: 'w-full px-2 py-1 border border-gray-300 rounded text-sm',
-                  placeholder: 'Description'
+                  className: 'w-full px-2 py-1 border rounded text-sm',
+                  placeholder: 'Description',
+                  style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                 }),
                 // Category, Character, Status, Cost
                 React.createElement(
@@ -1390,20 +1398,23 @@ function PropsView({ production, onSave, onUpdateScene }) {
                     type: 'text',
                     value: prop.category || '',
                     onChange: (e) => handleUpdatePropAndSave(scene.actIndex, scene.sceneIndex, prop.id, 'category', e.target.value),
-                    className: 'px-2 py-1 border border-gray-300 rounded text-xs',
-                    placeholder: 'Category'
+                    className: 'px-2 py-1 border rounded text-xs',
+                    placeholder: 'Category',
+                    style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                   }),
                   React.createElement('input', {
                     type: 'text',
                     value: prop.character || '',
                     onChange: (e) => handleUpdatePropAndSave(scene.actIndex, scene.sceneIndex, prop.id, 'character', e.target.value),
-                    className: 'px-2 py-1 border border-gray-300 rounded text-xs',
-                    placeholder: 'Character'
+                    className: 'px-2 py-1 border rounded text-xs',
+                    placeholder: 'Character',
+                    style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                   }),
                   React.createElement('select', {
                     value: prop.status || 'To Source',
                     onChange: (e) => handleUpdatePropAndSave(scene.actIndex, scene.sceneIndex, prop.id, 'status', e.target.value),
-                    className: 'px-2 py-1 border border-gray-300 rounded text-xs bg-white'
+                    className: 'px-2 py-1 border rounded text-xs',
+                    style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                   },
                     React.createElement('option', { value: 'To Source' }, 'To Source'),
                     React.createElement('option', { value: 'In Progress' }, 'In Progress'),
@@ -1416,8 +1427,9 @@ function PropsView({ production, onSave, onUpdateScene }) {
                   React.createElement(
                     'div',
                     { className: 'relative' },
-                    React.createElement('span', { 
-                      className: 'absolute left-2 top-2 text-gray-500 text-xs pointer-events-none z-10' 
+                    React.createElement('span', {
+                      className: 'absolute left-2 top-2 text-xs pointer-events-none z-10',
+                      style: { color: 'var(--color-text-muted)' }
                     }, '$'),
                     React.createElement('input', {
                       type: 'text',
@@ -1509,15 +1521,17 @@ function PropsView({ production, onSave, onUpdateScene }) {
                       disabled: false,
                       tabIndex: 0,
                       
-                      style: { 
+                      style: {
                         paddingLeft: '1.5rem',
                         cursor: 'text',
-                        backgroundColor: 'white',
+                        backgroundColor: 'var(--color-bg-elevated)',
+                        color: 'var(--color-text-primary)',
+                        borderColor: 'var(--color-border)',
                         pointerEvents: 'auto', // Ensure pointer events work
                         userSelect: 'text' // Allow text selection
                       },
-                      
-                      className: 'w-full pr-2 py-1.5 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none',
+
+                      className: 'w-full pr-2 py-1.5 border rounded text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none',
                       
                       'aria-label': 'Cost',
                       'data-field': 'cost',
@@ -1533,7 +1547,7 @@ function PropsView({ production, onSave, onUpdateScene }) {
         // No results message when filters are active
         scene.props?.items && scene.props.items.length > 0 && filterProps(scene.props.items, scene.act).length === 0 && React.createElement(
           'div',
-          { className: 'p-4 text-center text-gray-500 bg-gray-50 rounded border border-gray-200' },
+          { className: 'p-4 text-center rounded border border-gray-200', style: { color: 'var(--color-text-muted)', backgroundColor: 'var(--color-bg-elevated)' } },
           'No props match the current filters'
         )
       )

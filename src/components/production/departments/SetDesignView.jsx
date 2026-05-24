@@ -773,7 +773,7 @@ function SetDesignView({ production, onSave }) {
     React.createElement(
       'div',
       { className: 'flex items-center justify-between mb-4' },
-      React.createElement('h3', { className: 'text-lg font-semibold text-gray-900' }, '🎨 Set Design & Scene Shop'),
+      React.createElement('h3', { className: 'text-lg font-semibold', style: { color: 'var(--color-text-primary)' } }, '🎨 Set Design & Scene Shop'),
       React.createElement(
         'div',
         { className: 'flex gap-2' },
@@ -866,9 +866,9 @@ function SetDesignView({ production, onSave }) {
         // Checklist Title
         React.createElement(
           'div',
-          { className: 'p-4 bg-blue-50 border border-blue-200 rounded-lg' },
+          { className: 'p-4 bg-blue-50 border border-blue-200 rounded-lg', style: { backgroundColor: 'var(--color-info-surface)' } },
           React.createElement('h2', { className: 'text-2xl font-bold text-blue-900 mb-1' }, '✓ Set Pieces Checklist'),
-          React.createElement('p', { className: 'text-sm text-blue-700' }, `${production.title || 'Production'} - ${allScenes.length} scenes`)
+          React.createElement('p', { className: 'text-sm', style: { color: 'var(--color-info)' } }, `${production.title || 'Production'} - ${allScenes.length} scenes`)
         ),
         // Checklist Controls
         React.createElement(
@@ -905,13 +905,13 @@ function SetDesignView({ production, onSave }) {
               React.createElement(
                 'tr',
                 { className: 'border-b-2 border-gray-300 bg-gray-100' },
-                React.createElement('th', { className: 'p-3 text-left font-semibold text-gray-700 w-10' }, '#'),
-                React.createElement('th', { className: 'p-3 text-left font-semibold text-gray-700' }, 'Scene'),
-                React.createElement('th', { className: 'p-3 text-left font-semibold text-gray-700' }, 'Piece'),
-                React.createElement('th', { className: 'p-3 text-left font-semibold text-gray-700' }, 'Type'),
-                React.createElement('th', { className: 'p-3 text-center font-semibold text-gray-700 w-20' }, 'Built'),
-                React.createElement('th', { className: 'p-3 text-center font-semibold text-gray-700 w-20' }, 'Installed'),
-                React.createElement('th', { className: 'p-3 text-center font-semibold text-gray-700 w-20' }, 'Ready')
+                React.createElement('th', { className: 'p-3 text-left font-semibold w-10', style: { color: 'var(--color-text-secondary)' } }, '#'),
+                React.createElement('th', { className: 'p-3 text-left font-semibold', style: { color: 'var(--color-text-secondary)' } }, 'Scene'),
+                React.createElement('th', { className: 'p-3 text-left font-semibold', style: { color: 'var(--color-text-secondary)' } }, 'Piece'),
+                React.createElement('th', { className: 'p-3 text-left font-semibold', style: { color: 'var(--color-text-secondary)' } }, 'Type'),
+                React.createElement('th', { className: 'p-3 text-center font-semibold w-20', style: { color: 'var(--color-text-secondary)' } }, 'Built'),
+                React.createElement('th', { className: 'p-3 text-center font-semibold w-20', style: { color: 'var(--color-text-secondary)' } }, 'Installed'),
+                React.createElement('th', { className: 'p-3 text-center font-semibold w-20', style: { color: 'var(--color-text-secondary)' } }, 'Ready')
               )
             ),
             // Table Body
@@ -929,22 +929,22 @@ function SetDesignView({ production, onSave }) {
                     },
                     React.createElement(
                       'td',
-                      { className: 'p-3 text-sm text-gray-600' },
+                      { className: 'p-3 text-sm', style: { color: 'var(--color-text-secondary)' } },
                       pieceIdx + 1
                     ),
                     React.createElement(
                       'td',
-                      { className: 'p-3 text-sm font-semibold text-gray-800 whitespace-nowrap' },
+                      { className: 'p-3 text-sm font-semibold whitespace-nowrap', style: { color: 'var(--color-text-primary)' } },
                       `${scene.act}, Scene ${scene.number}`
                     ),
                     React.createElement(
                       'td',
-                      { className: 'p-3 text-sm text-gray-800 font-medium' },
+                      { className: 'p-3 text-sm font-medium', style: { color: 'var(--color-text-primary)' } },
                       piece.name
                     ),
                     React.createElement(
                       'td',
-                      { className: 'p-3 text-sm text-gray-600' },
+                      { className: 'p-3 text-sm', style: { color: 'var(--color-text-secondary)' } },
                       piece.type || '-'
                     ),
                     React.createElement(
@@ -1000,10 +1000,10 @@ function SetDesignView({ production, onSave }) {
             React.createElement(
               'div',
               null,
-              React.createElement('h3', { className: 'text-lg font-semibold text-gray-800 mb-1' }, '💰 Set Budget & Labor'),
+              React.createElement('h3', { className: 'text-lg font-semibold mb-1', style: { color: 'var(--color-text-primary)' } }, '💰 Set Budget & Labor'),
               React.createElement(
                 'div',
-                { className: 'flex items-center gap-4 text-sm text-gray-600' },
+                { className: 'flex items-center gap-4 text-sm', style: { color: 'var(--color-text-secondary)' } },
                 React.createElement(
                   'span',
                   null,
@@ -1025,7 +1025,7 @@ function SetDesignView({ production, onSave }) {
               ),
               React.createElement(
                 'div',
-                { className: 'mt-2 flex items-center gap-4 text-xs text-gray-500' },
+                { className: 'mt-2 flex items-center gap-4 text-xs', style: { color: 'var(--color-text-muted)' } },
                 React.createElement('span', null,
                   'Built: $', budgetTotals.setPiecesCost.toFixed(2)
                 ),
@@ -1040,7 +1040,7 @@ function SetDesignView({ production, onSave }) {
               React.createElement('div', { className: 'text-3xl font-bold text-blue-700' },
                 '$' + setDesignBudget.spent.toFixed(2)
               ),
-              React.createElement('div', { className: 'text-xs text-gray-500' },
+              React.createElement('div', { className: 'text-xs', style: { color: 'var(--color-text-muted)' } },
                 setDesignBudget.allocated > 0 ? 'of $' + setDesignBudget.allocated.toFixed(2) + ' allocated' : 'Total Set Cost'
               )
             )
@@ -1147,12 +1147,12 @@ function SetDesignView({ production, onSave }) {
             // In Shop
             React.createElement(
               'div',
-              { className: 'bg-white p-3 rounded-lg border border-gray-200' },
-              React.createElement('h4', { className: 'font-semibold text-gray-800 mb-2' }, 'In Shop'),
+              { className: 'p-3 rounded-lg border border-gray-200', style: { backgroundColor: 'var(--color-bg-surface)' } },
+              React.createElement('h4', { className: 'font-semibold mb-2', style: { color: 'var(--color-text-primary)' } }, 'In Shop'),
               React.createElement('div', { className: 'text-3xl font-bold text-blue-600 mb-2' },
                 getPiecesByStatus('In Shop').length
               ),
-              React.createElement('div', { className: 'text-xs text-gray-600' },
+              React.createElement('div', { className: 'text-xs', style: { color: 'var(--color-text-secondary)' } },
                 `${getPiecesByStatus('Framed').length} framed, ${getPiecesByStatus('Assembled').length} assembled`
               )
             ),
@@ -1160,12 +1160,12 @@ function SetDesignView({ production, onSave }) {
             // Being Painted
             React.createElement(
               'div',
-              { className: 'bg-white p-3 rounded-lg border border-gray-200' },
-              React.createElement('h4', { className: 'font-semibold text-gray-800 mb-2' }, 'Paint Shop'),
+              { className: 'p-3 rounded-lg border border-gray-200', style: { backgroundColor: 'var(--color-bg-surface)' } },
+              React.createElement('h4', { className: 'font-semibold mb-2', style: { color: 'var(--color-text-primary)' } }, 'Paint Shop'),
               React.createElement('div', { className: 'text-3xl font-bold text-purple-600 mb-2' },
                 getPiecesByStatus('Primed').length + getPiecesByStatus('Painted').length
               ),
-              React.createElement('div', { className: 'text-xs text-gray-600' },
+              React.createElement('div', { className: 'text-xs', style: { color: 'var(--color-text-secondary)' } },
                 `${getPiecesByStatus('Primed').length} primed, ${getPiecesByStatus('Painted').length} painted`
               )
             ),
@@ -1173,12 +1173,12 @@ function SetDesignView({ production, onSave }) {
             // Ready/Installed
             React.createElement(
               'div',
-              { className: 'bg-white p-3 rounded-lg border border-gray-200' },
-              React.createElement('h4', { className: 'font-semibold text-gray-800 mb-2' }, 'Complete'),
+              { className: 'p-3 rounded-lg border border-gray-200', style: { backgroundColor: 'var(--color-bg-surface)' } },
+              React.createElement('h4', { className: 'font-semibold mb-2', style: { color: 'var(--color-text-primary)' } }, 'Complete'),
               React.createElement('div', { className: 'text-3xl font-bold text-green-600 mb-2' },
                 getPiecesByStatus('Finished').length + getPiecesByStatus('Installed').length
               ),
-              React.createElement('div', { className: 'text-xs text-gray-600' },
+              React.createElement('div', { className: 'text-xs', style: { color: 'var(--color-text-secondary)' } },
                 `${getPiecesByStatus('Installed').length} on stage`
               )
             )
@@ -1186,16 +1186,16 @@ function SetDesignView({ production, onSave }) {
 
           // Carpenter Assignments
           React.createElement('div', { className: 'mt-4' },
-            React.createElement('h4', { className: 'font-semibold text-gray-800 mb-2' }, 'Carpenter Assignments'),
+            React.createElement('h4', { className: 'font-semibold mb-2', style: { color: 'var(--color-text-primary)' } }, 'Carpenter Assignments'),
             React.createElement(
               'div',
               { className: 'space-y-2' },
               Object.entries(getPiecesByAssignment()).map(([carpenter, pieces]) =>
                 React.createElement(
                   'div',
-                  { key: carpenter, className: 'flex items-center justify-between bg-white p-2 rounded border border-gray-200' },
-                  React.createElement('span', { className: 'font-medium text-sm' }, carpenter),
-                  React.createElement('span', { className: 'text-sm text-gray-600' },
+                  { key: carpenter, className: 'flex items-center justify-between p-2 rounded border border-gray-200', style: { backgroundColor: 'var(--color-bg-surface)' } },
+                  React.createElement('span', { className: 'font-medium text-sm', style: { color: 'var(--color-text-primary)' } }, carpenter),
+                  React.createElement('span', { className: 'text-sm', style: { color: 'var(--color-text-secondary)' } },
                     `${pieces.length} pieces (${pieces.reduce((sum, p) => sum + (parseFloat(p.laborHours) || 0), 0).toFixed(1)} hrs)`
                   )
                 )
@@ -1220,7 +1220,8 @@ function SetDesignView({ production, onSave }) {
               'button',
               {
                 onClick: () => setSelectedPieces([]),
-                className: 'px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50'
+                className: 'px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50',
+                style: { backgroundColor: 'var(--color-bg-surface)', color: 'var(--color-text-primary)' }
               },
               'Deselect All'
             ),
@@ -1238,7 +1239,7 @@ function SetDesignView({ production, onSave }) {
         // Search & Filter Bar
         React.createElement(
           'div',
-          { className: 'mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg' },
+          { className: 'mb-4 p-4 border border-gray-200 rounded-lg', style: { backgroundColor: 'var(--color-bg-elevated)' } },
           React.createElement(
             'div',
             { className: 'grid grid-cols-1 md:grid-cols-4 gap-3 mb-3' },
@@ -1250,7 +1251,8 @@ function SetDesignView({ production, onSave }) {
                 placeholder: '🔍 Search set pieces by name, type, or materials...',
                 value: searchQuery,
                 onChange: (e) => setSearchQuery(e.target.value),
-                className: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                className: 'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+                style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
               })
             ),
             React.createElement(
@@ -1258,7 +1260,8 @@ function SetDesignView({ production, onSave }) {
               {
                 value: filterStatus,
                 onChange: (e) => setFilterStatus(e.target.value),
-                className: 'px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white'
+                className: 'px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500',
+                style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
               },
               React.createElement('option', { value: '' }, 'All Build Statuses'),
               uniqueStatuses.map(status =>
@@ -1270,7 +1273,8 @@ function SetDesignView({ production, onSave }) {
               {
                 value: filterType,
                 onChange: (e) => setFilterType(e.target.value),
-                className: 'px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white'
+                className: 'px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500',
+                style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
               },
               React.createElement('option', { value: '' }, 'All Types'),
               uniqueTypes.map(type =>
@@ -1286,7 +1290,8 @@ function SetDesignView({ production, onSave }) {
               {
                 value: filterAct,
                 onChange: (e) => setFilterAct(e.target.value),
-                className: 'px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white'
+                className: 'px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500',
+                style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
               },
               React.createElement('option', { value: '' }, 'All Acts'),
               uniqueActs.map(act =>
@@ -1332,7 +1337,7 @@ function SetDesignView({ production, onSave }) {
               React.createElement(
                 'div',
                 { className: 'p-4 bg-green-50 border border-green-200 rounded-lg' },
-                React.createElement('div', { className: 'text-sm text-gray-600 mb-1' }, 'Total Rental Cost'),
+                React.createElement('div', { className: 'text-sm mb-1', style: { color: 'var(--color-text-secondary)' } }, 'Total Rental Cost'),
                 React.createElement('div', { className: 'text-3xl font-bold text-green-700' },
                   '$' + calculateRentalCosts().totalRentalCost.toFixed(2)
                 )
@@ -1340,7 +1345,7 @@ function SetDesignView({ production, onSave }) {
               React.createElement(
                 'div',
                 { className: 'p-4 bg-yellow-50 border border-yellow-200 rounded-lg' },
-                React.createElement('div', { className: 'text-sm text-gray-600 mb-1' }, 'Total Deposits Held'),
+                React.createElement('div', { className: 'text-sm mb-1', style: { color: 'var(--color-text-secondary)' } }, 'Total Deposits Held'),
                 React.createElement('div', { className: 'text-3xl font-bold text-yellow-700' },
                   '$' + calculateRentalCosts().totalDeposits.toFixed(2)
                 )
@@ -1348,7 +1353,7 @@ function SetDesignView({ production, onSave }) {
               React.createElement(
                 'div',
                 { className: 'p-4 bg-blue-50 border border-blue-200 rounded-lg' },
-                React.createElement('div', { className: 'text-sm text-gray-600 mb-1' }, 'Active Rentals'),
+                React.createElement('div', { className: 'text-sm mb-1', style: { color: 'var(--color-text-secondary)' } }, 'Active Rentals'),
                 React.createElement('div', { className: 'text-3xl font-bold text-blue-700' },
                   rentals.filter(r => r.status === 'Checked Out' || r.status === 'In Use').length
                 )
@@ -1408,7 +1413,7 @@ function SetDesignView({ production, onSave }) {
             React.createElement(
               'div',
               { className: 'space-y-4' },
-              rentals.length === 0 ? React.createElement('p', { className: 'text-gray-500 text-center py-8' },
+              rentals.length === 0 ? React.createElement('p', { className: 'text-center py-8', style: { color: 'var(--color-text-muted)' } },
                 'No rentals tracked. Click + Add Rental to start.'
               ) : rentals.map(rental => {
                 const isOverdue = rental.returnDate && new Date(rental.returnDate) < new Date() && rental.status !== 'Returned';
@@ -1418,8 +1423,9 @@ function SetDesignView({ production, onSave }) {
                   {
                     key: rental.id,
                     className: `p-4 border rounded-lg ${
-                      isOverdue ? 'bg-red-50 border-red-300' : 'bg-white border-gray-200'
-                    }`
+                      isOverdue ? 'bg-red-50 border-red-300' : 'border-gray-200'
+                    }`,
+                    style: isOverdue ? {} : { backgroundColor: 'var(--color-bg-surface)' }
                   },
 
                   // Header row
@@ -1461,7 +1467,8 @@ function SetDesignView({ production, onSave }) {
                     placeholder: 'Item description',
                     value: rental.description || '',
                     onChange: (e) => handleUpdateRental(rental.id, 'description', e.target.value),
-                    className: 'w-full mb-3 px-2 py-1 border border-gray-300 rounded text-sm',
+                    className: 'w-full mb-3 px-2 py-1 border rounded text-sm',
+                    style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' },
                     rows: 2
                   }),
 
@@ -1474,7 +1481,8 @@ function SetDesignView({ production, onSave }) {
                     React.createElement('select', {
                       value: rental.itemType || 'Furniture',
                       onChange: (e) => handleUpdateRental(rental.id, 'itemType', e.target.value),
-                      className: 'px-2 py-2 border border-gray-300 rounded text-sm'
+                      className: 'px-2 py-2 border rounded text-sm',
+                      style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                     },
                       rentalItemTypes.map(type =>
                         React.createElement('option', { key: type, value: type }, type)
@@ -1487,7 +1495,8 @@ function SetDesignView({ production, onSave }) {
                       placeholder: 'Rental company',
                       value: rental.rentalCompany || '',
                       onChange: (e) => handleUpdateRental(rental.id, 'rentalCompany', e.target.value),
-                      className: 'px-2 py-2 border border-gray-300 rounded text-sm'
+                      className: 'px-2 py-2 border rounded text-sm',
+                      style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                     }),
 
                     // Contact Person
@@ -1496,7 +1505,8 @@ function SetDesignView({ production, onSave }) {
                       placeholder: 'Contact person',
                       value: rental.contactPerson || '',
                       onChange: (e) => handleUpdateRental(rental.id, 'contactPerson', e.target.value),
-                      className: 'px-2 py-2 border border-gray-300 rounded text-sm'
+                      className: 'px-2 py-2 border rounded text-sm',
+                      style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                     }),
 
                     // Phone
@@ -1505,7 +1515,8 @@ function SetDesignView({ production, onSave }) {
                       placeholder: 'Phone',
                       value: rental.phone || '',
                       onChange: (e) => handleUpdateRental(rental.id, 'phone', e.target.value),
-                      className: 'px-2 py-2 border border-gray-300 rounded text-sm'
+                      className: 'px-2 py-2 border rounded text-sm',
+                      style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                     })
                   ),
 
@@ -1518,12 +1529,13 @@ function SetDesignView({ production, onSave }) {
                     React.createElement(
                       'div',
                       null,
-                      React.createElement('label', { className: 'block text-xs text-gray-600 mb-1' }, 'Checkout Date'),
+                      React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-secondary)' } }, 'Checkout Date'),
                       React.createElement('input', {
                         type: 'date',
                         value: rental.checkoutDate || '',
                         onChange: (e) => handleUpdateRental(rental.id, 'checkoutDate', e.target.value),
-                        className: 'w-full px-2 py-1 border border-gray-300 rounded text-sm'
+                        className: 'w-full px-2 py-1 border rounded text-sm',
+                        style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                       })
                     ),
 
@@ -1531,7 +1543,7 @@ function SetDesignView({ production, onSave }) {
                     React.createElement(
                       'div',
                       null,
-                      React.createElement('label', { className: 'block text-xs text-gray-600 mb-1' }, 'Return Date'),
+                      React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-secondary)' } }, 'Return Date'),
                       React.createElement('input', {
                         type: 'date',
                         value: rental.returnDate || '',
@@ -1546,11 +1558,11 @@ function SetDesignView({ production, onSave }) {
                     React.createElement(
                       'div',
                       null,
-                      React.createElement('label', { className: 'block text-xs text-gray-600 mb-1' }, 'Rental Rate'),
+                      React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-secondary)' } }, 'Rental Rate'),
                       React.createElement(
                         'div',
                         { className: 'relative' },
-                        React.createElement('span', { className: 'absolute left-2 top-2 text-gray-500 text-xs' }, '$'),
+                        React.createElement('span', { className: 'absolute left-2 top-2 text-xs', style: { color: 'var(--color-text-muted)' } }, '$'),
                         React.createElement('input', {
                           type: 'text',
                           inputMode: 'decimal',
@@ -1560,7 +1572,8 @@ function SetDesignView({ production, onSave }) {
                             let cleanValue = e.target.value.replace(/[^\d.]/g, '');
                             handleUpdateRental(rental.id, 'rentalRate', cleanValue);
                           },
-                          className: 'w-full pl-5 pr-2 py-1 border border-gray-300 rounded text-sm'
+                          className: 'w-full pl-5 pr-2 py-1 border rounded text-sm',
+                          style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                         })
                       )
                     ),
@@ -1569,11 +1582,12 @@ function SetDesignView({ production, onSave }) {
                     React.createElement(
                       'div',
                       null,
-                      React.createElement('label', { className: 'block text-xs text-gray-600 mb-1' }, 'Rate Type'),
+                      React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-secondary)' } }, 'Rate Type'),
                       React.createElement('select', {
                         value: rental.rateType || 'daily',
                         onChange: (e) => handleUpdateRental(rental.id, 'rateType', e.target.value),
-                        className: 'w-full px-2 py-1 border border-gray-300 rounded text-sm'
+                        className: 'w-full px-2 py-1 border rounded text-sm',
+                        style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                       },
                         rateTypes.map(type =>
                           React.createElement('option', { key: type, value: type }, type)
@@ -1585,11 +1599,11 @@ function SetDesignView({ production, onSave }) {
                     React.createElement(
                       'div',
                       null,
-                      React.createElement('label', { className: 'block text-xs text-gray-600 mb-1' }, 'Deposit'),
+                      React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-secondary)' } }, 'Deposit'),
                       React.createElement(
                         'div',
                         { className: 'relative' },
-                        React.createElement('span', { className: 'absolute left-2 top-2 text-gray-500 text-xs' }, '$'),
+                        React.createElement('span', { className: 'absolute left-2 top-2 text-xs', style: { color: 'var(--color-text-muted)' } }, '$'),
                         React.createElement('input', {
                           type: 'text',
                           inputMode: 'decimal',
@@ -1599,7 +1613,8 @@ function SetDesignView({ production, onSave }) {
                             let cleanValue = e.target.value.replace(/[^\d.]/g, '');
                             handleUpdateRental(rental.id, 'damageDeposit', cleanValue);
                           },
-                          className: 'w-full pl-5 pr-2 py-1 border border-gray-300 rounded text-sm'
+                          className: 'w-full pl-5 pr-2 py-1 border rounded text-sm',
+                          style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                         })
                       )
                     ),
@@ -1608,11 +1623,11 @@ function SetDesignView({ production, onSave }) {
                     React.createElement(
                       'div',
                       null,
-                      React.createElement('label', { className: 'block text-xs text-gray-600 mb-1' }, 'Total Cost'),
+                      React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-secondary)' } }, 'Total Cost'),
                       React.createElement(
                         'div',
                         { className: 'relative' },
-                        React.createElement('span', { className: 'absolute left-2 top-2 text-gray-500 text-xs' }, '$'),
+                        React.createElement('span', { className: 'absolute left-2 top-2 text-xs', style: { color: 'var(--color-text-muted)' } }, '$'),
                         React.createElement('input', {
                           type: 'text',
                           inputMode: 'decimal',
@@ -1622,7 +1637,8 @@ function SetDesignView({ production, onSave }) {
                             let cleanValue = e.target.value.replace(/[^\d.]/g, '');
                             handleUpdateRental(rental.id, 'totalCost', cleanValue);
                           },
-                          className: 'w-full pl-5 pr-2 py-1 border border-gray-300 rounded text-sm'
+                          className: 'w-full pl-5 pr-2 py-1 border rounded text-sm',
+                          style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                         })
                       )
                     )
@@ -1633,7 +1649,8 @@ function SetDesignView({ production, onSave }) {
                     placeholder: 'Notes (contract details, special instructions, etc.)',
                     value: rental.notes || '',
                     onChange: (e) => handleUpdateRental(rental.id, 'notes', e.target.value),
-                    className: 'w-full px-2 py-1 border border-gray-300 rounded text-sm',
+                    className: 'w-full px-2 py-1 border rounded text-sm',
+                    style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' },
                     rows: 2
                   }),
 
@@ -1666,13 +1683,14 @@ function SetDesignView({ production, onSave }) {
                 // Quick Add Tool
                 React.createElement(
                   'div',
-                  { className: 'mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg' },
-                  React.createElement('label', { className: 'block text-sm font-semibold text-gray-700 mb-3' }, '⚡ Quick Add Tool'),
+                  { className: 'mb-4 p-4 border border-gray-200 rounded-lg', style: { backgroundColor: 'var(--color-bg-elevated)' } },
+                  React.createElement('label', { className: 'block text-sm font-semibold mb-3', style: { color: 'var(--color-text-secondary)' } }, '⚡ Quick Add Tool'),
                   // Full-width dropdown
                   React.createElement(
                     'select',
                     {
-                      className: 'w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white mb-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                      className: 'w-full px-3 py-2.5 border rounded-lg text-sm mb-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                      style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' },
                       defaultValue: '',
                       onChange: (e) => {
                         if (!e.target.value) return;
@@ -1710,7 +1728,7 @@ function SetDesignView({ production, onSave }) {
                     'div',
                     { className: 'flex items-center gap-2 mb-3' },
                     React.createElement('div', { className: 'flex-1 border-t border-gray-200' }),
-                    React.createElement('span', { className: 'text-xs text-gray-400 font-medium' }, 'OR'),
+                    React.createElement('span', { className: 'text-xs font-medium', style: { color: 'var(--color-text-muted)' } }, 'OR'),
                     React.createElement('div', { className: 'flex-1 border-t border-gray-200' })
                   ),
                   // Custom tool button — full width, own row
@@ -1741,7 +1759,7 @@ function SetDesignView({ production, onSave }) {
                   ),
                   React.createElement(
                     'p',
-                    { className: 'text-xs text-gray-400 mt-2 text-center' },
+                    { className: 'text-xs mt-2 text-center', style: { color: 'var(--color-text-muted)' } },
                     'Select from ' + THEATRE_SHOP_TOOLS.length + ' common theatre tools, or add your own'
                   )
                 ),
@@ -1749,25 +1767,25 @@ function SetDesignView({ production, onSave }) {
                 // Tools Stats
                 React.createElement(
                   'div',
-                  { className: 'mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg' },
+                  { className: 'mb-4 p-3 border border-blue-200 rounded-lg', style: { backgroundColor: 'var(--color-info-surface)' } },
                   React.createElement('div', { className: 'grid grid-cols-3 gap-2 text-center text-sm' },
                     React.createElement('div', null,
                       React.createElement('div', { className: 'text-2xl font-bold text-green-600' },
                         toolsInventory.filter(t => t.status === 'Working').length
                       ),
-                      React.createElement('div', { className: 'text-xs text-gray-600' }, 'Working')
+                      React.createElement('div', { className: 'text-xs', style: { color: 'var(--color-text-secondary)' } }, 'Working')
                     ),
                     React.createElement('div', null,
                       React.createElement('div', { className: 'text-2xl font-bold text-yellow-600' },
                         toolsInventory.filter(t => t.status === 'Needs Repair' || t.status === 'Out for Repair').length
                       ),
-                      React.createElement('div', { className: 'text-xs text-gray-600' }, 'Needs Service')
+                      React.createElement('div', { className: 'text-xs', style: { color: 'var(--color-text-secondary)' } }, 'Needs Service')
                     ),
                     React.createElement('div', null,
-                      React.createElement('div', { className: 'text-2xl font-bold text-gray-600' },
+                      React.createElement('div', { className: 'text-2xl font-bold', style: { color: 'var(--color-text-secondary)' } },
                         toolsInventory.filter(t => t.checkedOutTo).length
                       ),
-                      React.createElement('div', { className: 'text-xs text-gray-600' }, 'Checked Out')
+                      React.createElement('div', { className: 'text-xs', style: { color: 'var(--color-text-secondary)' } }, 'Checked Out')
                     )
                   )
                 ),
@@ -1776,7 +1794,7 @@ function SetDesignView({ production, onSave }) {
                 toolsInventory.length > 0 && React.createElement(
                   'div',
                   { className: 'flex items-center justify-between mb-2' },
-                  React.createElement('span', { className: 'text-sm font-semibold text-gray-700' },
+                  React.createElement('span', { className: 'text-sm font-semibold', style: { color: 'var(--color-text-secondary)' } },
                     'Inventory (' + toolsInventory.length + ' ' + (toolsInventory.length === 1 ? 'tool' : 'tools') + ')'
                   ),
                   React.createElement(
@@ -1785,7 +1803,7 @@ function SetDesignView({ production, onSave }) {
                     Object.entries(
                       toolsInventory.reduce((acc, t) => { acc[t.category] = (acc[t.category] || 0) + 1; return acc; }, {})
                     ).map(([cat, count]) =>
-                      React.createElement('span', { key: cat, className: 'px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full' },
+                      React.createElement('span', { key: cat, className: 'px-2 py-0.5 text-xs rounded-full', style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-secondary)' } },
                         cat + ': ' + count
                       )
                     )
@@ -1796,14 +1814,14 @@ function SetDesignView({ production, onSave }) {
                   { className: 'space-y-2 max-h-96 overflow-y-auto' },
                   toolsInventory.length === 0 ? React.createElement(
                     'div',
-                    { className: 'text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300' },
+                    { className: 'text-center py-8 rounded-lg border border-dashed border-gray-300', style: { backgroundColor: 'var(--color-bg-elevated)' } },
                     React.createElement('div', { className: 'text-4xl mb-2' }, '🛠️'),
-                    React.createElement('p', { className: 'text-gray-500 text-sm font-medium' }, 'No tools in inventory'),
-                    React.createElement('p', { className: 'text-gray-400 text-xs mt-1' }, 'Use the dropdown above to add tools')
+                    React.createElement('p', { className: 'text-sm font-medium', style: { color: 'var(--color-text-muted)' } }, 'No tools in inventory'),
+                    React.createElement('p', { className: 'text-xs mt-1', style: { color: 'var(--color-text-muted)' } }, 'Use the dropdown above to add tools')
                   ) : toolsInventory.map(tool =>
                     React.createElement(
                       'div',
-                      { key: tool.id, className: 'p-3 border border-gray-200 rounded-lg bg-white hover:shadow-sm transition-shadow' },
+                      { key: tool.id, className: 'p-3 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow', style: { backgroundColor: 'var(--color-bg-surface)' } },
                       React.createElement(
                         'div',
                         { className: 'flex items-start justify-between mb-2' },
@@ -1812,7 +1830,8 @@ function SetDesignView({ production, onSave }) {
                           placeholder: 'Tool name',
                           value: tool.name || '',
                           onChange: (e) => handleUpdateTool(tool.id, 'name', e.target.value),
-                          className: 'flex-1 font-semibold px-2 py-1 border-b border-gray-200 focus:border-blue-500 focus:outline-none'
+                          className: 'flex-1 font-semibold px-2 py-1 border-b border-gray-200 focus:border-blue-500 focus:outline-none',
+                          style: { backgroundColor: 'transparent', color: 'var(--color-text-primary)' }
                         }),
                         React.createElement('button', {
                           onClick: () => handleDeleteTool(tool.id),
@@ -1826,7 +1845,8 @@ function SetDesignView({ production, onSave }) {
                         React.createElement('select', {
                           value: tool.category || 'Power Tool',
                           onChange: (e) => handleUpdateTool(tool.id, 'category', e.target.value),
-                          className: 'px-2 py-1 border border-gray-300 rounded text-xs bg-white'
+                          className: 'px-2 py-1 border rounded text-xs',
+                          style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                         },
                           toolCategories.map(cat =>
                             React.createElement('option', { key: cat, value: cat }, cat)
@@ -1850,22 +1870,25 @@ function SetDesignView({ production, onSave }) {
                           placeholder: 'Location',
                           value: tool.location || '',
                           onChange: (e) => handleUpdateTool(tool.id, 'location', e.target.value),
-                          className: 'px-2 py-1 border border-gray-300 rounded text-xs'
+                          className: 'px-2 py-1 border rounded text-xs',
+                          style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                         }),
                         React.createElement('input', {
                           type: 'text',
                           placeholder: 'Checked out to',
                           value: tool.checkedOutTo || '',
                           onChange: (e) => handleUpdateTool(tool.id, 'checkedOutTo', e.target.value),
-                          className: 'px-2 py-1 border border-gray-300 rounded text-xs'
+                          className: 'px-2 py-1 border rounded text-xs',
+                          style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                         })
                       ),
-                      
+
                       React.createElement('textarea', {
                         placeholder: 'Notes / maintenance log',
                         value: tool.notes || '',
                         onChange: (e) => handleUpdateTool(tool.id, 'notes', e.target.value),
-                        className: 'w-full mt-2 px-2 py-1 border border-gray-300 rounded text-xs',
+                        className: 'w-full mt-2 px-2 py-1 border rounded text-xs',
+                        style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' },
                         rows: 2
                       })
                     )
@@ -1911,7 +1934,7 @@ function SetDesignView({ production, onSave }) {
                 React.createElement(
                   'div',
                   { className: 'space-y-2 max-h-96 overflow-y-auto' },
-                  consumables.length === 0 ? React.createElement('p', { className: 'text-gray-500 text-sm text-center py-4' },
+                  consumables.length === 0 ? React.createElement('p', { className: 'text-sm text-center py-4', style: { color: 'var(--color-text-muted)' } },
                     'No consumables tracked. Click + Add Item to start.'
                   ) : consumables.map(item => {
                     const isLowStock = item.quantity && item.reorderLevel && 
@@ -1921,9 +1944,10 @@ function SetDesignView({ production, onSave }) {
                       'div',
                       { 
                         key: item.id,
-                        className: `p-3 border rounded-lg bg-white ${
+                        className: `p-3 border rounded-lg ${
                           isLowStock ? 'border-orange-300 bg-orange-50' : 'border-gray-200'
-                        }`
+                        }`,
+                        style: isLowStock ? {} : { backgroundColor: 'var(--color-bg-surface)' }
                       },
                       React.createElement(
                         'div',
@@ -1947,7 +1971,8 @@ function SetDesignView({ production, onSave }) {
                         React.createElement('select', {
                           value: item.category || 'Hardware',
                           onChange: (e) => handleUpdateConsumable(item.id, 'category', e.target.value),
-                          className: 'px-2 py-1 border border-gray-300 rounded text-xs bg-white'
+                          className: 'px-2 py-1 border rounded text-xs',
+                          style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                         },
                           consumableCategories.map(cat =>
                             React.createElement('option', { key: cat, value: cat }, cat)
@@ -1959,12 +1984,14 @@ function SetDesignView({ production, onSave }) {
                           placeholder: 'Qty',
                           value: item.quantity || '',
                           onChange: (e) => handleUpdateConsumable(item.id, 'quantity', e.target.value),
-                          className: 'px-2 py-1 border border-gray-300 rounded text-xs'
+                          className: 'px-2 py-1 border rounded text-xs',
+                          style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                         }),
                         React.createElement('select', {
                           value: item.unit || 'ea',
                           onChange: (e) => handleUpdateConsumable(item.id, 'unit', e.target.value),
-                          className: 'px-2 py-1 border border-gray-300 rounded text-xs bg-white'
+                          className: 'px-2 py-1 border rounded text-xs',
+                          style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                         },
                           units.map(unit =>
                             React.createElement('option', { key: unit, value: unit }, unit)
@@ -1976,19 +2003,21 @@ function SetDesignView({ production, onSave }) {
                           placeholder: 'Reorder at',
                           value: item.reorderLevel || '',
                           onChange: (e) => handleUpdateConsumable(item.id, 'reorderLevel', e.target.value),
-                          className: 'px-2 py-1 border border-gray-300 rounded text-xs'
+                          className: 'px-2 py-1 border rounded text-xs',
+                          style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                         }),
                         React.createElement('input', {
                           type: 'text',
                           placeholder: 'Location',
                           value: item.location || '',
                           onChange: (e) => handleUpdateConsumable(item.id, 'location', e.target.value),
-                          className: 'px-2 py-1 border border-gray-300 rounded text-xs'
+                          className: 'px-2 py-1 border rounded text-xs',
+                          style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                         }),
                         React.createElement(
                           'div',
                           { className: 'relative' },
-                          React.createElement('span', { className: 'absolute left-2 top-1.5 text-gray-500 text-xs pointer-events-none' }, '$'),
+                          React.createElement('span', { className: 'absolute left-2 top-1.5 text-xs pointer-events-none', style: { color: 'var(--color-text-muted)' } }, '$'),
                           React.createElement('input', {
                             type: 'text',
                             inputMode: 'decimal',
@@ -1998,7 +2027,8 @@ function SetDesignView({ production, onSave }) {
                               let cleanValue = e.target.value.replace(/[^\d.]/g, '');
                               handleUpdateConsumable(item.id, 'cost', cleanValue);
                             },
-                            className: 'w-full pl-5 pr-2 py-1 border border-gray-300 rounded text-xs'
+                            className: 'w-full pl-5 pr-2 py-1 border rounded text-xs',
+                            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                           })
                         )
                       ),
@@ -2022,7 +2052,7 @@ function SetDesignView({ production, onSave }) {
             React.createElement(
               'div',
               { className: 'mb-4 flex gap-2' },
-              React.createElement('span', { className: 'text-sm text-gray-600 flex items-center' }, 'Sort by due date')
+              React.createElement('span', { className: 'text-sm flex items-center', style: { color: 'var(--color-text-secondary)' } }, 'Sort by due date')
             ),
 
             // Timeline view
@@ -2036,7 +2066,8 @@ function SetDesignView({ production, onSave }) {
                   'div',
                   {
                     key: piece.id,
-                    className: `p-4 border rounded-lg ${isOverdue ? 'bg-red-50 border-red-300' : 'bg-white border-gray-200'}`
+                    className: `p-4 border rounded-lg ${isOverdue ? 'bg-red-50 border-red-300' : 'border-gray-200'}`,
+                    style: isOverdue ? {} : { backgroundColor: 'var(--color-bg-surface)' }
                   },
                   React.createElement(
                     'div',
@@ -2045,7 +2076,7 @@ function SetDesignView({ production, onSave }) {
                       'div',
                       { className: 'flex-1' },
                       React.createElement('h4', { className: 'font-semibold text-lg' }, piece.name || 'Unnamed Piece'),
-                      React.createElement('div', { className: 'text-sm text-gray-600 mt-1' },
+                      React.createElement('div', { className: 'text-sm mt-1', style: { color: 'var(--color-text-secondary)' } },
                         `${piece.actName} - Scene ${piece.sceneNumber}${piece.sceneLabel ? ': ' + piece.sceneLabel : ''}`
                       ),
                       React.createElement(
@@ -2066,7 +2097,7 @@ function SetDesignView({ production, onSave }) {
                           }, piece.priority || 'Normal')
                         )
                       ),
-                      piece.assignedTo && React.createElement('div', { className: 'text-sm text-gray-600 mt-1' },
+                      piece.assignedTo && React.createElement('div', { className: 'text-sm mt-1', style: { color: 'var(--color-text-secondary)' } },
                         React.createElement('strong', null, 'Assigned to:'),
                         ' ', piece.assignedTo,
                         piece.laborHours ? ` (${piece.laborHours} hrs)` : ''
@@ -2081,8 +2112,8 @@ function SetDesignView({ production, onSave }) {
                         isOverdue && '⚠️ ',
                         'Due: ',
                         new Date(piece.dueDate).toLocaleDateString()
-                      ) : React.createElement('div', { className: 'text-sm text-gray-400' }, 'No due date'),
-                      piece.cost && React.createElement('div', { className: 'text-sm text-gray-600 mt-1' },
+                      ) : React.createElement('div', { className: 'text-sm', style: { color: 'var(--color-text-muted)' } }, 'No due date'),
+                      piece.cost && React.createElement('div', { className: 'text-sm mt-1', style: { color: 'var(--color-text-secondary)' } },
                         '$', parseFloat(piece.cost).toFixed(2)
                       )
                     )
@@ -2097,8 +2128,8 @@ function SetDesignView({ production, onSave }) {
             null,
             production.acts.length === 0 && React.createElement(
               'div',
-              { className: 'bg-gray-50 border border-gray-200 rounded-lg p-8 text-center' },
-              React.createElement('p', { className: 'text-gray-600' }, 'No acts/scenes defined yet. Add scenes in the Scenes tab first.')
+              { className: 'border border-gray-200 rounded-lg p-8 text-center', style: { backgroundColor: 'var(--color-bg-elevated)' } },
+              React.createElement('p', { style: { color: 'var(--color-text-secondary)' } }, 'No acts/scenes defined yet. Add scenes in the Scenes tab first.')
             ),
 
             production.acts.map((act, actIndex) =>
@@ -2115,14 +2146,14 @@ function SetDesignView({ production, onSave }) {
 
                   return React.createElement(
                     'div',
-                    { key: sceneIndex, className: 'mb-4 bg-white border border-gray-200 rounded-lg p-4' },
+                    { key: sceneIndex, className: 'mb-4 border border-gray-200 rounded-lg p-4', style: { backgroundColor: 'var(--color-bg-surface)' } },
                     // Scene header
                     React.createElement(
                       'div',
                       { className: 'flex flex-wrap items-start justify-between gap-2 mb-3' },
                       React.createElement(
                         'h4',
-                        { className: 'font-semibold text-gray-900' },
+                        { className: 'font-semibold', style: { color: 'var(--color-text-primary)' } },
                         `Scene ${scene.number || sceneIndex + 1}: ${scene.label || scene.title || 'Untitled'}`
                       ),
                       React.createElement(
@@ -2130,7 +2161,7 @@ function SetDesignView({ production, onSave }) {
                         { className: 'flex items-center gap-2 flex-shrink-0' },
                         scenePieces.length > 0 && React.createElement(
                           'span',
-                          { className: 'text-sm text-gray-600' },
+                          { className: 'text-sm', style: { color: 'var(--color-text-secondary)' } },
                           `${scenePieces.length} piece${scenePieces.length !== 1 ? 's' : ''}`
                         ),
                         React.createElement(
@@ -2147,12 +2178,12 @@ function SetDesignView({ production, onSave }) {
                     // Set pieces list
                     scenePieces.length === 0 ? React.createElement(
                       'p',
-                      { className: 'text-gray-500 text-sm italic' },
+                      { className: 'text-sm italic', style: { color: 'var(--color-text-muted)' } },
                       'No set pieces for this scene.'
                     ) : scenePieces.map((piece) =>
                       React.createElement(
                         'div',
-                        { key: piece.id, className: 'flex flex-col gap-2 p-3 bg-gray-50 rounded border border-gray-200 mb-2' },
+                        { key: piece.id, className: 'flex flex-col gap-2 p-3 rounded border border-gray-200 mb-2', style: { backgroundColor: 'var(--color-bg-elevated)' } },
 
                         // Top row: checkbox, name, delete
                         React.createElement(
@@ -2170,7 +2201,8 @@ function SetDesignView({ production, onSave }) {
                             value: piece.name || '',
                             onChange: (e) => handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'name', e.target.value),
                             onBlur: (e) => handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'name', e.target.value),
-                            className: 'flex-1 min-w-0 px-2 py-1 border border-gray-300 rounded text-sm font-medium',
+                            className: 'flex-1 min-w-0 px-2 py-1 border rounded text-sm font-medium',
+                            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' },
                             placeholder: 'Set piece name'
                           }),
                           React.createElement(
@@ -2189,14 +2221,15 @@ function SetDesignView({ production, onSave }) {
                           { className: 'space-y-2' },
 
                           // === DESIGN SECTION (always visible) ===
-                          React.createElement('p', { className: 'text-xs font-semibold text-gray-400 uppercase tracking-wide -mb-1' }, 'Design'),
+                          React.createElement('p', { className: 'text-xs font-semibold uppercase tracking-wide -mb-1', style: { color: 'var(--color-text-muted)' } }, 'Design'),
 
                           // Description
                           React.createElement('textarea', {
                             value: piece.description || '',
                             onChange: (e) => handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'description', e.target.value),
                             onBlur: (e) => handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'description', e.target.value),
-                            className: 'w-full px-2 py-1 border border-gray-300 rounded text-sm',
+                            className: 'w-full px-2 py-1 border rounded text-sm',
+                            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' },
                             placeholder: 'Description',
                             rows: 2
                           }),
@@ -2211,7 +2244,8 @@ function SetDesignView({ production, onSave }) {
                                 handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'type', e.target.value);
                                 handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'type', e.target.value);
                               },
-                              className: 'px-2 py-1.5 border border-gray-300 rounded text-xs bg-white',
+                              className: 'px-2 py-1.5 border rounded text-xs',
+                              style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' },
                               placeholder: 'Type'
                             },
                               React.createElement('option', { value: '' }, 'Type'),
@@ -2225,7 +2259,8 @@ function SetDesignView({ production, onSave }) {
                                 handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'buildStatus', e.target.value);
                                 handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'buildStatus', e.target.value);
                               },
-                              className: 'px-2 py-1.5 border border-gray-300 rounded text-xs bg-white'
+                              className: 'px-2 py-1.5 border rounded text-xs',
+                              style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                             },
                               buildStatuses.map(status =>
                                 React.createElement('option', { key: status, value: status }, status)
@@ -2237,7 +2272,8 @@ function SetDesignView({ production, onSave }) {
                                 handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'priority', e.target.value);
                                 handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'priority', e.target.value);
                               },
-                              className: 'px-2 py-1.5 border border-gray-300 rounded text-xs bg-white'
+                              className: 'px-2 py-1.5 border rounded text-xs',
+                              style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                             },
                               priorities.map(priority =>
                                 React.createElement('option', { key: priority, value: priority }, priority)
@@ -2249,7 +2285,8 @@ function SetDesignView({ production, onSave }) {
                               value: piece.dimensions || '',
                               onChange: (e) => handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'dimensions', e.target.value),
                               onBlur: (e) => handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'dimensions', e.target.value),
-                              className: 'px-2 py-1.5 border border-gray-300 rounded text-xs'
+                              className: 'px-2 py-1.5 border rounded text-xs',
+                              style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                             })
                           ),
 
@@ -2263,12 +2300,13 @@ function SetDesignView({ production, onSave }) {
                               value: piece.materials || '',
                               onChange: (e) => handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'materials', e.target.value),
                               onBlur: (e) => handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'materials', e.target.value),
-                              className: 'px-2 py-1.5 border border-gray-300 rounded text-xs'
+                              className: 'px-2 py-1.5 border rounded text-xs',
+                              style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                             }),
                             React.createElement(
                               'div',
                               { className: 'relative' },
-                              React.createElement('span', { className: 'absolute left-2 top-2 text-gray-500 text-xs pointer-events-none z-10' }, '$'),
+                              React.createElement('span', { className: 'absolute left-2 top-2 text-xs pointer-events-none z-10', style: { color: 'var(--color-text-muted)' } }, '$'),
                               React.createElement('input', {
                                 type: 'text',
                                 inputMode: 'decimal',
@@ -2285,7 +2323,8 @@ function SetDesignView({ production, onSave }) {
                                     handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'cost', formatted);
                                   }
                                 },
-                                className: 'w-full pl-5 pr-2 py-1.5 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-blue-500'
+                                className: 'w-full pl-5 pr-2 py-1.5 border rounded text-xs focus:ring-2 focus:ring-blue-500',
+                                style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                               })
                             )
                           ),
@@ -2296,7 +2335,8 @@ function SetDesignView({ production, onSave }) {
                             {
                               type: 'button',
                               onClick: () => toggleConstruction(piece.id),
-                              className: 'flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 font-medium mt-1 select-none'
+                              className: 'flex items-center gap-1.5 text-xs font-medium mt-1 select-none',
+                              style: { color: 'var(--color-text-muted)' }
                             },
                             expandedConstruction[piece.id] ? '▼' : '▶',
                             ' Build Details',
@@ -2323,7 +2363,8 @@ function SetDesignView({ production, onSave }) {
                                 value: piece.weight || '',
                                 onChange: (e) => handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'weight', e.target.value),
                                 onBlur: (e) => handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'weight', e.target.value),
-                                className: 'px-2 py-1.5 border border-gray-300 rounded text-xs'
+                                className: 'px-2 py-1.5 border rounded text-xs',
+                                style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                               }),
                               React.createElement('input', {
                                 type: 'text',
@@ -2335,7 +2376,8 @@ function SetDesignView({ production, onSave }) {
                                   handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'laborHours', cleanValue);
                                 },
                                 onBlur: (e) => handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'laborHours', e.target.value),
-                                className: 'px-2 py-1.5 border border-gray-300 rounded text-xs'
+                                className: 'px-2 py-1.5 border rounded text-xs',
+                                style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                               })
                             ),
 
@@ -2349,14 +2391,16 @@ function SetDesignView({ production, onSave }) {
                                 value: piece.assignedTo || '',
                                 onChange: (e) => handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'assignedTo', e.target.value),
                                 onBlur: (e) => handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'assignedTo', e.target.value),
-                                className: 'px-2 py-1.5 border border-gray-300 rounded text-xs'
+                                className: 'px-2 py-1.5 border rounded text-xs',
+                                style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                               }),
                               React.createElement('input', {
                                 type: 'date',
                                 value: piece.dueDate || '',
                                 onChange: (e) => handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'dueDate', e.target.value),
                                 onBlur: (e) => handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'dueDate', e.target.value),
-                                className: 'px-2 py-1.5 border border-gray-300 rounded text-xs'
+                                className: 'px-2 py-1.5 border rounded text-xs',
+                                style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                               })
                             ),
 
@@ -2367,7 +2411,8 @@ function SetDesignView({ production, onSave }) {
                               value: piece.laborLog || '',
                               onChange: (e) => handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'laborLog', e.target.value),
                               onBlur: (e) => handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'laborLog', e.target.value),
-                              className: 'w-full px-2 py-1.5 border border-gray-300 rounded text-xs'
+                              className: 'w-full px-2 py-1.5 border rounded text-xs',
+                              style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                             }),
 
                             // Construction Notes
@@ -2376,7 +2421,8 @@ function SetDesignView({ production, onSave }) {
                               value: piece.constructionNotes || '',
                               onChange: (e) => handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'constructionNotes', e.target.value),
                               onBlur: (e) => handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'constructionNotes', e.target.value),
-                              className: 'w-full text-xs px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500',
+                              className: 'w-full text-xs px-2 py-1 border rounded focus:ring-2 focus:ring-blue-500',
+                              style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' },
                               rows: 2
                             }),
 
@@ -2386,7 +2432,8 @@ function SetDesignView({ production, onSave }) {
                               value: piece.riggingNotes || '',
                               onChange: (e) => handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'riggingNotes', e.target.value),
                               onBlur: (e) => handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'riggingNotes', e.target.value),
-                              className: 'w-full text-xs px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500',
+                              className: 'w-full text-xs px-2 py-1 border rounded focus:ring-2 focus:ring-blue-500',
+                              style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' },
                               rows: 2
                             }),
 
@@ -2396,7 +2443,8 @@ function SetDesignView({ production, onSave }) {
                               value: piece.safetyNotes || '',
                               onChange: (e) => handleUpdatePieceImmediate(actIndex, sceneIndex, piece.id, 'safetyNotes', e.target.value),
                               onBlur: (e) => handleUpdatePieceAndSave(actIndex, sceneIndex, piece.id, 'safetyNotes', e.target.value),
-                              className: 'w-full text-xs px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500',
+                              className: 'w-full text-xs px-2 py-1 border rounded focus:ring-2 focus:ring-blue-500',
+                              style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' },
                               rows: 2
                             })
                           )

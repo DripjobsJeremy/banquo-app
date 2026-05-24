@@ -801,8 +801,8 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
       'div',
       { className: 'flex items-center justify-between mb-4' },
       React.createElement('div', { className: 'flex items-baseline gap-2' },
-        React.createElement('h3', { className: 'text-lg font-semibold text-gray-900' }, '👗 Wardrobe Department'),
-        lastSaved && React.createElement('span', { className: 'text-xs text-gray-500 font-normal' },
+        React.createElement('h3', { className: 'text-lg font-semibold', style: { color: 'var(--color-text-primary)' } }, '👗 Wardrobe Department'),
+        lastSaved && React.createElement('span', { className: 'text-xs font-normal', style: { color: 'var(--color-text-muted)' } },
           'Last saved: ' + lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         )
       ),
@@ -816,7 +816,7 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
             className: `px-4 py-2 text-sm font-medium rounded transition-colors ${
               !checklistMode && !ghostLightMode
                 ? 'bg-violet-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-gray-200 hover:bg-gray-300'
             }`
           },
           '📋 Manager View'
@@ -828,7 +828,7 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
             className: `px-4 py-2 text-sm font-medium rounded transition-colors ${
               checklistMode && !ghostLightMode
                 ? 'bg-violet-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-gray-200 hover:bg-gray-300'
             }`
           },
           '✓ Checklist View'
@@ -843,7 +843,7 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
             className: `ghostlight-btn px-4 py-2 text-sm font-medium rounded transition-colors ${
               ghostLightMode
                 ? ''
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-gray-200 hover:bg-gray-300'
             }`
           },
           React.createElement('span', {
@@ -935,14 +935,14 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
               null,
               React.createElement(
                 'tr',
-                { className: 'border-b-2 border-gray-300 bg-gray-100' },
-                React.createElement('th', { className: 'p-3 text-left font-semibold text-gray-700 w-10' }, '#'),
-                React.createElement('th', { className: 'p-3 text-left font-semibold text-gray-700' }, 'Scene'),
-                React.createElement('th', { className: 'p-3 text-left font-semibold text-gray-700' }, 'Costume'),
-                React.createElement('th', { className: 'p-3 text-left font-semibold text-gray-700' }, 'Character'),
-                React.createElement('th', { className: 'p-3 text-center font-semibold text-gray-700 w-20' }, 'Ready'),
-                React.createElement('th', { className: 'p-3 text-center font-semibold text-gray-700 w-20' }, 'Worn'),
-                React.createElement('th', { className: 'p-3 text-center font-semibold text-gray-700 w-20' }, 'Returned')
+                { className: 'border-b-2 border-gray-300', style: { backgroundColor: 'var(--color-bg-elevated)' } },
+                React.createElement('th', { className: 'p-3 text-left font-semibold w-10', style: { color: 'var(--color-text-secondary)' } }, '#'),
+                React.createElement('th', { className: 'p-3 text-left font-semibold', style: { color: 'var(--color-text-secondary)' } }, 'Scene'),
+                React.createElement('th', { className: 'p-3 text-left font-semibold', style: { color: 'var(--color-text-secondary)' } }, 'Costume'),
+                React.createElement('th', { className: 'p-3 text-left font-semibold', style: { color: 'var(--color-text-secondary)' } }, 'Character'),
+                React.createElement('th', { className: 'p-3 text-center font-semibold w-20', style: { color: 'var(--color-text-secondary)' } }, 'Ready'),
+                React.createElement('th', { className: 'p-3 text-center font-semibold w-20', style: { color: 'var(--color-text-secondary)' } }, 'Worn'),
+                React.createElement('th', { className: 'p-3 text-center font-semibold w-20', style: { color: 'var(--color-text-secondary)' } }, 'Returned')
               )
             ),
             // Table Body
@@ -960,22 +960,22 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
                     },
                     React.createElement(
                       'td',
-                      { className: 'p-3 text-sm text-gray-600' },
+                      { className: 'p-3 text-sm', style: { color: 'var(--color-text-secondary)' } },
                       costumeIdx + 1
                     ),
                     React.createElement(
                       'td',
-                      { className: 'p-3 text-sm font-semibold text-gray-800 whitespace-nowrap' },
+                      { className: 'p-3 text-sm font-semibold whitespace-nowrap', style: { color: 'var(--color-text-primary)' } },
                       `Act ${scene.act}, Scene ${scene.number}`
                     ),
                     React.createElement(
                       'td',
-                      { className: 'p-3 text-sm text-gray-800 font-medium' },
+                      { className: 'p-3 text-sm font-medium', style: { color: 'var(--color-text-primary)' } },
                       costume.description
                     ),
                     React.createElement(
                       'td',
-                      { className: 'p-3 text-sm text-gray-600' },
+                      { className: 'p-3 text-sm', style: { color: 'var(--color-text-secondary)' } },
                       costume.character || '-'
                     ),
                     React.createElement(
@@ -1030,10 +1030,10 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
         React.createElement(
           'div',
           null,
-          React.createElement('h3', { className: 'text-lg font-semibold text-gray-800 mb-1' }, '💰 Costume Budget'),
+          React.createElement('h3', { className: 'text-lg font-semibold mb-1', style: { color: 'var(--color-text-primary)' } }, '💰 Costume Budget'),
           React.createElement(
             'div',
-            { className: 'flex items-center gap-4 text-sm text-gray-600' },
+            { className: 'flex items-center gap-4 text-sm', style: { color: 'var(--color-text-secondary)' } },
             React.createElement(
               'span',
               null,
@@ -1057,7 +1057,7 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
             { className: 'text-3xl font-bold text-rose-700' },
             `$${wardrobeBudget.spent.toFixed(2)}`
           ),
-          React.createElement('div', { className: 'text-xs text-gray-500' },
+          React.createElement('div', { className: 'text-xs', style: { color: 'var(--color-text-muted)' } },
             wardrobeBudget.allocated > 0 ? 'of $' + wardrobeBudget.allocated.toFixed(2) + ' allocated' : 'Total Costume Cost'
           )
         )
@@ -1097,7 +1097,8 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
           'button',
           {
             onClick: deselectAllWardrobe,
-            className: 'px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50'
+            className: 'px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50',
+            style: { backgroundColor: 'var(--color-bg-surface)', color: 'var(--color-text-primary)' }
           },
           'Deselect All'
         ),
@@ -1115,7 +1116,7 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
     // Search and Filter Bar
     React.createElement(
       'div',
-      { className: 'mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg' },
+      { className: 'mb-4 p-4 border border-gray-200 rounded-lg', style: { backgroundColor: 'var(--color-bg-elevated)' } },
       React.createElement(
         'div',
         { className: 'grid grid-cols-1 md:grid-cols-4 gap-3 mb-3' },
@@ -1128,7 +1129,8 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
             placeholder: '🔍 Search costumes by description, pieces, character, or category...',
             value: searchQuery,
             onChange: (e) => setSearchQuery(e.target.value),
-            className: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent'
+            className: 'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent',
+            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
           })
         ),
         // Status Filter
@@ -1137,7 +1139,8 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
           {
             value: filterStatus,
             onChange: (e) => setFilterStatus(e.target.value),
-            className: 'px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 bg-white'
+            className: 'px-3 py-2 border rounded-lg focus:ring-2 focus:ring-rose-500',
+            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
           },
           React.createElement('option', { value: '' }, 'All Statuses'),
           uniqueStatuses.map(status =>
@@ -1150,7 +1153,8 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
           {
             value: filterCategory,
             onChange: (e) => setFilterCategory(e.target.value),
-            className: 'px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 bg-white'
+            className: 'px-3 py-2 border rounded-lg focus:ring-2 focus:ring-rose-500',
+            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
           },
           React.createElement('option', { value: '' }, 'All Categories'),
           uniqueCategories.map(category =>
@@ -1167,7 +1171,8 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
           {
             value: filterAct,
             onChange: (e) => setFilterAct(e.target.value),
-            className: 'px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 bg-white'
+            className: 'px-3 py-2 border rounded-lg focus:ring-2 focus:ring-rose-500',
+            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
           },
           React.createElement('option', { value: '' }, 'All Acts'),
           uniqueActs.map(act =>
@@ -1205,7 +1210,7 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
         // Show filter indicator if filters active
         hasActiveFilters && React.createElement(
           'span',
-          { className: 'px-3 py-1.5 text-sm bg-blue-50 text-blue-700 border border-blue-200 rounded' },
+          { className: 'px-3 py-1.5 text-sm border border-blue-200 rounded', style: { backgroundColor: 'var(--color-info-surface)', color: 'var(--color-info)' } },
           'Filters Active'
         )
       ),
@@ -1262,28 +1267,28 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
     // Filter indicator message
     hasActiveFilters && React.createElement(
       'div',
-      { className: 'mb-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800' },
+      { className: 'mb-3 p-3 border border-blue-200 rounded text-sm', style: { backgroundColor: 'var(--color-info-surface)', color: 'var(--color-info)' } },
       'ℹ️ Export will include only the filtered costumes currently visible'
     ),
     
     // Costumes by scene
     allScenes.length === 0 && React.createElement(
       'div',
-      { className: 'bg-gray-50 border border-gray-200 rounded-lg p-8 text-center' },
-      React.createElement('p', { className: 'text-gray-600' }, 'No scenes defined yet. Add scenes in the Scenes tab first.')
+      { className: 'border border-gray-200 rounded-lg p-8 text-center', style: { backgroundColor: 'var(--color-bg-elevated)' } },
+      React.createElement('p', { style: { color: 'var(--color-text-secondary)' } }, 'No scenes defined yet. Add scenes in the Scenes tab first.')
     ),
     
     allScenes.map((scene, idx) =>
       React.createElement(
         'div',
-        { key: idx, className: 'bg-white border border-gray-200 rounded-lg p-4' },
+        { key: idx, className: 'border border-gray-200 rounded-lg p-4', style: { backgroundColor: 'var(--color-bg-surface)' } },
         // Scene header
         React.createElement(
           'div',
           { className: 'flex flex-wrap items-start justify-between gap-2 mb-3' },
           React.createElement(
             'h4',
-            { className: 'font-semibold text-gray-900' },
+            { className: 'font-semibold', style: { color: 'var(--color-text-primary)' } },
             `${scene.act} - Scene ${scene.number || scene.sceneIndex + 1}` +
             (scene.name ? `: ${scene.name}` : '')
           ),
@@ -1292,7 +1297,7 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
             { className: 'flex items-center gap-2 flex-shrink-0' },
             scene.wardrobe?.items && scene.wardrobe.items.length > 0 && React.createElement(
               'span',
-              { className: 'text-sm text-gray-600' },
+              { className: 'text-sm', style: { color: 'var(--color-text-secondary)' } },
               `${filterWardrobe(scene.wardrobe.items, scene.act).length} costume${filterWardrobe(scene.wardrobe.items, scene.act).length !== 1 ? 's' : ''}`
             ),
             scene.wardrobe?.items && calculateSceneCost(scene.wardrobe.items) > 0 && React.createElement(
@@ -1314,7 +1319,7 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
         // Costumes list
         (!scene.wardrobe?.items || scene.wardrobe.items.length === 0) && React.createElement(
           'p',
-          { className: 'text-gray-500 text-sm italic' },
+          { className: 'text-sm italic', style: { color: 'var(--color-text-muted)' } },
           'No costumes for this scene yet.'
         ),
 
@@ -1324,7 +1329,7 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
           filterWardrobe(scene.wardrobe.items, scene.act).map(costume =>
             React.createElement(
               'div',
-              { key: costume.id, className: 'flex flex-col gap-2 p-3 bg-gray-50 rounded border border-gray-200' },
+              { key: costume.id, className: 'flex flex-col gap-2 p-3 rounded border border-gray-200', style: { backgroundColor: 'var(--color-bg-elevated)' } },
               // Top row: checkbox, description, cost badge, delete
               React.createElement(
                 'div',
@@ -1340,8 +1345,9 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
                   type: 'text',
                   value: costume.description || '',
                   onChange: (e) => handleUpdateCostumeAndSave(scene.actIndex, scene.sceneIndex, costume.id, 'description', e.target.value),
-                  className: 'flex-1 min-w-0 px-2 py-1 border border-gray-300 rounded text-sm font-medium',
-                  placeholder: 'Costume description'
+                  className: 'flex-1 min-w-0 px-2 py-1 border rounded text-sm font-medium',
+                  placeholder: 'Costume description',
+                  style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                 }),
                 costume.cost && !isNaN(parseFloat(costume.cost)) && React.createElement(
                   'span',
@@ -1361,7 +1367,8 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
                       e.stopPropagation();
                       handleDeleteCostume(scene.actIndex, scene.sceneIndex, costume.id);
                     },
-                    className: 'flex-shrink-0 text-gray-400 hover:text-red-600 transition-colors p-0'
+                    className: 'flex-shrink-0 hover:text-red-600 transition-colors p-0',
+                    style: { color: 'var(--color-text-muted)' }
                   },
                   '🗑️'
                 )
@@ -1374,8 +1381,9 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
                   type: 'text',
                   value: costume.pieces || '',
                   onChange: (e) => handleUpdateCostumeAndSave(scene.actIndex, scene.sceneIndex, costume.id, 'pieces', e.target.value),
-                  className: 'w-full px-2 py-1 border border-gray-300 rounded text-sm',
-                  placeholder: 'Pieces/Items'
+                  className: 'w-full px-2 py-1 border rounded text-sm',
+                  placeholder: 'Pieces/Items',
+                  style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                 }),
                 // Category, Character, Status, Cost
                 React.createElement(
@@ -1385,20 +1393,23 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
                     type: 'text',
                     value: costume.category || '',
                     onChange: (e) => handleUpdateCostumeAndSave(scene.actIndex, scene.sceneIndex, costume.id, 'category', e.target.value),
-                    className: 'px-2 py-1 border border-gray-300 rounded text-xs',
-                    placeholder: 'Category'
+                    className: 'px-2 py-1 border rounded text-xs',
+                    placeholder: 'Category',
+                    style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                   }),
                   React.createElement('input', {
                     type: 'text',
                     value: costume.character || '',
                     onChange: (e) => handleUpdateCostumeAndSave(scene.actIndex, scene.sceneIndex, costume.id, 'character', e.target.value),
-                    className: 'px-2 py-1 border border-gray-300 rounded text-xs',
-                    placeholder: 'Character'
+                    className: 'px-2 py-1 border rounded text-xs',
+                    placeholder: 'Character',
+                    style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                   }),
                   React.createElement('select', {
                     value: costume.status || 'To Source',
                     onChange: (e) => handleUpdateCostumeAndSave(scene.actIndex, scene.sceneIndex, costume.id, 'status', e.target.value),
-                    className: 'px-2 py-1 border border-gray-300 rounded text-xs bg-white'
+                    className: 'px-2 py-1 border rounded text-xs',
+                    style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                   },
                     React.createElement('option', { value: 'To Source' }, 'To Source'),
                     React.createElement('option', { value: 'In Progress' }, 'In Progress'),
@@ -1411,8 +1422,9 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
                   React.createElement(
                     'div',
                     { className: 'relative' },
-                    React.createElement('span', { 
-                      className: 'absolute left-2 top-2 text-gray-500 text-xs pointer-events-none z-10' 
+                    React.createElement('span', {
+                      className: 'absolute left-2 top-2 text-xs pointer-events-none z-10',
+                      style: { color: 'var(--color-text-muted)' }
                     }, '$'),
                     React.createElement('input', {
                       type: 'text',
@@ -1504,15 +1516,17 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
                       disabled: false,
                       tabIndex: 0,
                       
-                      style: { 
+                      style: {
                         paddingLeft: '1.5rem',
                         cursor: 'text',
-                        backgroundColor: 'white',
+                        backgroundColor: 'var(--color-bg-elevated)',
+                        color: 'var(--color-text-primary)',
+                        borderColor: 'var(--color-border)',
                         pointerEvents: 'auto', // Ensure pointer events work
                         userSelect: 'text' // Allow text selection
                       },
-                      
-                      className: 'w-full pr-2 py-1.5 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-rose-500 focus:border-rose-500 focus:outline-none',
+
+                      className: 'w-full pr-2 py-1.5 border rounded text-xs focus:ring-2 focus:ring-rose-500 focus:border-rose-500 focus:outline-none',
                       
                       'aria-label': 'Cost',
                       'data-field': 'cost',
@@ -1528,7 +1542,7 @@ function WardrobeView({ production, onSave, onUpdateScene }) {
         // No results message when filters are active
         scene.wardrobe?.items && scene.wardrobe.items.length > 0 && filterWardrobe(scene.wardrobe.items, scene.act).length === 0 && React.createElement(
           'div',
-          { className: 'p-4 text-center text-gray-500 bg-gray-50 rounded border border-gray-200' },
+          { className: 'p-4 text-center rounded border border-gray-200', style: { color: 'var(--color-text-muted)', backgroundColor: 'var(--color-bg-elevated)' } },
           'No costumes match the current filters'
         )
       )

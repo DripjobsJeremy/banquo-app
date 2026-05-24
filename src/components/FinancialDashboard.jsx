@@ -27,7 +27,7 @@
           { className: 'max-w-2xl mx-auto mt-16 p-8 bg-gray-800 rounded-lg border border-red-700 text-center' },
           React.createElement('div', { className: 'text-5xl mb-4' }, '⚠️'),
           React.createElement('h2', { className: 'text-xl font-bold text-white mb-2' }, 'Something went wrong in the Financial Dashboard'),
-          React.createElement('p', { className: 'text-gray-400 mb-6' }, 'An unexpected error occurred while loading this section. Your data is safe.'),
+          React.createElement('p', { className: 'mb-6', style: { color: 'var(--color-text-muted)' } }, 'An unexpected error occurred while loading this section. Your data is safe.'),
           React.createElement('p', { className: 'text-red-400 text-sm font-mono mb-6 bg-gray-900 p-3 rounded text-left' }, this.state.error?.message || 'Unknown error'),
           React.createElement(
             'div',
@@ -64,8 +64,9 @@
         className: `px-6 py-3 font-medium border-b-2 transition-colors ${
           active
             ? 'border-violet-600 text-violet-400'
-            : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-400'
-        }`
+            : 'border-transparent hover:border-gray-400'
+        }`,
+        style: active ? {} : { color: 'var(--color-text-secondary)' }
       },
       React.createElement('span', { className: 'mr-2' }, icon),
       label
@@ -436,8 +437,8 @@
           React.createElement(
             'div',
             null,
-            React.createElement('h1', { className: 'text-3xl font-bold mb-2 text-gray-900' }, 'Financial Dashboard'),
-            React.createElement('p', { className: 'text-gray-400' }, 'Comprehensive financial oversight and donor analytics')
+            React.createElement('h1', { className: 'text-3xl font-bold mb-2', style: { color: 'var(--color-text-primary)' } }, 'Financial Dashboard'),
+            React.createElement('p', { style: { color: 'var(--color-text-muted)' } }, 'Comprehensive financial oversight and donor analytics')
           ),
           React.createElement(
             'div',
@@ -445,13 +446,14 @@
             React.createElement(
               'div',
               { className: 'date-range-selector' },
-              React.createElement('label', { className: 'block text-sm font-medium mb-2 text-gray-300' }, 'Date Range:'),
+              React.createElement('label', { className: 'block text-sm font-medium mb-2', style: { color: 'var(--color-text-muted)' } }, 'Date Range:'),
               React.createElement(
                 'select',
                 {
                   value: dateRange,
                   onChange: (e) => setDateRange(e.target.value),
-                  className: 'border border-gray-300 rounded px-4 py-2 bg-white text-gray-900'
+                  className: 'border rounded px-4 py-2',
+                  style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                 },
                 React.createElement('option', { value: 'today' }, 'Today'),
                 React.createElement('option', { value: 'week' }, 'This Week'),
@@ -470,7 +472,8 @@
                 'button',
                 {
                   onClick: () => global.financialExportService?.exportDashboardToCSV(financialData, dateRange),
-                  className: 'px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 hover:bg-gray-50',
+                  className: 'px-3 py-2 border rounded',
+                  style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' },
                   title: 'Export CSV'
                 },
                 '📊 Export CSV'
@@ -479,7 +482,8 @@
                 'button',
                 {
                   onClick: () => global.financialExportService?.exportToExcel(financialData, dateRange),
-                  className: 'px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 hover:bg-gray-50',
+                  className: 'px-3 py-2 border rounded',
+                  style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' },
                   title: 'Export Excel'
                 },
                 '📗 Export Excel'
@@ -488,7 +492,8 @@
                 'button',
                 {
                   onClick: () => global.financialExportService?.printDashboard(financialData, dateRange),
-                  className: 'px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 hover:bg-gray-50',
+                  className: 'px-3 py-2 border rounded',
+                  style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' },
                   title: 'Print Report'
                 },
                 '🖨️ Print Report'
@@ -527,7 +532,7 @@
             'div',
             { className: 'loading-state text-center py-12' },
             React.createElement('div', { className: 'text-6xl mb-4' }, '⏳'),
-            React.createElement('p', { className: 'text-gray-400' }, 'Loading financial data...')
+            React.createElement('p', { style: { color: 'var(--color-text-muted)' } }, 'Loading financial data...')
           )
         : React.createElement(
             React.Fragment,

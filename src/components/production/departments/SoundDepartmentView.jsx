@@ -116,9 +116,9 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
   if (!localProduction?.acts?.length) {
     return React.createElement(
       'div',
-      { className: 'text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300' },
-      React.createElement('p', { className: 'text-gray-600' }, 'No scenes created yet.'),
-      React.createElement('p', { className: 'text-sm text-gray-500 mt-2' }, 'Add acts and scenes in the Scenes tab first.')
+      { className: 'text-center py-12 rounded-lg border-2 border-dashed border-gray-300', style: { backgroundColor: 'var(--color-bg-elevated)' } },
+      React.createElement('p', { style: { color: 'var(--color-text-secondary)' } }, 'No scenes created yet.'),
+      React.createElement('p', { className: 'text-sm mt-2', style: { color: 'var(--color-text-muted)' } }, 'Add acts and scenes in the Scenes tab first.')
     );
   }
 
@@ -129,7 +129,7 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
     localProduction.acts.map((act, actIndex) =>
       React.createElement(
         'div',
-        { key: actIndex, className: 'bg-white rounded-lg border border-gray-200 overflow-hidden' },
+        { key: actIndex, className: 'rounded-lg border border-gray-200 overflow-hidden', style: { backgroundColor: 'var(--color-bg-surface)' } },
         // Act header
         React.createElement(
           'div',
@@ -137,7 +137,7 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
           React.createElement(
             'div',
             { className: 'flex items-center gap-3' },
-            React.createElement('span', { className: 'text-gray-400 transition-transform ' + (expandedActs[actIndex] ? 'rotate-90' : '') }, '▶'),
+            React.createElement('span', { className: 'transition-transform ' + (expandedActs[actIndex] ? 'rotate-90' : ''), style: { color: 'var(--color-text-muted)' } }, '▶'),
             React.createElement('span', { className: 'font-semibold text-purple-900' }, act.name || ('Act ' + (actIndex + 1))),
             React.createElement('span', { className: 'text-sm text-purple-700 bg-white px-2 py-1 rounded' }, (act.scenes?.length || 0) + ' scene' + ((act.scenes?.length || 0) !== 1 ? 's' : ''))
           )
@@ -156,9 +156,9 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
                     'div',
                     { className: 'flex items-center gap-2 mb-3' },
                     React.createElement('span', { className: 'px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded' }, 'Scene ' + (scene.number || scene.sceneNumber || sceneIndex + 1)),
-                    scene.label && scene.label !== 'Custom' && React.createElement('span', { className: 'text-sm text-gray-600' }, scene.label),
-                    scene.label === 'Custom' && scene.customLabel && React.createElement('span', { className: 'text-sm text-gray-600' }, scene.customLabel),
-                    scene.name && React.createElement('span', { className: 'text-sm font-medium text-gray-800' }, scene.name),
+                    scene.label && scene.label !== 'Custom' && React.createElement('span', { className: 'text-sm', style: { color: 'var(--color-text-secondary)' } }, scene.label),
+                    scene.label === 'Custom' && scene.customLabel && React.createElement('span', { className: 'text-sm', style: { color: 'var(--color-text-secondary)' } }, scene.customLabel),
+                    scene.name && React.createElement('span', { className: 'text-sm font-medium', style: { color: 'var(--color-text-primary)' } }, scene.name),
                     scene.time && React.createElement('span', { className: 'text-xs ml-auto', style: { color: 'var(--color-text-muted)' } }, '🕐 ' + scene.time)
                   ),
                   // Sound fields
@@ -171,7 +171,7 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
                       React.createElement(
                         'div',
                         null,
-                        React.createElement('label', { className: 'block text-xs text-gray-500 mb-1' }, 'Song Title'),
+                        React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-muted)' } }, 'Song Title'),
                         React.createElement('div', { className: 'relative' },
                           React.createElement('span', { className: 'absolute left-3 top-2.5 text-gray-400 pointer-events-none' }, '🎵'),
                           React.createElement('input', {
@@ -186,7 +186,7 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
                       scene.soundType !== 'Musical Number' && React.createElement(
                         'div',
                         null,
-                        React.createElement('label', { className: 'block text-xs text-gray-500 mb-1' }, 'Artist'),
+                        React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-muted)' } }, 'Artist'),
                         React.createElement('div', { className: 'relative' },
                           React.createElement('span', { className: 'absolute left-3 top-2.5 text-gray-400 pointer-events-none' }, '🎤'),
                           React.createElement('input', {
@@ -205,7 +205,7 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
                       React.createElement(
                         'div',
                         null,
-                        React.createElement('label', { className: 'block text-xs text-gray-500 mb-1' }, 'Duration'),
+                        React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-muted)' } }, 'Duration'),
                         React.createElement('div', { className: 'relative' },
                           React.createElement('span', { className: 'absolute left-3 top-2.5 text-gray-400 pointer-events-none' }, '⏱️'),
                           React.createElement('input', {
@@ -220,7 +220,7 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
                       React.createElement(
                         'div',
                         null,
-                        React.createElement('label', { className: 'block text-xs text-gray-500 mb-1' }, 'Sound Type'),
+                        React.createElement('label', { className: 'block text-xs mb-1', style: { color: 'var(--color-text-muted)' } }, 'Sound Type'),
                         React.createElement('div', { className: 'relative' },
                           React.createElement('span', { className: 'absolute left-3 top-2.5 text-gray-400 pointer-events-none z-10' }, '🔊'),
                           React.createElement(
@@ -228,7 +228,8 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
                             {
                               value: scene.soundType || '',
                               onChange: (e) => updateSoundField(actIndex, sceneIndex, 'soundType', e.target.value),
-                              className: 'w-full pl-9 pr-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white appearance-none'
+                              className: 'w-full pl-9 pr-3 py-2 border rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 appearance-none',
+                              style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
                             },
                             React.createElement('option', { value: '' }, 'Select type...'),
                             soundTypeOptions.map(opt => React.createElement('option', { key: opt.value, value: opt.value }, opt.label))
@@ -329,7 +330,7 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
                 )
               )
             )
-          : React.createElement('div', { className: 'p-4 text-center text-gray-500 text-sm' }, 'No scenes in this act')
+          : React.createElement('div', { className: 'p-4 text-center text-sm', style: { color: 'var(--color-text-muted)' } }, 'No scenes in this act')
         )
       )
     )
@@ -348,23 +349,23 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
 
   const budgetPanel = React.createElement(
     'div',
-    { className: 'bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4' },
+    { className: 'border border-blue-200 rounded-lg p-4 mb-4', style: { backgroundColor: 'var(--color-info-surface)' } },
     React.createElement(
       'div',
       { className: 'flex items-center justify-between' },
       React.createElement(
         'div',
         null,
-        React.createElement('h3', { className: 'font-semibold text-blue-900' }, '🎵 Sound Budget'),
-        React.createElement('p', { className: 'text-sm text-blue-700' },
+        React.createElement('h3', { className: 'font-semibold', style: { color: 'var(--color-info)' } }, '🎵 Sound Budget'),
+        React.createElement('p', { className: 'text-sm', style: { color: 'var(--color-info)' } },
           soundBudget.itemCount + ' item' + (soundBudget.itemCount !== 1 ? 's' : '') + ' with cost data'
         )
       ),
       React.createElement(
         'div',
         { className: 'text-right' },
-        React.createElement('div', { className: 'text-2xl font-bold text-blue-900' }, '$' + soundBudget.spent.toFixed(2)),
-        React.createElement('div', { className: 'text-sm text-blue-700' },
+        React.createElement('div', { className: 'text-2xl font-bold', style: { color: 'var(--color-info)' } }, '$' + soundBudget.spent.toFixed(2)),
+        React.createElement('div', { className: 'text-sm', style: { color: 'var(--color-info)' } },
           soundBudget.allocated > 0 ? 'of $' + soundBudget.allocated.toFixed(2) + ' allocated' : 'No budget allocated'
         )
       )
@@ -380,7 +381,7 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
           style: { width: Math.min(100, (soundBudget.spent / soundBudget.allocated) * 100) + '%' }
         })
       ),
-      React.createElement('div', { className: 'text-xs text-blue-700 mt-1' },
+      React.createElement('div', { className: 'text-xs mt-1', style: { color: 'var(--color-info)' } },
         soundBudget.spent > soundBudget.allocated
           ? 'Over budget'
           : '$' + (soundBudget.allocated - soundBudget.spent).toFixed(2) + ' remaining'
@@ -425,8 +426,8 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
       'div',
       { className: 'flex items-center justify-between mb-4' },
       React.createElement('div', { className: 'flex items-baseline gap-2' },
-        React.createElement('h3', { className: 'text-lg font-semibold text-gray-900' }, '🔊 Sound Design'),
-        React.createElement('span', { className: 'text-xs text-gray-500 font-normal' },
+        React.createElement('h3', { className: 'text-lg font-semibold', style: { color: 'var(--color-text-primary)' } }, '🔊 Sound Design'),
+        React.createElement('span', { className: 'text-xs font-normal', style: { color: 'var(--color-text-muted)' } },
           scenesWithSound + ' / ' + totalScenes + ' scenes with data'
         )
       ),

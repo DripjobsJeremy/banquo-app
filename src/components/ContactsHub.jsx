@@ -246,28 +246,29 @@ function AllContactsList({ contacts, donations }) {
           <h3 className="text-sm font-semibold text-violet-900 mb-3">New Contact</h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">First Name *</label>
-              <input title="First name" type="text" value={form.firstName} onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-violet-400" />
+              <label className="block text-xs font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>First Name *</label>
+              <input title="First name" type="text" value={form.firstName} onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-violet-400" style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Last Name</label>
-              <input title="Last name" type="text" value={form.lastName} onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-violet-400" />
+              <label className="block text-xs font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Last Name</label>
+              <input title="Last name" type="text" value={form.lastName} onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-violet-400" style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Email *</label>
-              <input title="Email address" type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-violet-400" />
+              <label className="block text-xs font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Email *</label>
+              <input title="Email address" type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-violet-400" style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Phone</label>
-              <input title="Phone number" type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-violet-400" />
+              <label className="block text-xs font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Phone</label>
+              <input title="Phone number" type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-violet-400" style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Type *</label>
+              <label className="block text-xs font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Type *</label>
               <select
                 title="Contact type"
                 value={form.type}
                 onChange={e => setForm(f => ({ ...f, type: e.target.value }))}
-                className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-violet-400 ${!form.type ? 'border-red-400' : 'border-gray-300'}`}
+                className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-violet-400 ${!form.type ? 'border-red-400' : ''}`}
+                style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: form.type ? 'var(--color-border)' : undefined }}
               >
                 <option value="" disabled>— Select type —</option>
                 {TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -442,8 +443,8 @@ function BoardMembersView({ contacts }) {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Board Members</h2>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Board Members</h2>
+          <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
             {boardMembers.length} board member{boardMembers.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -465,8 +466,8 @@ function BoardMembersView({ contacts }) {
       {boardMembers.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-4xl mb-3">🏛</div>
-          <p className="text-lg font-medium text-gray-800 mb-1">No board members yet</p>
-          <p className="text-sm text-gray-400">Tag a contact with "Board Member" to add them here</p>
+          <p className="text-lg font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>No board members yet</p>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Tag a contact with "Board Member" to add them here</p>
         </div>
       ) : viewMode === 'table' ? (
         <div className="hub-table-wrap">
@@ -783,8 +784,8 @@ function ContactsHub({ data, userRole }) {
   return (
     <div className="max-w-[1400px] mx-auto">
       <div className="mb-5">
-        <h1 className="text-2xl font-bold text-gray-900">Contacts</h1>
-        <p className="text-sm text-gray-500 mt-0.5">All people associated with your organization</p>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Contacts</h1>
+        <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-muted)' }}>All people associated with your organization</p>
       </div>
 
       {/* Tab bar */}
@@ -813,19 +814,19 @@ function ContactsHub({ data, userRole }) {
       {activeTab === 'donors' && (
         window.DonorsView
           ? React.createElement(window.DonorsView, { data: { contacts, donations, donorLevels } })
-          : <div className="text-center py-16 text-gray-400">Donors view loading…</div>
+          : <div className="text-center py-16" style={{ color: 'var(--color-text-muted)' }}>Donors view loading…</div>
       )}
 
       {activeTab === 'staff' && (
         window.StaffDirectory
           ? React.createElement(window.StaffDirectory, {})
-          : <div className="text-center py-16 text-gray-400">Staff Directory loading…</div>
+          : <div className="text-center py-16" style={{ color: 'var(--color-text-muted)' }}>Staff Directory loading…</div>
       )}
 
       {activeTab === 'actors' && (
         window.ActorAdminRouter
           ? React.createElement(window.ActorAdminRouter, { userRole: 'Admin' })
-          : <div className="text-center py-16 text-gray-500">
+          : <div className="text-center py-16" style={{ color: 'var(--color-text-muted)' }}>
               <div className="text-4xl mb-3">🎬</div>
               <p>Actor roster loading…</p>
             </div>
@@ -840,7 +841,7 @@ function ContactsHub({ data, userRole }) {
       )}
 
       {isDirector && (
-        <div className="mt-6 px-4 py-3 bg-gray-800 border border-gray-700 rounded text-sm text-gray-500 flex items-center gap-2">
+        <div className="mt-6 px-4 py-3 bg-gray-800 border border-gray-700 rounded text-sm flex items-center gap-2" style={{ color: 'var(--color-text-muted)' }}>
           <span>✉️</span>
           <span>Email communication and internal team messaging coming in a future update</span>
         </div>

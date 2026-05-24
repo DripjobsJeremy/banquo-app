@@ -179,13 +179,13 @@ function CharacterCastList({ production, onUpdate }) {
         <>
           {characters.length > 0 && (
             <div className="flex items-center gap-3 mb-2 px-3 pb-2 border-b border-gray-200">
-              <div className="flex-1">
+              <div className="cast-list-role-col">
                 <span className="text-xs font-semibold text-violet-600 uppercase tracking-wide">ROLE</span>
               </div>
-              <div className="w-56">
+              <div className="cast-list-actor-col">
                 <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wide">ACTOR</span>
               </div>
-              <div className="w-20"></div>
+              <div className="cast-list-actions-spacer"></div>
             </div>
           )}
 
@@ -201,23 +201,23 @@ function CharacterCastList({ production, onUpdate }) {
                   key={char.id}
                   className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
                 >
-                  <div className="flex-1 flex items-center">
+                  <div className="cast-list-role-col flex items-center">
                     <div className="w-1 h-8 bg-violet-400 rounded-full mr-3"></div>
                     <input
                       type="text"
                       value={char.name}
                       onChange={(e) => handleUpdateCharacter(char.id, 'name', e.target.value)}
                       placeholder="Character name"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                      className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
                     />
                   </div>
 
-                  <div className="flex items-center">
+                  <div className="cast-list-actor-col flex items-center">
                     <div className="w-1 h-8 bg-emerald-400 rounded-full mr-3"></div>
                     <select
                       value={char.actorId || ''}
                       onChange={(e) => handleAssignActor(char.id, e.target.value)}
-                      className="w-52 px-3 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      className="cast-list-actor-select px-3 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                     >
                       <option value="">-- Select Actor --</option>
                       {actors.map(actor => {
@@ -234,11 +234,11 @@ function CharacterCastList({ production, onUpdate }) {
                   </div>
 
                   {char.actorId ? (
-                    <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full whitespace-nowrap">
+                    <span className="cast-list-badge px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
                       ✓ Cast
                     </span>
                   ) : (
-                    <span className="px-3 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full whitespace-nowrap">
+                    <span className="cast-list-badge px-3 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full">
                       Uncast
                     </span>
                   )}
@@ -246,7 +246,7 @@ function CharacterCastList({ production, onUpdate }) {
                   <button
                     onClick={() => handleDeleteCharacter(char.id)}
                     title="Delete character"
-                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    className="cast-list-delete p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                   >
                     🗑
                   </button>

@@ -33,7 +33,7 @@ const saveCustomValue = (field, value) => {
   } catch {}
 };
 
-const SmartDropdown = ({ field, value, defaultOptions, onChange, placeholder }) => {
+const SmartDropdown = ({ field, value, defaultOptions, onChange, placeholder, disabled }) => {
   const [showCustomInput, setShowCustomInput] = React.useState(false);
   const [customText, setCustomText] = React.useState('');
   const [customOptions, setCustomOptions] = React.useState(() => getCustomValues(field));
@@ -91,10 +91,13 @@ const SmartDropdown = ({ field, value, defaultOptions, onChange, placeholder }) 
         }
       },
       className: 'w-full px-3 py-2 rounded-lg text-sm',
+      disabled,
       style: {
-        backgroundColor: 'var(--color-bg-elevated)',
+        backgroundColor: disabled ? '#f9fafb' : 'var(--color-bg-elevated)',
         color: value ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
-        border: '1px solid var(--color-border)'
+        border: '1px solid var(--color-border)',
+        opacity: disabled ? 0.7 : 1,
+        cursor: disabled ? 'not-allowed' : undefined,
       }
     },
     React.createElement('option', { value: '' }, placeholder),
@@ -296,11 +299,12 @@ const findActorByMention = (mentionText, castMembers) => {
 
 // Push the full blocking text as a rehearsal note to every @mentioned actor.
 // Called on textarea blur — not on every keystroke.
-const pushRehearsalNotes = (production, scene, actIndex) => {
+// noteText defaults to scene.blocking so the existing blocking/staging onBlur call is unchanged.
+const pushRehearsalNotes = (production, scene, actIndex, noteText) => {
   if (!window.actorsService?.addRehearsalNote) return;
-  const blockingText = scene.blocking || '';
+  const text = noteText !== undefined ? noteText : (scene.blocking || '');
   const castMembers = getCastMembers(production, scene);
-  const mentionedNames = extractMentions(blockingText, castMembers);
+  const mentionedNames = extractMentions(text, castMembers);
   if (mentionedNames.length === 0) return;
 
   const actEntry = production.acts?.[actIndex];
@@ -317,7 +321,7 @@ const pushRehearsalNotes = (production, scene, actIndex) => {
       actName,
       sceneName,
       sceneRef,
-      note: blockingText,
+      note: text,
       taggedBy: 'Director',
       actorName: member.name,
       character: member.character,
@@ -354,10 +358,19 @@ function SceneBuilder({ productionId: propId }) {
     } catch {}
     return localStorage.getItem('showsuite_active_department_tab') || 'scenes';
   });
+  const [productionSubView, setProductionSubView] = React.useState(null);
+  const [editingSceneId, setEditingSceneId] = React.useState(null);
+  const [filterAct, setFilterAct] = React.useState('');
+  const [filterLabel, setFilterLabel] = React.useState('');
+  const [filterStatus, setFilterStatus] = React.useState('');
+  const [filterRole, setFilterRole] = React.useState('');
+  const [roleDisplayMode, setRoleDisplayMode] = React.useState(
+    () => localStorage.getItem('showsuite_scene_role_display_mode') || 'role_actor'
+  );
   // Resolve role from staffProfile.productions assignment for this specific production,
   // falling back to the app-level role. Computed each render so URL changes are reflected.
+  const rawAppRole = localStorage.getItem('showsuite_user_role') || 'admin';
   const currentRole = (() => {
-    const rawAppRole = localStorage.getItem('showsuite_user_role') || 'admin';
     const SUPER_ROLES = ['super_admin', 'venue_manager', 'admin', 'client_admin', 'board_member', 'accounting_manager'];
 
     if (SUPER_ROLES.includes(rawAppRole)) {
@@ -412,7 +425,19 @@ function SceneBuilder({ productionId: propId }) {
     }
     return window.getCurrentRole?.() || { id: 'admin', departments: 'all' };
   })();
-  
+
+  const DEPT_ROLES_APP = ['lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager'];
+  const isDeptManager = DEPT_ROLES_APP.includes(rawAppRole);
+  const DEPT_TAB_INFO = {
+    lighting:      { id: 'lighting',      label: 'Lighting',      icon: '💡' },
+    sound:         { id: 'sound',         label: 'Sound',         icon: '🔊' },
+    wardrobe:      { id: 'wardrobe',      label: 'Wardrobe',      icon: '👗' },
+    props:         { id: 'props',         label: 'Props',         icon: '🎭' },
+    set:           { id: 'set',           label: 'Set Design',    icon: '🏗️' },
+    stage_manager: { id: 'stage_manager', label: 'Stage Manager', icon: '📋' },
+  };
+  const deptTabInfo = isDeptManager ? (DEPT_TAB_INFO[rawAppRole] || null) : null;
+
   // Get ID from React Router params (defined globally via routerGlobals.js)
   const params = typeof useParams === 'function' ? useParams() : null;
   const productionId = propId || (params && params.id) || null;
@@ -807,189 +832,16 @@ function SceneBuilder({ productionId: propId }) {
     React.createElement('div', { className: 'dept-tab-bar-fade' })
   );
 
-  // Character & Cast List section
-  const characterSection = React.createElement(
-    'div',
-    { className: 'mb-6' },
-    window.CharacterCastList && React.createElement(window.CharacterCastList, {
-      production: production,
-      onUpdate: (updatedProduction) => {
-        saveProduction(updatedProduction);
-      }
-    })
-  );
 
-  // Acts list
-  const actsList = React.createElement(
-    'div',
-    { className: 'space-y-4' },
-    (production.acts || []).map((act, actIndex) =>
-      React.createElement(
-        'div',
-        { 
-          key: actIndex, 
-          className: 'bg-white rounded-lg border border-gray-200 p-4 ' + 
-            (draggedActIndex === actIndex ? 'opacity-50' : '') +
-            (draggedActIndex !== null && draggedActIndex !== actIndex ? ' border-dashed border-violet-300' : ''),
-          draggable: true,
-          onDragStart: (e) => handleDragStart(e, actIndex),
-          onDragEnd: handleDragEnd,
-          onDragOver: (e) => handleDragOver(e, actIndex),
-          onDrop: (e) => handleDrop(e, actIndex)
-        },
-        React.createElement(
-          'div',
-          {
-            className: 'flex items-center justify-between mb-3 cursor-pointer select-none',
-            onClick: () => toggleActCollapse(actIndex)
-          },
-          React.createElement(
-            'div',
-            { className: 'flex items-center' },
-            React.createElement('span', {
-              className: 'cursor-grab text-gray-400 mr-2',
-              title: 'Drag to reorder',
-              onClick: (e) => e.stopPropagation()
-            }, '⋮⋮'),
-            React.createElement(
-              'span',
-              { className: 'text-gray-400 mr-2 transition-transform text-sm ' + (isActCollapsed(actIndex) ? '' : 'rotate-90') },
-              '▶'
-            ),
-            React.createElement(
-              'select',
-              {
-                value: act.name || '',
-                onChange: (e) => handleUpdateActName(actIndex, e.target.value),
-                onClick: (e) => e.stopPropagation(),
-                className: 'px-3 py-2 border border-gray-300 rounded-lg w-48 font-semibold bg-white focus:ring-2 focus:ring-violet-500 focus:border-violet-500'
-              },
-              React.createElement('option', { value: '' }, '-- Select Act --'),
-              React.createElement('option', { value: 'Pre-Show' }, 'Pre-Show'),
-              React.createElement('option', { value: 'Prologue' }, 'Prologue'),
-              React.createElement('option', { value: 'Act One' }, 'Act One'),
-              React.createElement('option', { value: 'Act Two' }, 'Act Two'),
-              React.createElement('option', { value: 'Act Three' }, 'Act Three'),
-              React.createElement('option', { value: 'Act Four' }, 'Act Four'),
-              React.createElement('option', { value: 'Act Five' }, 'Act Five'),
-              React.createElement('option', { value: 'Act I' }, 'Act I'),
-              React.createElement('option', { value: 'Act II' }, 'Act II'),
-              React.createElement('option', { value: 'Act III' }, 'Act III'),
-              React.createElement('option', { value: 'Act IV' }, 'Act IV'),
-              React.createElement('option', { value: 'Act V' }, 'Act V'),
-              React.createElement('option', { value: 'Intermission' }, 'Intermission'),
-              React.createElement('option', { value: "Entr'acte" }, "Entr'acte"),
-              React.createElement('option', { value: 'Epilogue' }, 'Epilogue'),
-              React.createElement('option', { value: 'Post-Show' }, 'Post-Show')
-            )
-          ),
-          !scenesReadOnly && React.createElement(
-            'div',
-            { className: 'flex gap-2' },
-            React.createElement(
-              'button',
-              {
-                className: 'px-3 py-2 bg-violet-600 text-white rounded hover:bg-violet-700 text-sm',
-                onClick: (e) => { e.stopPropagation(); handleAddScene(actIndex); }
-              },
-              '+ Add Scene'
-            ),
-            React.createElement(
-              'button',
-              {
-                className: 'px-3 py-2 bg-red-50 text-red-700 border border-red-200 rounded hover:bg-red-100 text-sm',
-                onClick: (e) => { e.stopPropagation(); handleDeleteAct(actIndex); }
-              },
-              'Delete Act'
-            )
-          )
-        ),
-        !isActCollapsed(actIndex) && React.createElement(
-          'div',
-          { className: 'space-y-3 ml-4' },
-          (act.scenes || []).map((scene, sceneIndex) =>
-            React.createElement(
-              'div',
-              { 
-                key: sceneIndex, 
-                className: 'border border-gray-200 rounded bg-gray-50 overflow-hidden'
-              },
-              // Collapse header (always visible)
-              React.createElement(
-                'div',
-                { 
-                  className: 'flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-100',
-                  onClick: () => toggleSceneCollapse(actIndex, sceneIndex)
-                },
-                // Collapse toggle arrow
-                React.createElement(
-                  'span',
-                  { className: 'text-gray-400 text-sm transition-transform ' + (isSceneCollapsed(actIndex, sceneIndex) ? '' : 'rotate-90') },
-                  '▶'
-                ),
-                // Scene summary
-                React.createElement(
-                  'div',
-                  { className: 'flex-1 flex items-center gap-3' },
-                  React.createElement('span', { className: 'font-semibold text-gray-700' }, 
-                    'Scene ' + (scene.number || sceneIndex + 1) + 
-                    (scene.label && scene.label !== 'Custom' ? ' - ' + scene.label : '') +
-                    (scene.label === 'Custom' && scene.customLabel ? ' - ' + scene.customLabel : '') +
-                    (scene.name ? ': ' + scene.name : '')
-                  ),
-                  // Character count badge
-                  (scene.characterIds?.length > 0) && React.createElement(
-                    'span',
-                    { className: 'px-2 py-0.5 bg-violet-100 text-violet-700 text-xs rounded-full' },
-                    scene.characterIds.length + ' character' + (scene.characterIds.length !== 1 ? 's' : '')
-                  ),
-                  // Song/music summary
-                  scene.songTitle && React.createElement(
-                    'span',
-                    { className: 'text-xs ' + (scene.soundType === 'Musical Number' ? 'text-violet-600' : 'text-green-600') },
-                    (scene.soundType === 'Musical Number' ? '🎵 ' : '♫ ') + scene.songTitle +
-                    (scene.soundType === 'Musical Number' && (scene.musicalCharacterIds || []).length > 0
-                      ? ' – ' + (production.characters || []).filter(c => (scene.musicalCharacterIds || []).includes(c.id)).map(c => c.name).join(', ')
-                      : '') +
-                    (scene.soundType !== 'Musical Number' && scene.artist ? ' – ' + scene.artist : '')
-                  )
-                ),
-                // Scene action buttons (hidden in read-only mode)
-                !scenesReadOnly && React.createElement(
-                  'div',
-                  { className: 'flex items-center gap-1' },
-                  // Duplicate button
-                  React.createElement(
-                    'button',
-                    {
-                      className: 'p-1 text-gray-400 hover:text-violet-600 text-sm',
-                      onClick: (e) => {
-                        e.stopPropagation();
-                        handleDuplicateScene(actIndex, sceneIndex);
-                      },
-                      title: 'Duplicate scene'
-                    },
-                    '📋'
-                  ),
-                  // Delete button
-                  React.createElement(
-                    'button',
-                    {
-                      className: 'p-1 text-gray-400 hover:text-red-600 text-sm',
-                      onClick: (e) => {
-                        e.stopPropagation();
-                        handleDeleteScene(actIndex, sceneIndex);
-                      },
-                      title: 'Delete scene'
-                    },
-                    '🗑'
-                  )
-                )
-              ),
-              // Collapsible content
-              !isSceneCollapsed(actIndex, sceneIndex) && React.createElement(
-                'div',
-                { className: 'p-3 pt-3 border-t border-gray-200' },
+  // Extracted scene form — renders the full edit panel for one scene.
+  const renderSceneFormContent = (actIndex, sceneIndex, scene) => {
+    const sceneKey = `${actIndex}-${sceneIndex}`;
+    const isReadOnly = isDeptManager;
+    const myDept = deptTabInfo ? deptTabInfo.id : null;
+    const readOnlyFieldStyle = isReadOnly ? { opacity: 0.7, cursor: 'not-allowed', background: '#f9fafb' } : {};
+    return React.createElement(
+      React.Fragment,
+      null,
                 // Completion summary
                 React.createElement(
                   'div',
@@ -1014,7 +866,8 @@ function SceneBuilder({ productionId: propId }) {
                       min: 1,
                       value: scene.number || sceneIndex + 1,
                       onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'number', parseInt(e.target.value) || 1),
-                      style: { height: '38px', width: '50px' },
+                      disabled: isReadOnly,
+                      style: { height: '38px', width: '50px', ...readOnlyFieldStyle },
                       className: 'px-2 text-center font-semibold border-0 focus:ring-0 focus:outline-none'
                     })
                   ),
@@ -1024,7 +877,8 @@ function SceneBuilder({ productionId: propId }) {
                     {
                       value: scene.label || '',
                       onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'label', e.target.value),
-                      style: { height: '38px' },
+                      disabled: isReadOnly,
+                      style: { height: '38px', ...readOnlyFieldStyle },
                       className: 'w-36 px-2 border border-gray-300 rounded bg-white text-sm shrink-0'
                     },
                     React.createElement('option', { value: '' }, '— No Label —'),
@@ -1037,12 +891,13 @@ function SceneBuilder({ productionId: propId }) {
                     React.createElement('option', { value: 'Custom' }, 'Custom...')
                   ),
                   // Scene title or custom label (fills remaining space)
-                  scene.label === 'Custom' 
+                  scene.label === 'Custom'
                     ? React.createElement('input', {
                         type: 'text',
                         value: scene.customLabel || '',
                         onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'customLabel', e.target.value),
-                        style: { height: '38px' },
+                        disabled: isReadOnly,
+                        style: { height: '38px', ...readOnlyFieldStyle },
                         className: 'flex-1 px-3 border border-gray-300 rounded text-sm',
                         placeholder: 'Enter custom label...'
                       })
@@ -1050,7 +905,8 @@ function SceneBuilder({ productionId: propId }) {
                         type: 'text',
                         value: scene.name || '',
                         onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'name', e.target.value),
-                        style: { height: '38px' },
+                        disabled: isReadOnly,
+                        style: { height: '38px', ...readOnlyFieldStyle },
                         className: 'flex-1 px-3 border border-gray-300 rounded text-sm',
                         placeholder: 'Scene title (optional)'
                       })
@@ -1059,7 +915,24 @@ function SceneBuilder({ productionId: propId }) {
                 React.createElement(
                   'div',
                   { className: 'mb-4' },
-                  React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🎭 Characters in Scene'),
+                  React.createElement(
+                    'div',
+                    { className: 'flex items-center justify-between mb-1' },
+                    React.createElement('label', { className: 'block text-xs font-medium text-gray-600' }, '🎭 Characters in Scene'),
+                    !isReadOnly && React.createElement(
+                      'button',
+                      {
+                        type: 'button',
+                        onClick: () => {
+                          const next = roleDisplayMode === 'role_actor' ? 'role' : 'role_actor';
+                          setRoleDisplayMode(next);
+                          localStorage.setItem('showsuite_scene_role_display_mode', next);
+                        },
+                        className: 'text-xs text-blue-600 hover:text-blue-800 font-medium',
+                      },
+                      roleDisplayMode === 'role_actor' ? 'Role / Actor Name ⇄ Role Only' : 'Role Only ⇄ Role / Actor Name'
+                    )
+                  ),
                   (() => {
                     const sceneCharsArr = scene.characters || [];
                     const isFullCompanyScene = sceneCharsArr.includes('Full Company');
@@ -1078,8 +951,9 @@ function SceneBuilder({ productionId: propId }) {
                             '🎭 Full Company',
                             React.createElement('button', {
                               type: 'button',
-                              onClick: () => handleUpdateScene(actIndex, sceneIndex, 'characters', []),
-                              style: { background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-primary)', marginLeft: '2px' }
+                              onClick: () => !isReadOnly && handleUpdateScene(actIndex, sceneIndex, 'characters', []),
+                              disabled: isReadOnly,
+                              style: { background: 'none', border: 'none', cursor: isReadOnly ? 'default' : 'pointer', color: 'var(--color-primary)', marginLeft: '2px' }
                             }, '×')
                           )
                         : [
@@ -1089,10 +963,11 @@ function SceneBuilder({ productionId: propId }) {
                               return React.createElement(
                                 'span',
                                 { key: charId, className: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-violet-100 text-violet-800' },
-                                char.name,
+                                formatCharLabel(char.name),
                                 React.createElement('button', {
                                   type: 'button',
-                                  onClick: () => handleUpdateScene(actIndex, sceneIndex, 'characterIds', (scene.characterIds || []).filter(id => id !== charId)),
+                                  onClick: () => !isReadOnly && handleUpdateScene(actIndex, sceneIndex, 'characterIds', (scene.characterIds || []).filter(id => id !== charId)),
+                                  disabled: isReadOnly,
                                   className: 'ml-0.5 text-violet-500 hover:text-violet-900 font-bold leading-none'
                                 }, '×')
                               );
@@ -1101,10 +976,11 @@ function SceneBuilder({ productionId: propId }) {
                               React.createElement(
                                 'span',
                                 { key: `fc-${i}`, className: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-violet-100 text-violet-800' },
-                                charName,
+                                formatCharLabel(charName),
                                 React.createElement('button', {
                                   type: 'button',
-                                  onClick: () => handleUpdateScene(actIndex, sceneIndex, 'characters', sceneCharsArr.filter((_, idx) => idx !== i)),
+                                  onClick: () => !isReadOnly && handleUpdateScene(actIndex, sceneIndex, 'characters', sceneCharsArr.filter((_, idx) => idx !== i)),
+                                  disabled: isReadOnly,
                                   className: 'ml-0.5 text-violet-500 hover:text-violet-900 font-bold leading-none'
                                 }, '×')
                               )
@@ -1123,6 +999,7 @@ function SceneBuilder({ productionId: propId }) {
                         'select',
                         {
                           value: '',
+                          disabled: isReadOnly,
                           onChange: e => {
                             const val = e.target.value;
                             if (!val) return;
@@ -1136,6 +1013,7 @@ function SceneBuilder({ productionId: propId }) {
                               handleUpdateScene(actIndex, sceneIndex, 'characters', unique);
                             }
                           },
+                          style: readOnlyFieldStyle,
                           className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors'
                         },
                         React.createElement('option', { value: '' }, '+ Add character from Cast List...'),
@@ -1162,6 +1040,8 @@ function SceneBuilder({ productionId: propId }) {
                           }
                         },
                         className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
+                        disabled: isReadOnly,
+                        style: readOnlyFieldStyle,
                         placeholder: 'Type character name and press Enter…'
                       }),
                       React.createElement('p', { className: 'text-xs text-gray-400 mt-1' }, '💡 Add characters to the Cast List first for faster entry')
@@ -1180,6 +1060,8 @@ function SceneBuilder({ productionId: propId }) {
                       type: 'text',
                       value: scene.location || '',
                       onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'location', e.target.value),
+                      disabled: isReadOnly,
+                      style: readOnlyFieldStyle,
                       className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
                       placeholder: 'e.g., The Unemployment Office, Stage Right'
                     })
@@ -1193,7 +1075,8 @@ function SceneBuilder({ productionId: propId }) {
                       value: scene.time || '',
                       defaultOptions: TIME_OF_DAY_OPTIONS,
                       onChange: (val) => handleUpdateScene(actIndex, sceneIndex, 'time', val),
-                      placeholder: 'Select time of day...'
+                      placeholder: 'Select time of day...',
+                      disabled: isReadOnly
                     })
                   )
                 ),
@@ -1205,13 +1088,15 @@ function SceneBuilder({ productionId: propId }) {
                   React.createElement('textarea', {
                     value: scene.description || '',
                     onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'description', e.target.value),
+                    disabled: isReadOnly,
+                    style: readOnlyFieldStyle,
                     className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors resize-y',
                     rows: 3,
                     placeholder: 'Brief description of what happens in this scene…'
                   })
                 ),
                 // ── Department Cues (collapsible by default) ─────────────────────────────────
-                React.createElement(
+                (!isDeptManager || myDept === 'lighting' || myDept === 'sound') && React.createElement(
                   'button',
                   {
                     type: 'button',
@@ -1228,43 +1113,44 @@ function SceneBuilder({ productionId: propId }) {
                     ? React.createElement('span', { className: 'w-2 h-2 rounded-full bg-green-500 ml-1 shrink-0', title: 'Has cue data' })
                     : React.createElement('span', { className: 'ml-auto text-gray-400 text-xs italic font-normal normal-case tracking-normal' }, 'not set')
                 ),
-                isSectionOpen(`${actIndex}-${sceneIndex}`, 'cues') && React.createElement(
+                (!isDeptManager || myDept === 'lighting' || myDept === 'sound') && isSectionOpen(`${actIndex}-${sceneIndex}`, 'cues') && React.createElement(
                   'div',
                   { className: 'pb-3 space-y-3' },
-                  React.createElement(
-                    'div',
-                    { className: 'grid grid-cols-1 md:grid-cols-2 gap-3' },
-                    React.createElement(
-                      'div',
-                      null,
-                      React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '💡 Lighting Mood'),
-                      React.createElement(SmartDropdown, {
-                        field: 'lightingMood',
-                        value: scene.lightingMood || '',
-                        defaultOptions: LIGHTING_MOOD_OPTIONS,
-                        onChange: (val) => handleUpdateScene(actIndex, sceneIndex, 'lightingMood', val),
-                        placeholder: 'Select lighting mood...'
-                      })
-                    ),
-                    React.createElement(
-                      'div',
-                      null,
-                      React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🎨 Lighting Color'),
-                      React.createElement('input', {
-                        type: 'text',
-                        value: scene.lightingColor || '',
-                        onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'lightingColor', e.target.value),
-                        className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
-                        placeholder: 'e.g., amber, blue wash'
-                      })
-                    )
+                  (!isDeptManager || myDept === 'lighting') && React.createElement('div', null,
+                    React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '💡 Lighting Mood'),
+                    React.createElement(SmartDropdown, {
+                      field: 'lightingMood',
+                      value: scene.lightingMood || '',
+                      defaultOptions: LIGHTING_MOOD_OPTIONS,
+                      onChange: (val) => handleUpdateScene(actIndex, sceneIndex, 'lightingMood', val),
+                      placeholder: 'Select lighting mood...'
+                    })
                   ),
-                  React.createElement(
+                  !isDeptManager && React.createElement('div', null,
+                    React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, "💡 Director's Lighting Notes"),
+                    React.createElement(MentionTextarea, {
+                      value: scene.lighting?.directorNotes ?? '',
+                      onChange: (val) => handleUpdateScene(actIndex, sceneIndex, 'lighting', { ...(scene.lighting || {}), directorNotes: val }),
+                      onBlur: () => pushRehearsalNotes(production, scene, actIndex, scene.lighting?.directorNotes || ''),
+                      placeholder: 'Lighting direction, color intent, atmosphere, special effects...',
+                      rows: 3,
+                      castMembers: getCastMembers(production, scene),
+                    }),
+                    (() => {
+                      const castMems = getCastMembers(production, scene);
+                      const matched = extractMentions(scene.lighting?.directorNotes || '', castMems)
+                        .filter(name => findActorByMention(name, castMems)?.actorId);
+                      if (matched.length === 0) return null;
+                      return React.createElement('p', { className: 'mention-notify-hint' },
+                        `✓ Note will be sent to ${matched.length} actor${matched.length !== 1 ? 's' : ''} in their portal`);
+                    })()
+                  ),
+                  (!isDeptManager || myDept === 'sound') && React.createElement(
                     'div',
                     { className: 'space-y-3' },
                     React.createElement(
                       'div',
-                      { className: 'grid gap-3', style: { gridTemplateColumns: '1fr auto auto' } },
+                      { className: 'grid gap-3', style: { gridTemplateColumns: '1fr auto' } },
                       React.createElement(
                         'div',
                         null,
@@ -1275,18 +1161,6 @@ function SceneBuilder({ productionId: propId }) {
                           onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'songTitle', e.target.value),
                           className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
                           placeholder: 'Song title'
-                        })
-                      ),
-                      React.createElement(
-                        'div',
-                        null,
-                        React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '⏱ Duration'),
-                        React.createElement('input', {
-                          type: 'text',
-                          value: scene.duration || '',
-                          onChange: (e) => handleUpdateScene(actIndex, sceneIndex, 'duration', e.target.value),
-                          className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
-                          placeholder: 'Duration'
                         })
                       ),
                       React.createElement(
@@ -1336,6 +1210,25 @@ function SceneBuilder({ productionId: propId }) {
                           })
                         )
                       : null,
+                    !isDeptManager && React.createElement('div', null,
+                      React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, "🎵 Director's Sound Notes"),
+                      React.createElement(MentionTextarea, {
+                        value: scene.sound?.directorNotes ?? '',
+                        onChange: (val) => handleUpdateScene(actIndex, sceneIndex, 'sound', { ...(scene.sound || {}), directorNotes: val }),
+                        onBlur: () => pushRehearsalNotes(production, scene, actIndex, scene.sound?.directorNotes || ''),
+                        placeholder: 'Musical direction, sound design intent, volume notes, special audio needs...',
+                        rows: 3,
+                        castMembers: getCastMembers(production, scene),
+                      }),
+                      (() => {
+                        const castMems = getCastMembers(production, scene);
+                        const matched = extractMentions(scene.sound?.directorNotes || '', castMems)
+                          .filter(name => findActorByMention(name, castMems)?.actorId);
+                        if (matched.length === 0) return null;
+                        return React.createElement('p', { className: 'mention-notify-hint' },
+                          `✓ Note will be sent to ${matched.length} actor${matched.length !== 1 ? 's' : ''} in their portal`);
+                      })()
+                    ),
                     scene.soundType === 'Musical Number'
                       ? (() => {
                           const sceneChars = scene.characters || [];
@@ -1490,8 +1383,147 @@ function SceneBuilder({ productionId: propId }) {
                       : null
                   )
                 ),
+                // ── Wardrobe (collapsible) ────────────────────────────────────────────────────
+                (!isDeptManager || myDept === 'wardrobe') && React.createElement(
+                  'button',
+                  { type: 'button', onClick: () => toggleSection(`${actIndex}-${sceneIndex}`, 'wardrobe'), className: 'flex items-center gap-2 w-full py-2 text-left select-none border-t border-gray-200 mt-1 hover:text-gray-700 transition-colors' },
+                  React.createElement('span', { className: 'text-gray-400 text-xs transition-transform duration-150 ' + (isSectionOpen(`${actIndex}-${sceneIndex}`, 'wardrobe') ? 'rotate-90' : '') }, '▶'),
+                  React.createElement('span', { className: 'text-xs font-semibold tracking-wide text-gray-500 uppercase' }, '👗 Wardrobe')
+                ),
+                (!isDeptManager || myDept === 'wardrobe') && isSectionOpen(`${actIndex}-${sceneIndex}`, 'wardrobe') && React.createElement(
+                  'div',
+                  { className: 'pb-3 space-y-3' },
+                  (() => {
+                    const castList = production.characters || [];
+                    const inputCls = 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors';
+                    if (castList.length === 0) {
+                      return React.createElement('p', { className: 'text-xs text-gray-400 italic' }, 'Add cast members in Edit Production Details to populate wardrobe notes.');
+                    }
+                    return castList.map(char => {
+                      const roleId = char.id || char.name;
+                      const costumeData = ((scene.wardrobe || {}).costumes || {})[roleId] || {};
+                      const actorName = getActorNameForRole(char.name);
+                      const updateCostume = (field, val) => handleUpdateScene(actIndex, sceneIndex, 'wardrobe', {
+                        ...(scene.wardrobe || {}),
+                        costumes: { ...((scene.wardrobe || {}).costumes || {}), [roleId]: { ...costumeData, [field]: val } }
+                      });
+                      return React.createElement(
+                        'div',
+                        { key: roleId, className: 'border border-gray-200 rounded-lg p-3 space-y-2' },
+                        React.createElement('div', { className: 'flex items-baseline gap-2 mb-1' },
+                          React.createElement('span', { className: 'text-sm font-semibold text-gray-800' }, char.name),
+                          actorName && React.createElement('span', { className: 'text-xs text-gray-500' }, actorName)
+                        ),
+                        React.createElement('input', { type: 'text', value: costumeData.description || '', onChange: e => updateCostume('description', e.target.value), className: inputCls, placeholder: 'Costume description...' }),
+                        React.createElement('textarea', { value: costumeData.notes || '', onChange: e => updateCostume('notes', e.target.value), rows: 2, className: inputCls + ' resize-y', placeholder: 'Enter info about style, fit, use, quick-change needs, budget, sourcing tips…' })
+                      );
+                    });
+                  })(),
+                  !isDeptManager && React.createElement('div', null,
+                    React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, "👗 Director's Wardrobe Notes"),
+                    React.createElement(MentionTextarea, {
+                      value: scene.wardrobe?.directorNotes ?? '',
+                      onChange: (val) => handleUpdateScene(actIndex, sceneIndex, 'wardrobe', { ...(scene.wardrobe || {}), directorNotes: val }),
+                      onBlur: () => pushRehearsalNotes(production, scene, actIndex, scene.wardrobe?.directorNotes || ''),
+                      placeholder: 'Overall wardrobe direction, style period, quick-change needs, budget guidance...',
+                      rows: 3, castMembers: getCastMembers(production, scene),
+                    }),
+                    (() => {
+                      const castMems = getCastMembers(production, scene);
+                      const matched = extractMentions(scene.wardrobe?.directorNotes || '', castMems).filter(n => findActorByMention(n, castMems)?.actorId);
+                      if (matched.length === 0) return null;
+                      return React.createElement('p', { className: 'mention-notify-hint' }, `✓ Note will be sent to ${matched.length} actor${matched.length !== 1 ? 's' : ''} in their portal`);
+                    })()
+                  )
+                ),
+                // ── Props (collapsible) ───────────────────────────────────────────────────────
+                (!isDeptManager || myDept === 'props') && React.createElement(
+                  'button',
+                  { type: 'button', onClick: () => toggleSection(`${actIndex}-${sceneIndex}`, 'props'), className: 'flex items-center gap-2 w-full py-2 text-left select-none border-t border-gray-200 mt-1 hover:text-gray-700 transition-colors' },
+                  React.createElement('span', { className: 'text-gray-400 text-xs transition-transform duration-150 ' + (isSectionOpen(`${actIndex}-${sceneIndex}`, 'props') ? 'rotate-90' : '') }, '▶'),
+                  React.createElement('span', { className: 'text-xs font-semibold tracking-wide text-gray-500 uppercase' }, '🎭 Props')
+                ),
+                (!isDeptManager || myDept === 'props') && isSectionOpen(`${actIndex}-${sceneIndex}`, 'props') && React.createElement(
+                  'div',
+                  { className: 'pb-3 space-y-3' },
+                  (Array.isArray(scene.props) ? scene.props : []).map((prop, propIdx) => {
+                    const inputCls = 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors';
+                    const updateProp = (field, val) => {
+                      const updated = [...(Array.isArray(scene.props) ? scene.props : [])];
+                      updated[propIdx] = { ...updated[propIdx], [field]: val };
+                      handleUpdateScene(actIndex, sceneIndex, 'props', updated);
+                    };
+                    return React.createElement(
+                      'div',
+                      { key: propIdx, className: 'border border-gray-200 rounded-lg p-3 space-y-2 relative' },
+                      React.createElement('button', { type: 'button', onClick: () => handleUpdateScene(actIndex, sceneIndex, 'props', (Array.isArray(scene.props) ? scene.props : []).filter((_, i) => i !== propIdx)), className: 'absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xs' }, '✕'),
+                      React.createElement('input', { type: 'text', value: prop.name || '', onChange: e => updateProp('name', e.target.value), className: inputCls, placeholder: 'Prop name...' }),
+                      React.createElement(
+                        'select',
+                        { value: prop.character || '', onChange: e => updateProp('character', e.target.value), className: inputCls },
+                        React.createElement('option', { value: '' }, '— Select Character —'),
+                        ...(production.characters || []).map(c => React.createElement('option', { key: c.name, value: c.name }, formatCharLabel(c.name)))
+                      ),
+                      React.createElement('textarea', { value: prop.notes || '', onChange: e => updateProp('notes', e.target.value), rows: 2, className: inputCls + ' resize-y', placeholder: 'Enter info about use, hazard warning, period, placement, budget, sourcing tips…' })
+                    );
+                  }),
+                  React.createElement('button', { type: 'button', onClick: () => handleUpdateScene(actIndex, sceneIndex, 'props', [...(Array.isArray(scene.props) ? scene.props : []), {}]), className: 'text-sm text-violet-600 hover:text-violet-800 font-medium' }, '+ Add Prop'),
+                  !isDeptManager && React.createElement('div', null,
+                    React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, "🎭 Director's Props Notes"),
+                    React.createElement(MentionTextarea, {
+                      value: scene.propsDirectorNotes ?? '',
+                      onChange: (val) => handleUpdateScene(actIndex, sceneIndex, 'propsDirectorNotes', val),
+                      onBlur: () => pushRehearsalNotes(production, scene, actIndex, scene.propsDirectorNotes || ''),
+                      placeholder: 'Overall props direction, period accuracy notes, hazard warnings, sourcing guidance...',
+                      rows: 3, castMembers: getCastMembers(production, scene),
+                    }),
+                    (() => {
+                      const castMems = getCastMembers(production, scene);
+                      const matched = extractMentions(scene.propsDirectorNotes || '', castMems).filter(n => findActorByMention(n, castMems)?.actorId);
+                      if (matched.length === 0) return null;
+                      return React.createElement('p', { className: 'mention-notify-hint' }, `✓ Note will be sent to ${matched.length} actor${matched.length !== 1 ? 's' : ''} in their portal`);
+                    })()
+                  )
+                ),
+                // ── Set (collapsible) ─────────────────────────────────────────────────────────
+                (!isDeptManager || myDept === 'set') && React.createElement(
+                  'button',
+                  { type: 'button', onClick: () => toggleSection(`${actIndex}-${sceneIndex}`, 'set'), className: 'flex items-center gap-2 w-full py-2 text-left select-none border-t border-gray-200 mt-1 hover:text-gray-700 transition-colors' },
+                  React.createElement('span', { className: 'text-gray-400 text-xs transition-transform duration-150 ' + (isSectionOpen(`${actIndex}-${sceneIndex}`, 'set') ? 'rotate-90' : '') }, '▶'),
+                  React.createElement('span', { className: 'text-xs font-semibold tracking-wide text-gray-500 uppercase' }, '🏗️ Set')
+                ),
+                (!isDeptManager || myDept === 'set') && isSectionOpen(`${actIndex}-${sceneIndex}`, 'set') && React.createElement(
+                  'div',
+                  { className: 'pb-3 space-y-3' },
+                  React.createElement('div', null,
+                    React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, '🏗️ Set Notes'),
+                    React.createElement('textarea', {
+                      value: scene.set?.notes ?? '',
+                      onChange: e => handleUpdateScene(actIndex, sceneIndex, 'set', { ...(scene.set || {}), notes: e.target.value }),
+                      rows: 4,
+                      className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors resize-y',
+                      placeholder: 'Describe set pieces, layout, construction notes, design intent, sight-line considerations, budget...'
+                    })
+                  ),
+                  !isDeptManager && React.createElement('div', null,
+                    React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, "🏗️ Director's Set Notes"),
+                    React.createElement(MentionTextarea, {
+                      value: scene.set?.directorNotes ?? '',
+                      onChange: (val) => handleUpdateScene(actIndex, sceneIndex, 'set', { ...(scene.set || {}), directorNotes: val }),
+                      onBlur: () => pushRehearsalNotes(production, scene, actIndex, scene.set?.directorNotes || ''),
+                      placeholder: 'Set direction, staging considerations, fly cues, discovery moments, scene transition notes...',
+                      rows: 3, castMembers: getCastMembers(production, scene),
+                    }),
+                    (() => {
+                      const castMems = getCastMembers(production, scene);
+                      const matched = extractMentions(scene.set?.directorNotes || '', castMems).filter(n => findActorByMention(n, castMems)?.actorId);
+                      if (matched.length === 0) return null;
+                      return React.createElement('p', { className: 'mention-notify-hint' }, `✓ Note will be sent to ${matched.length} actor${matched.length !== 1 ? 's' : ''} in their portal`);
+                    })()
+                  )
+                ),
                 // ── Director's Notes (collapsible by default) ─────────────────────────────────
-                React.createElement(
+                !isDeptManager && React.createElement(
                   'button',
                   {
                     type: 'button',
@@ -1504,7 +1536,7 @@ function SceneBuilder({ productionId: propId }) {
                     ? React.createElement('span', { className: 'w-2 h-2 rounded-full bg-green-500 ml-1 shrink-0', title: 'Has director notes' })
                     : React.createElement('span', { className: 'ml-auto text-gray-400 text-xs italic font-normal normal-case tracking-normal' }, 'not set')
                 ),
-                isSectionOpen(`${actIndex}-${sceneIndex}`, 'director') && React.createElement(
+                !isDeptManager && isSectionOpen(`${actIndex}-${sceneIndex}`, 'director') && React.createElement(
                   'div',
                   { className: 'pb-3 space-y-3' },
                   React.createElement(
@@ -1605,7 +1637,7 @@ function SceneBuilder({ productionId: propId }) {
                   )
                 ),
                 // ── SM Notes (collapsible by default) ─────────────────────────────────────────
-                React.createElement(
+                (!isDeptManager || myDept === 'stage_manager') && React.createElement(
                   'button',
                   {
                     type: 'button',
@@ -1622,7 +1654,7 @@ function SceneBuilder({ productionId: propId }) {
                       )
                     : React.createElement('span', { className: 'ml-auto text-gray-400 text-xs italic font-normal normal-case tracking-normal' }, 'not set')
                 ),
-                isSectionOpen(`${actIndex}-${sceneIndex}`, 'smNotes') && React.createElement(
+                (!isDeptManager || myDept === 'stage_manager') && isSectionOpen(`${actIndex}-${sceneIndex}`, 'smNotes') && React.createElement(
                   'div',
                   { className: 'pb-3 space-y-3' },
                   React.createElement(
@@ -1646,9 +1678,194 @@ function SceneBuilder({ productionId: propId }) {
                       className: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors',
                       placeholder: 'e.g., Pyro, flying, quick change, live flame...'
                     })
+                  ),
+                  !isDeptManager && React.createElement('div', null,
+                    React.createElement('label', { className: 'block text-xs font-medium text-gray-600 mb-1' }, "📋 Director's SM Notes"),
+                    React.createElement(MentionTextarea, {
+                      value: scene.smDirectorNotes ?? '',
+                      onChange: (val) => handleUpdateScene(actIndex, sceneIndex, 'smDirectorNotes', val),
+                      onBlur: () => pushRehearsalNotes(production, scene, actIndex, scene.smDirectorNotes || ''),
+                      placeholder: 'Pacing notes, special timing, transition instructions, notes for the SM calling this scene...',
+                      rows: 3, castMembers: getCastMembers(production, scene),
+                    }),
+                    (() => {
+                      const castMems = getCastMembers(production, scene);
+                      const matched = extractMentions(scene.smDirectorNotes || '', castMems).filter(n => findActorByMention(n, castMems)?.actorId);
+                      if (matched.length === 0) return null;
+                      return React.createElement('p', { className: 'mention-notify-hint' }, `✓ Note will be sent to ${matched.length} actor${matched.length !== 1 ? 's' : ''} in their portal`);
+                    })()
                   )
                 )
-              )
+    );
+  };
+  // Acts list
+  const actsList = React.createElement(
+    'div',
+    { className: 'space-y-4' },
+    (production.acts || []).map((act, actIndex) =>
+      React.createElement(
+        'div',
+        { 
+          key: actIndex, 
+          className: 'bg-white rounded-lg border border-gray-200 p-4 ' + 
+            (draggedActIndex === actIndex ? 'opacity-50' : '') +
+            (draggedActIndex !== null && draggedActIndex !== actIndex ? ' border-dashed border-violet-300' : ''),
+          draggable: true,
+          onDragStart: (e) => handleDragStart(e, actIndex),
+          onDragEnd: handleDragEnd,
+          onDragOver: (e) => handleDragOver(e, actIndex),
+          onDrop: (e) => handleDrop(e, actIndex)
+        },
+        React.createElement(
+          'div',
+          {
+            className: 'flex items-center justify-between mb-3 cursor-pointer select-none',
+            onClick: () => toggleActCollapse(actIndex)
+          },
+          React.createElement(
+            'div',
+            { className: 'flex items-center' },
+            React.createElement('span', {
+              className: 'cursor-grab text-gray-400 mr-2',
+              title: 'Drag to reorder',
+              onClick: (e) => e.stopPropagation()
+            }, '⋮⋮'),
+            React.createElement(
+              'span',
+              { className: 'text-gray-400 mr-2 transition-transform text-sm ' + (isActCollapsed(actIndex) ? '' : 'rotate-90') },
+              '▶'
+            ),
+            React.createElement(
+              'select',
+              {
+                value: act.name || '',
+                onChange: (e) => handleUpdateActName(actIndex, e.target.value),
+                onClick: (e) => e.stopPropagation(),
+                className: 'px-3 py-2 border border-gray-300 rounded-lg w-48 font-semibold bg-white focus:ring-2 focus:ring-violet-500 focus:border-violet-500'
+              },
+              React.createElement('option', { value: '' }, '-- Select Act --'),
+              React.createElement('option', { value: 'Pre-Show' }, 'Pre-Show'),
+              React.createElement('option', { value: 'Prologue' }, 'Prologue'),
+              React.createElement('option', { value: 'Act One' }, 'Act One'),
+              React.createElement('option', { value: 'Act Two' }, 'Act Two'),
+              React.createElement('option', { value: 'Act Three' }, 'Act Three'),
+              React.createElement('option', { value: 'Act Four' }, 'Act Four'),
+              React.createElement('option', { value: 'Act Five' }, 'Act Five'),
+              React.createElement('option', { value: 'Act I' }, 'Act I'),
+              React.createElement('option', { value: 'Act II' }, 'Act II'),
+              React.createElement('option', { value: 'Act III' }, 'Act III'),
+              React.createElement('option', { value: 'Act IV' }, 'Act IV'),
+              React.createElement('option', { value: 'Act V' }, 'Act V'),
+              React.createElement('option', { value: 'Intermission' }, 'Intermission'),
+              React.createElement('option', { value: "Entr'acte" }, "Entr'acte"),
+              React.createElement('option', { value: 'Epilogue' }, 'Epilogue'),
+              React.createElement('option', { value: 'Post-Show' }, 'Post-Show')
+            )
+          ),
+          !scenesReadOnly && React.createElement(
+            'div',
+            { className: 'flex gap-2' },
+            React.createElement(
+              'button',
+              {
+                className: 'px-3 py-2 bg-violet-600 text-white rounded hover:bg-violet-700 text-sm',
+                onClick: (e) => { e.stopPropagation(); handleAddScene(actIndex); }
+              },
+              '+ Add Scene'
+            ),
+            React.createElement(
+              'button',
+              {
+                className: 'px-3 py-2 bg-red-50 text-red-700 border border-red-200 rounded hover:bg-red-100 text-sm',
+                onClick: (e) => { e.stopPropagation(); handleDeleteAct(actIndex); }
+              },
+              'Delete Act'
+            )
+          )
+        ),
+        !isActCollapsed(actIndex) && React.createElement(
+          'div',
+          { className: 'space-y-3 ml-4' },
+          (act.scenes || []).map((scene, sceneIndex) =>
+            React.createElement(
+              'div',
+              { 
+                key: sceneIndex, 
+                className: 'border border-gray-200 rounded bg-gray-50 overflow-hidden'
+              },
+              // Collapse header (always visible)
+              React.createElement(
+                'div',
+                { 
+                  className: 'flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-100',
+                  onClick: () => setEditingSceneId(`${actIndex}-${sceneIndex}`)
+                },
+                // Collapse toggle arrow
+                React.createElement(
+                  'span',
+                  { className: 'text-gray-400 text-xs shrink-0' },
+                  '▶'
+                ),
+                // Scene summary
+                React.createElement(
+                  'div',
+                  { className: 'flex-1 flex items-center gap-3' },
+                  React.createElement('span', { className: 'font-semibold text-gray-700' }, 
+                    'Scene ' + (scene.number || sceneIndex + 1) + 
+                    (scene.label && scene.label !== 'Custom' ? ' - ' + scene.label : '') +
+                    (scene.label === 'Custom' && scene.customLabel ? ' - ' + scene.customLabel : '') +
+                    (scene.name ? ': ' + scene.name : '')
+                  ),
+                  // Character count badge
+                  (scene.characterIds?.length > 0) && React.createElement(
+                    'span',
+                    { className: 'px-2 py-0.5 bg-violet-100 text-violet-700 text-xs rounded-full' },
+                    scene.characterIds.length + ' character' + (scene.characterIds.length !== 1 ? 's' : '')
+                  ),
+                  // Song/music summary
+                  scene.songTitle && React.createElement(
+                    'span',
+                    { className: 'text-xs ' + (scene.soundType === 'Musical Number' ? 'text-violet-600' : 'text-green-600') },
+                    (scene.soundType === 'Musical Number' ? '🎵 ' : '♫ ') + scene.songTitle +
+                    (scene.soundType === 'Musical Number' && (scene.musicalCharacterIds || []).length > 0
+                      ? ' – ' + (production.characters || []).filter(c => (scene.musicalCharacterIds || []).includes(c.id)).map(c => c.name).join(', ')
+                      : '') +
+                    (scene.soundType !== 'Musical Number' && scene.artist ? ' – ' + scene.artist : '')
+                  )
+                ),
+                // Scene action buttons (hidden in read-only mode)
+                !scenesReadOnly && React.createElement(
+                  'div',
+                  { className: 'flex items-center gap-1' },
+                  // Duplicate button
+                  React.createElement(
+                    'button',
+                    {
+                      className: 'p-1 text-gray-400 hover:text-violet-600 text-sm',
+                      onClick: (e) => {
+                        e.stopPropagation();
+                        handleDuplicateScene(actIndex, sceneIndex);
+                      },
+                      title: 'Duplicate scene'
+                    },
+                    '📋'
+                  ),
+                  // Delete button
+                  React.createElement(
+                    'button',
+                    {
+                      className: 'p-1 text-gray-400 hover:text-red-600 text-sm',
+                      onClick: (e) => {
+                        e.stopPropagation();
+                        handleDeleteScene(actIndex, sceneIndex);
+                      },
+                      title: 'Delete scene'
+                    },
+                    '🗑'
+                  )
+                )
+              ),
+              null
             )
           ),
           (act.scenes || []).length === 0 &&
@@ -1694,55 +1911,257 @@ function SceneBuilder({ productionId: propId }) {
   const emptyState = (production.acts || []).length === 0
     ? React.createElement(
         'div',
-        { className: 'text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300' },
-        React.createElement('p', { className: 'text-gray-600 mb-4' }, 'No acts defined yet'),
-        React.createElement('p', { className: 'text-gray-500 text-sm mb-4' }, 'Start building your production by adding acts and scenes'),
+        { className: 'text-center py-16' },
+        React.createElement('div', { className: 'text-5xl mb-4' }, '🎬'),
+        React.createElement('p', { className: 'text-lg font-semibold text-gray-800 mb-2' }, 'No acts yet.'),
+        React.createElement('p', { className: 'text-sm text-gray-500 mb-6' }, "Click '+ Add Act' to create your first act and start building scenes."),
         !scenesReadOnly && React.createElement(
           'button',
-          {
-            onClick: handleAddAct,
-            className: 'px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700'
-          },
-          '+ Add Your First Act'
+          { onClick: handleAddAct, className: 'px-5 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 font-medium' },
+          '+ Add Act'
         )
       )
     : null;
 
 
+  // ── Scene role display helpers ────────────────────────────────────────────
+  const getActorNameForRole = (roleName) => {
+    const char = (production.characters || []).find(c => c.name === roleName);
+    if (!char?.actorId) return null;
+    try {
+      const allActors = JSON.parse(localStorage.getItem('showsuite_actors') || '[]');
+      const actor = allActors.find(a => a.id === char.actorId);
+      return actor ? (`${actor.firstName || ''} ${actor.lastName || ''}`).trim() || null : null;
+    } catch { return null; }
+  };
+  const formatCharLabel = (roleName) => {
+    if (roleDisplayMode === 'role') return roleName;
+    const actorName = getActorNameForRole(roleName);
+    return actorName ? `${roleName} / ${actorName}` : roleName;
+  };
+
+  // ── Flat scene list + filter state ────────────────────────────────────────
+  const allFlatScenes = [];
+  (production.acts || []).forEach((act, aIdx) => {
+    (act.scenes || []).forEach((sc, sIdx) => {
+      allFlatScenes.push({
+        actIndex: aIdx, sceneIndex: sIdx, scene: sc,
+        sceneId: `${aIdx}-${sIdx}`,
+        actName: act.name || act.label || `Act ${aIdx + 1}`,
+      });
+    });
+  });
+
+  const actFilterOptions = [...new Set((production.acts || []).map(a => a.name || a.label || '').filter(Boolean))];
+  const labelFilterOptions = [...new Set(allFlatScenes.map(({ scene: sc }) =>
+    sc.label === 'Custom' ? (sc.customLabel || '') : (sc.label || '')
+  ).filter(Boolean))];
+  const roleFilterOptions = (production.characters || []).map(c => c.name).filter(Boolean);
+
+  const STATUS_FILTER_OPTIONS = [
+    { value: 'not-started',     label: 'Not Started' },
+    { value: 'in-rehearsal',    label: 'In Rehearsal' },
+    { value: 'blocked',         label: 'Blocked' },
+    { value: 'stumble-through', label: 'Stumble Through' },
+    { value: 'run-through',     label: 'Rehearsal Complete' },
+    { value: 'frozen',          label: 'Performance Ready' },
+  ];
+
+  const filteredScenes = allFlatScenes.filter(({ actName, scene: sc }) => {
+    if (filterAct && actName !== filterAct) return false;
+    const labelVal = sc.label === 'Custom' ? (sc.customLabel || '') : (sc.label || '');
+    if (filterLabel && labelVal !== filterLabel) return false;
+    if (filterStatus && (sc.sceneStatus || 'not-started') !== filterStatus) return false;
+    if (filterRole && !(sc.characters || []).includes(filterRole)) return false;
+    return true;
+  });
+
+  const hasActiveFilter = !!(filterAct || filterLabel || filterStatus || filterRole);
+
+  const filterBar = React.createElement(
+    'div',
+    { className: 'scene-filter-bar' },
+    React.createElement(
+      'select',
+      { value: filterAct, onChange: e => setFilterAct(e.target.value), className: 'scene-filter-select' },
+      React.createElement('option', { value: '' }, 'All Acts'),
+      actFilterOptions.map(a => React.createElement('option', { key: a, value: a }, a))
+    ),
+    React.createElement(
+      'select',
+      { value: filterLabel, onChange: e => setFilterLabel(e.target.value), className: 'scene-filter-select' },
+      React.createElement('option', { value: '' }, 'All Labels'),
+      labelFilterOptions.map(l => React.createElement('option', { key: l, value: l }, l))
+    ),
+    React.createElement(
+      'select',
+      { value: filterStatus, onChange: e => setFilterStatus(e.target.value), className: 'scene-filter-select' },
+      React.createElement('option', { value: '' }, 'All Statuses'),
+      STATUS_FILTER_OPTIONS.map(s => React.createElement('option', { key: s.value, value: s.value }, s.label))
+    ),
+    React.createElement(
+      'select',
+      { value: filterRole, onChange: e => setFilterRole(e.target.value), className: 'scene-filter-select' },
+      React.createElement('option', { value: '' }, 'All Roles'),
+      roleFilterOptions.map(r => React.createElement('option', { key: r, value: r }, r))
+    ),
+    hasActiveFilter && React.createElement(
+      'button',
+      {
+        type: 'button',
+        onClick: () => { setFilterAct(''); setFilterLabel(''); setFilterStatus(''); setFilterRole(''); },
+        className: 'scene-filter-clear',
+      },
+      'Clear'
+    )
+  );
+
+  // Hub page
+  if (productionSubView === null) {
+    const actCount = production.acts?.length || 0;
+    const sceneCount = production.acts?.reduce((sum, a) => sum + (a.scenes?.length || 0), 0) || 0;
+    const hubButtons = isDeptManager ? [
+      { subView: 'scenes',     icon: '📋', label: 'Scenes',                       desc: 'View acts, scenes, and production notes (read-only)' },
+      { subView: 'department', icon: deptTabInfo?.icon || '🎭', label: deptTabInfo?.label || 'Department', desc: 'Manage your department' },
+      { subView: 'calendar',   icon: '📅', label: 'Calendar',                     desc: 'Rehearsal schedule and show dates' },
+    ] : [
+      { subView: 'scenes',   icon: '🎬', label: 'Scenes',   desc: 'Manage acts, scenes, and production notes' },
+      { subView: 'images',   icon: '🖼️', label: 'Images',   desc: 'Production photos and reference imagery' },
+      { subView: 'calendar', icon: '📅', label: 'Calendar', desc: 'Rehearsal schedule and show dates' },
+    ];
+    return React.createElement(
+      'div',
+      { className: 'p-6 max-w-2xl mx-auto' },
+      React.createElement(
+        Link,
+        { to: '/productions', className: 'inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700' },
+        '← Productions'
+      ),
+      React.createElement(
+        'div',
+        { className: 'text-center pt-10 pb-8' },
+        React.createElement('h1', { className: 'text-3xl font-bold text-gray-900 mb-2' }, production.title),
+        React.createElement('p', { className: 'text-sm text-gray-500' }, actCount + ' Acts · ' + sceneCount + ' Scenes')
+      ),
+      React.createElement(
+        'div',
+        { className: 'prod-hub-buttons' },
+        ...hubButtons.map(btn =>
+          React.createElement(
+            'button',
+            {
+              key: btn.subView,
+              type: 'button',
+              onClick: () => setProductionSubView(btn.subView),
+              className: 'prod-hub-btn',
+            },
+            React.createElement('div', { className: 'prod-hub-icon' }, btn.icon),
+            React.createElement(
+              'div',
+              { style: { display: 'flex', flexDirection: 'column', textAlign: 'left' } },
+              React.createElement('span', { className: 'prod-hub-title' }, btn.label),
+              React.createElement('span', { className: 'prod-hub-desc' }, btn.desc)
+            )
+          )
+        )
+      )
+    );
+  }
+
+  // Sub-view
+  const subViewTab = productionSubView === 'department' ? (deptTabInfo?.id || rawAppRole) : productionSubView;
+  const subViewScenesReadOnly = subViewTab === 'scenes' && isDeptManager;
+
+  const subViewHeader = React.createElement(
+    'div',
+    { className: 'flex items-center justify-between mb-6 flex-wrap gap-2' },
+    React.createElement(
+      'div',
+      { className: 'flex items-center gap-4' },
+      React.createElement(
+        'button',
+        {
+          type: 'button',
+          onClick: () => setProductionSubView(null),
+          className: 'px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded',
+        },
+        '← Back'
+      ),
+      React.createElement('h2', { className: 'text-2xl font-bold text-gray-900' }, production.title)
+    ),
+    React.createElement(
+      'span',
+      { className: 'text-sm text-gray-500' },
+      (production.acts?.length || 0) + ' Acts · ' +
+      (production.acts?.reduce((sum, act) => sum + (act.scenes?.length || 0), 0) || 0) + ' Scenes'
+    )
+  );
+
   return React.createElement(
     'div',
     { className: 'p-6 max-w-4xl mx-auto' },
-    header,
-    tabNavigation,
-    effectiveTab === 'scenes' && React.createElement(
-      React.Fragment,
-      null,
-      scenesReadOnly && React.createElement(
+    subViewHeader,
+    subViewTab === 'scenes' && (() => {
+      const readOnlyBanner = subViewScenesReadOnly && React.createElement(
         'div',
         { className: 'mb-4 px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-sm text-amber-800' },
         React.createElement('span', null, '👁'),
         React.createElement('span', null, 'Read-only view — scene editing is available to Directors and Admins only.')
-      ),
-      characterSection,
-      React.createElement('hr', { className: 'my-6 border-gray-200' }),
-      scenesToolbar,
-      emptyState || actsList,
-      !emptyState && addActButton
-    ),
-    effectiveTab === 'lighting' && React.createElement(LightingView, {
+      );
+
+      // Single-scene editor mode
+      if (editingSceneId !== null) {
+        const editIdx = filteredScenes.findIndex(s => s.sceneId === editingSceneId);
+        if (editIdx !== -1) {
+          const { actIndex, sceneIndex, scene } = filteredScenes[editIdx];
+          const total = filteredScenes.length;
+          return React.createElement(
+            React.Fragment,
+            null,
+            React.createElement(
+              'div',
+              { className: 'scene-editor-nav' },
+              React.createElement('button', { type: 'button', onClick: () => setEditingSceneId(null), className: 'scene-editor-nav-back' }, '← Back to Scenes'),
+              React.createElement('span', { className: 'text-sm text-gray-500 font-medium' }, `Scene ${editIdx + 1} of ${total}`),
+              React.createElement(
+                'div',
+                { className: 'flex gap-2' },
+                React.createElement('button', { type: 'button', disabled: editIdx === 0, onClick: () => setEditingSceneId(filteredScenes[editIdx - 1].sceneId), className: 'scene-editor-nav-btn' }, '◀ Prev'),
+                React.createElement('button', { type: 'button', disabled: editIdx === total - 1, onClick: () => setEditingSceneId(filteredScenes[editIdx + 1].sceneId), className: 'scene-editor-nav-btn' }, 'Next ▶')
+              )
+            ),
+            readOnlyBanner,
+            renderSceneFormContent(actIndex, sceneIndex, scene)
+          );
+        }
+        // Scene ID not found (filter changed) — fall through to list
+      }
+
+      // List mode
+      return React.createElement(
+        React.Fragment,
+        null,
+        filterBar,
+        readOnlyBanner,
+        scenesToolbar,
+        emptyState || actsList,
+        !emptyState && !subViewScenesReadOnly && addActButton
+      );
+    })(),
+    subViewTab === 'lighting' && React.createElement(LightingView, {
       production: production,
       onUpdateScene: (actIndex, sceneIndex, field, value) => {
         handleUpdateScene(actIndex, sceneIndex, field, value);
       }
     }),
-    effectiveTab === 'sound' && React.createElement(SoundDepartmentView, {
+    subViewTab === 'sound' && React.createElement(SoundDepartmentView, {
       production: production,
       userRole: currentRole.id,
       onUpdateScene: (actIndex, sceneIndex, field, value) => {
         handleUpdateScene(actIndex, sceneIndex, field, value);
       }
     }),
-    effectiveTab === 'wardrobe' && (
+    subViewTab === 'wardrobe' && (
       typeof WardrobeView !== 'undefined' ? React.createElement(WardrobeView, {
         production: production,
         onSave: saveProduction,
@@ -1756,20 +2175,20 @@ function SceneBuilder({ productionId: propId }) {
         React.createElement('p', { className: 'text-pink-600' }, 'Costume tracking coming soon...')
       )
     ),
-    effectiveTab === 'props' && React.createElement(PropsView, {
+    subViewTab === 'props' && React.createElement(PropsView, {
       production: production,
       onSave: saveProduction,
       onUpdateScene: (actIndex, sceneIndex, field, value) => {
         handleUpdateScene(actIndex, sceneIndex, field, value);
       }
     }),
-    effectiveTab === 'set' && (
+    subViewTab === 'set' && (
       React.createElement(SetDesignView, {
         production: production,
         onSave: saveProduction
       })
     ),
-    effectiveTab === 'stage_manager' && React.createElement(StageManagerView, {
+    subViewTab === 'stage_manager' && React.createElement(StageManagerView, {
       production: production,
       onUpdateScene: (actIndex, sceneIndex, field, value) => {
         handleUpdateScene(actIndex, sceneIndex, field, value);
@@ -1778,12 +2197,12 @@ function SceneBuilder({ productionId: propId }) {
         handleUpdateProduction(updates);
       }
     }),
-    effectiveTab === 'calendar' && React.createElement(CalendarView, {
+    subViewTab === 'calendar' && React.createElement(CalendarView, {
       production: production,
       onSave: saveProduction,
       userRole: currentRole.id
     }),
-    effectiveTab === 'images' && (
+    subViewTab === 'images' && (
       typeof ProductionImagesManager !== 'undefined'
         ? React.createElement(ProductionImagesManager, {
             production: production,

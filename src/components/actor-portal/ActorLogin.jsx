@@ -148,7 +148,7 @@ function ActorLogin({ onLoginSuccess }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--color-bg-base)' }}>
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+      <div className="rounded-2xl shadow-2xl max-w-md w-full overflow-hidden" style={{ backgroundColor: 'var(--color-bg-surface)' }}>
         {/* Header */}
         <div className="p-6 text-center" style={{ background: 'linear-gradient(135deg, #7a1f24 0%, #1c1413 100%)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '8px' }}>
@@ -175,9 +175,9 @@ function ActorLogin({ onLoginSuccess }) {
             className={`flex-1 py-3 text-center font-medium transition-colors ${
               mode === 'login'
                 ? 'border-b-2'
-                : 'text-gray-500 hover:text-gray-700'
+                : 'hover:opacity-80'
             }`}
-            style={mode === 'login' ? { color: 'var(--color-accent-gold)', borderColor: 'var(--color-accent-gold)' } : {}}
+            style={mode === 'login' ? { color: 'var(--color-accent-gold)', borderColor: 'var(--color-accent-gold)' } : { color: 'var(--color-text-muted)' }}
           >
             Login
           </button>
@@ -190,9 +190,9 @@ function ActorLogin({ onLoginSuccess }) {
             className={`flex-1 py-3 text-center font-medium transition-colors ${
               mode === 'signup'
                 ? 'border-b-2'
-                : 'text-gray-500 hover:text-gray-700'
+                : 'hover:opacity-80'
             }`}
-            style={mode === 'signup' ? { color: 'var(--color-accent-gold)', borderColor: 'var(--color-accent-gold)' } : {}}
+            style={mode === 'signup' ? { color: 'var(--color-accent-gold)', borderColor: 'var(--color-accent-gold)' } : { color: 'var(--color-text-muted)' }}
           >
             Sign Up
           </button>
@@ -218,28 +218,30 @@ function ActorLogin({ onLoginSuccess }) {
           {mode === 'login' && (
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                   Email
                 </label>
                 <input
                   type="email"
                   value={loginData.email}
                   onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }}
                   placeholder="your.email@example.com"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                   Password
                 </label>
                 <input
                   type="password"
                   value={loginData.password}
                   onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }}
                   placeholder="••••••••"
                   required
                 />
@@ -254,7 +256,7 @@ function ActorLogin({ onLoginSuccess }) {
                 {loading ? 'Logging in...' : 'Login'}
               </button>
 
-              <div className="text-center text-sm text-gray-600">
+              <div className="text-center text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 <p>Forgot password? Contact your theatre administrator.</p>
               </div>
             </form>
@@ -265,28 +267,30 @@ function ActorLogin({ onLoginSuccess }) {
             <form onSubmit={handleSignup} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                     First Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={signupData.firstName}
                     onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                    style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }}
                     placeholder="First"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                     Last Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={signupData.lastName}
                     onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                    style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }}
                     placeholder="Last"
                     required
                   />
@@ -294,34 +298,36 @@ function ActorLogin({ onLoginSuccess }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                   Email <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
                   value={signupData.email}
                   onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }}
                   placeholder="your.email@example.com"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                   Phone
                 </label>
                 <input
                   type="tel"
                   value={signupData.phone}
                   onChange={(e) => setSignupData({ ...signupData, phone: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }}
                   placeholder="(555) 123-4567"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                   Password <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -331,7 +337,8 @@ function ActorLogin({ onLoginSuccess }) {
                     setSignupData({ ...signupData, password: e.target.value });
                     checkPasswordStrength(e.target.value);
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }}
                   placeholder="••••••••"
                   required
                 />
@@ -346,7 +353,7 @@ function ActorLogin({ onLoginSuccess }) {
                           style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
                         ></div>
                       </div>
-                      <span className="text-xs font-medium text-gray-600">
+                      <span className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
                         {passwordStrength.label}
                       </span>
                     </div>
@@ -362,14 +369,15 @@ function ActorLogin({ onLoginSuccess }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                   Confirm Password <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="password"
                   value={signupData.confirmPassword}
                   onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }}
                   placeholder="••••••••"
                   required
                 />
@@ -384,7 +392,7 @@ function ActorLogin({ onLoginSuccess }) {
                 {loading ? 'Creating Account...' : 'Create Account'}
               </button>
 
-              <p className="text-xs text-gray-600 text-center">
+              <p className="text-xs text-center" style={{ color: 'var(--color-text-secondary)' }}>
                 By signing up, you agree to wait for admin approval before accessing your account.
               </p>
             </form>
@@ -392,7 +400,7 @@ function ActorLogin({ onLoginSuccess }) {
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 p-4 text-center border-t border-gray-200">
+        <div className="p-4 text-center border-t border-gray-200" style={{ backgroundColor: 'var(--color-bg-elevated)' }}>
           <button
             type="button"
             onClick={() => {
