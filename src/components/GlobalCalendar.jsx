@@ -315,11 +315,7 @@ function GlobalCalendar() {
                 >
                   {day && (
                     <>
-                      <div className={`text-xs font-semibold mb-1 w-6 h-6 flex items-center justify-center rounded-full ${
-                        today_
-                          ? 'bg-violet-600 text-white'
-                          : 'text-[var(--color-text-muted)]'
-                      }`}>
+                      <div className={`text-xs font-semibold mb-1 w-6 h-6 flex items-center justify-center rounded-full ${today_ ? 'cal-day-num--today' : 'cal-day-num'}`}>
                         {day.getDate()}
                       </div>
                       <div className="space-y-0.5">

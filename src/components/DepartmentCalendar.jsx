@@ -299,9 +299,7 @@ function DepartmentCalendar() {
                     backgroundColor: isToday ? 'rgba(124,58,237,0.08)' : 'var(--color-bg-surface)',
                   }}
                 >
-                  <div className={`text-xs font-medium mb-1 w-6 h-6 flex items-center justify-center rounded-full ${
-                    isToday ? 'bg-violet-600 text-white' : ''
-                  }`} style={!isToday ? { color: 'var(--color-text-primary)' } : {}}>
+                  <div className={`text-xs font-medium mb-1 w-6 h-6 flex items-center justify-center rounded-full ${isToday ? 'cal-day-num--today' : 'cal-day-num'}`}>
                     {day}
                   </div>
                   <div className="space-y-0.5">

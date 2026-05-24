@@ -1942,3 +1942,7 @@ html[data-theme="light"] {
 /* ══════════════════════════════════════════════════════════════════════════
    END BANQUO UNIFIED CARD HOVER SYSTEM
    ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Calendar day number cells ──────────────────────────────────────────── */
+.cal-day-num { color: var(--color-text-primary); }
+.cal-day-num--today { background-color: #8B1A2B; color: #ffffff; }

@@ -257,7 +257,8 @@ const ProductionsView = () => {
         {
           type: 'button',
           onClick: (e) => { e.stopPropagation(); setEditingProduction(production); setShowEditModal(true); },
-          className: 'prod-card-btn prod-card-btn--ghost',
+          className: 'prod-card-btn',
+          style: { backgroundColor: 'var(--color-bg-overlay)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)' },
           title: 'Edit production title and dates',
         },
         '✏️ Details'
@@ -324,8 +325,9 @@ const ProductionsView = () => {
       {
         key: production.id,
         onClick: () => handleSetActive(production.id),
-        className: 'prod-thumb-card bg-white rounded-lg border-2 p-6 cursor-pointer transition-all hover:shadow-lg ' +
+        className: 'prod-thumb-card rounded-lg border-2 p-6 cursor-pointer transition-all hover:shadow-lg ' +
           (isActive ? 'border-violet-500 shadow-md' : 'border-gray-200 hover:border-gray-300'),
+        style: { backgroundColor: 'var(--color-bg-surface)' },
       },
       isActive && React.createElement(
         'div',
@@ -333,20 +335,20 @@ const ProductionsView = () => {
         React.createElement('span', { className: 'inline-block px-2 py-1 bg-violet-100 text-violet-700 text-xs font-semibold rounded' }, 'ACTIVE PRODUCTION')
       ),
       posterUrl && React.createElement('img', { src: posterUrl, alt: production.title, className: 'prod-thumb-img' }),
-      React.createElement('h3', { className: 'text-xl font-bold text-gray-900 mb-2' }, production.title),
-      directorName && React.createElement('p', { className: 'text-gray-600 mb-3' }, '🎬 ', directorName),
+      React.createElement('h3', { className: 'text-xl font-bold mb-2', style: { color: 'var(--color-text-primary)' } }, production.title),
+      directorName && React.createElement('p', { className: 'mb-3', style: { color: 'var(--color-text-secondary)' } }, '🎬 ', directorName),
       React.createElement(
         'div',
-        { className: 'text-sm text-gray-500 mb-3 space-y-1' },
+        { className: 'text-sm mb-3 space-y-1', style: { color: 'var(--color-text-muted)' } },
         React.createElement('p', null, '🎭 Rehearsals: ', getRehearsalDatesDisplay(production)),
         React.createElement('p', null, '🎬 Shows: ', getPerformanceDatesDisplay(production))
       ),
-      production.venue && React.createElement('p', { className: 'text-sm text-gray-600 mb-3' }, '📍 ', production.venue),
+      production.venue && React.createElement('p', { className: 'text-sm mb-3', style: { color: 'var(--color-text-secondary)' } }, '📍 ', production.venue),
       React.createElement(
         'div',
-        { className: 'flex items-center justify-between pt-4 border-t border-gray-200' },
+        { className: 'flex items-center justify-between pt-4 border-t', style: { borderColor: 'var(--color-border)' } },
         React.createElement('span', { className: 'px-2 py-1 text-xs font-semibold rounded ' + getStatusColor(production.status) }, production.status),
-        React.createElement('span', { className: 'text-xs text-gray-500' }, 'Updated ', getTimeAgo(production.updatedAt))
+        React.createElement('span', { className: 'text-xs', style: { color: 'var(--color-text-muted)' } }, 'Updated ', getTimeAgo(production.updatedAt))
       ),
       renderCardActions(production)
     );

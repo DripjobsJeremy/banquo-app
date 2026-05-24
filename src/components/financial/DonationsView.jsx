@@ -128,7 +128,7 @@
       React.createElement(
         'div',
         { className: 'mb-6' },
-        React.createElement('h2', { className: 'text-2xl font-bold mb-4 text-gray-900' }, 'Donations'),
+        React.createElement('h2', { className: 'text-2xl font-bold mb-4', style: { color: 'var(--color-text-primary)' } }, 'Donations'),
         React.createElement(
           'div',
           { className: 'grid grid-cols-1 md:grid-cols-3 gap-4' },
@@ -141,7 +141,7 @@
       // Filters & Search
       React.createElement(
         'div',
-        { className: 'banquo-card mb-4 border border-gray-200 rounded-lg p-4 bg-gray-50' },
+        { className: 'banquo-card mb-4 border rounded-lg p-4', style: { borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-elevated)' } },
         React.createElement(
           'div',
           { className: 'flex flex-wrap gap-4 items-center' },
@@ -150,11 +150,12 @@
             placeholder: 'Search donations...',
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: 'flex-1 min-w-[200px] border border-gray-300 rounded px-3 py-2 text-sm bg-white text-gray-900'
+            className: 'flex-1 min-w-[200px] border rounded px-3 py-2 text-sm',
+            style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }
           }),
           React.createElement(
             'select',
-            { value: filterType, onChange: (e) => setFilterType(e.target.value), className: 'border border-gray-300 rounded px-3 py-2 text-sm bg-white text-gray-900' },
+            { value: filterType, onChange: (e) => setFilterType(e.target.value), className: 'border rounded px-3 py-2 text-sm', style: { backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' } },
             React.createElement('option', { value: 'all' }, 'All Types'),
             React.createElement('option', { value: 'monetary' }, 'Monetary'),
             React.createElement('option', { value: 'in-kind' }, 'In-Kind')
@@ -169,39 +170,39 @@
       // Donations Table
       React.createElement(
         'div',
-        { className: 'banquo-card overflow-x-auto border border-gray-200 rounded-lg bg-white' },
+        { className: 'banquo-card overflow-x-auto border rounded-lg', style: { borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-surface)' } },
         React.createElement(
           'table',
           { className: 'w-full' },
           React.createElement(
             'thead',
-            { className: 'bg-gray-100 border-b border-gray-200' },
+            { className: 'border-b', style: { backgroundColor: 'var(--color-bg-elevated)', borderColor: 'var(--color-border)' } },
             React.createElement(
               'tr',
               null,
               React.createElement(
                 'th',
-                { className: 'text-left px-6 py-3 text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-200 uppercase tracking-wider', onClick: () => handleSort('date') },
+                { className: 'text-left px-6 py-3 text-xs font-semibold cursor-pointer uppercase tracking-wider', style: { color: 'var(--color-text-primary)' }, onClick: () => handleSort('date') },
                 'Date ',
                 sortBy === 'date' && (sortOrder === 'asc' ? '↑' : '↓')
               ),
               React.createElement(
                 'th',
-                { className: 'text-left px-6 py-3 text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-200 uppercase tracking-wider', onClick: () => handleSort('donor') },
+                { className: 'text-left px-6 py-3 text-xs font-semibold cursor-pointer uppercase tracking-wider', style: { color: 'var(--color-text-primary)' }, onClick: () => handleSort('donor') },
                 'Donor ',
                 sortBy === 'donor' && (sortOrder === 'asc' ? '↑' : '↓')
               ),
               React.createElement(
                 'th',
-                { className: 'text-left px-6 py-3 text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-200 uppercase tracking-wider', onClick: () => handleSort('amount') },
+                { className: 'text-left px-6 py-3 text-xs font-semibold cursor-pointer uppercase tracking-wider', style: { color: 'var(--color-text-primary)' }, onClick: () => handleSort('amount') },
                 'Amount ',
                 sortBy === 'amount' && (sortOrder === 'asc' ? '↑' : '↓')
               ),
-              React.createElement('th', { className: 'text-left px-6 py-3 text-xs font-semibold text-gray-900 uppercase tracking-wider' }, 'Type'),
-              React.createElement('th', { className: 'text-left px-6 py-3 text-xs font-semibold text-gray-900 uppercase tracking-wider' }, 'Campaign'),
-              React.createElement('th', { className: 'text-left px-6 py-3 text-xs font-semibold text-gray-900 uppercase tracking-wider' }, 'Payment'),
-              React.createElement('th', { className: 'text-left px-6 py-3 text-xs font-semibold text-gray-900 uppercase tracking-wider' }, 'Status'),
-              React.createElement('th', { className: 'text-left px-6 py-3 text-xs font-semibold text-gray-900 uppercase tracking-wider' }, 'Actions')
+              React.createElement('th', { className: 'text-left px-6 py-3 text-xs font-semibold uppercase tracking-wider', style: { color: 'var(--color-text-primary)' } }, 'Type'),
+              React.createElement('th', { className: 'text-left px-6 py-3 text-xs font-semibold uppercase tracking-wider', style: { color: 'var(--color-text-primary)' } }, 'Campaign'),
+              React.createElement('th', { className: 'text-left px-6 py-3 text-xs font-semibold uppercase tracking-wider', style: { color: 'var(--color-text-primary)' } }, 'Payment'),
+              React.createElement('th', { className: 'text-left px-6 py-3 text-xs font-semibold uppercase tracking-wider', style: { color: 'var(--color-text-primary)' } }, 'Status'),
+              React.createElement('th', { className: 'text-left px-6 py-3 text-xs font-semibold uppercase tracking-wider', style: { color: 'var(--color-text-primary)' } }, 'Actions')
             )
           ),
           React.createElement(
@@ -211,11 +212,11 @@
               const contact = contacts.find((c) => c.id === donation.contactId);
               return React.createElement(
                 'tr',
-                { key: donation.id, className: 'border-b border-gray-200 hover:bg-gray-50 transition' },
-                React.createElement('td', { className: 'px-6 py-4 text-sm text-gray-900' }, formatDate(donation.date)),
+                { key: donation.id, className: 'border-b transition', style: { borderColor: 'var(--color-border)' } },
+                React.createElement('td', { className: 'px-6 py-4 text-sm', style: { color: 'var(--color-text-primary)' } }, formatDate(donation.date)),
                 React.createElement(
                   'td',
-                  { className: 'px-6 py-4 text-sm font-medium text-gray-900' },
+                  { className: 'px-6 py-4 text-sm font-medium', style: { color: 'var(--color-text-primary)' } },
                   contact ? `${contact.firstName} ${contact.lastName}` : 'Unknown'
                 ),
                 React.createElement('td', { className: 'px-6 py-4 text-sm font-semibold text-green-700' }, formatCurrency(donation.amount || donation.estimatedValue)),
@@ -225,17 +226,16 @@
                   React.createElement(
                     'span',
                     {
-                      className: `px-3 py-1 rounded-full text-xs font-medium ${
-                        donation.donationType === 'monetary'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`
+                      className: 'px-3 py-1 rounded-full text-xs font-medium',
+                      style: donation.donationType === 'monetary'
+                        ? { backgroundColor: 'rgba(201, 161, 74, 0.15)', color: '#c9a14a', border: '1px solid rgba(201, 161, 74, 0.4)' }
+                        : { backgroundColor: 'var(--color-bg-overlay)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border)' }
                     },
                     donation.donationType === 'monetary' ? 'Monetary' : 'In-Kind'
                   )
                 ),
-                React.createElement('td', { className: 'px-6 py-4 text-sm text-gray-700' }, donation.campaignName || 'General Fund'),
-                React.createElement('td', { className: 'px-6 py-4 text-sm text-gray-700' }, donation.paymentMethod || '—'),
+                React.createElement('td', { className: 'px-6 py-4 text-sm', style: { color: 'var(--color-text-secondary)' } }, donation.campaignName || 'General Fund'),
+                React.createElement('td', { className: 'px-6 py-4 text-sm', style: { color: 'var(--color-text-secondary)' } }, donation.paymentMethod || '—'),
                 React.createElement(
                   'td',
                   { className: 'px-6 py-4 text-sm' },
@@ -276,10 +276,10 @@
 
   // Helper Components
   const StatCard = ({ icon, label, value, color }) => {
-    const colorClasses = {
-      green: 'border-green-200 bg-green-50',
-      blue: 'border-blue-200 bg-blue-50',
-      purple: 'border-purple-200 bg-purple-50'
+    const borderClasses = {
+      green: 'border-green-200',
+      blue: 'border-blue-200',
+      purple: 'border-purple-200'
     };
     const textColors = {
       green: 'text-green-700',
@@ -288,10 +288,10 @@
     };
     return React.createElement(
       'div',
-      { className: `banquo-card stat-card border rounded-lg p-4 ${colorClasses[color]}` },
+      { className: `banquo-card stat-card border rounded-lg p-4 ${borderClasses[color]}`, style: { backgroundColor: 'var(--color-bg-elevated)' } },
       React.createElement('div', { className: 'text-3xl mb-2' }, icon),
       React.createElement('div', { className: `text-2xl font-bold mb-1 ${textColors[color]}` }, value),
-      React.createElement('div', { className: 'text-sm text-gray-600' }, label)
+      React.createElement('div', { className: 'text-sm', style: { color: 'var(--color-text-secondary)' } }, label)
     );
   };
 
@@ -301,12 +301,12 @@
       { className: 'fixed inset-0 bg-black/50 flex items-center justify-center z-50', onClick: onClose },
       React.createElement(
         'div',
-        { className: 'bg-white border border-gray-300 rounded-lg p-6 max-w-2xl w-full mx-4 shadow-lg', onClick: (e) => e.stopPropagation() },
+        { className: 'rounded-lg p-6 max-w-2xl w-full mx-4 shadow-lg', style: { backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)' }, onClick: (e) => e.stopPropagation() },
         React.createElement(
           'div',
           { className: 'flex items-center justify-between mb-4' },
-          React.createElement('h3', { className: 'text-xl font-bold text-gray-900' }, 'Donation Details'),
-          React.createElement('button', { onClick: onClose, className: 'text-gray-500 hover:text-gray-700 text-2xl' }, '×')
+          React.createElement('h3', { className: 'text-xl font-bold', style: { color: 'var(--color-text-primary)' } }, 'Donation Details'),
+          React.createElement('button', { onClick: onClose, className: 'text-2xl', style: { color: 'var(--color-text-muted)' } }, '×')
         ),
         React.createElement(
           'div',
@@ -331,9 +331,9 @@
   const DetailRow = ({ label, value }) => (
     React.createElement(
       'div',
-      { className: 'flex justify-between py-2 border-b border-gray-200' },
-      React.createElement('span', { className: 'font-medium text-gray-700' }, label + ':'),
-      React.createElement('span', { className: 'text-gray-900' }, value)
+      { className: 'flex justify-between py-2 border-b', style: { borderColor: 'var(--color-border)' } },
+      React.createElement('span', { className: 'font-medium', style: { color: 'var(--color-text-secondary)' } }, label + ':'),
+      React.createElement('span', { style: { color: 'var(--color-text-primary)' } }, value)
     )
   );
 

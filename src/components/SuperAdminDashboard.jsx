@@ -113,13 +113,15 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
     };
   };
 
-  const statusBadge = (status) => {
+  const statusBadgeStyle = (status) => {
     const s = (status || '').toLowerCase();
-    if (s === 'running' || s === 'open') return 'bg-green-100 text-green-800';
-    if (s === 'tech week') return 'bg-orange-100 text-orange-800';
-    if (s === 'in rehearsal') return 'bg-amber-100 text-amber-800';
-    if (s === 'active' || s === 'in production') return 'bg-blue-100 text-blue-800';
-    return 'bg-gray-100 text-gray-700';
+    if (s === 'running' || s === 'open') return { backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#10B981', border: '1px solid rgba(16, 185, 129, 0.4)' };
+    if (s === 'tech week') return { backgroundColor: 'rgba(249, 115, 22, 0.15)', color: '#f97316', border: '1px solid rgba(249, 115, 22, 0.4)' };
+    if (s === 'in rehearsal') return { backgroundColor: 'rgba(201, 161, 74, 0.2)', color: '#c9a14a', border: '1px solid rgba(201, 161, 74, 0.5)' };
+    if (s === 'active' || s === 'in production') return { backgroundColor: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.4)' };
+    if (s === 'completed') return { backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#10B981', border: '1px solid rgba(16, 185, 129, 0.4)' };
+    if (s === 'planning') return { backgroundColor: 'var(--color-bg-overlay)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border)' };
+    return { backgroundColor: 'var(--color-bg-overlay)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border)' };
   };
 
   const eventTypeBadge = (type) => {
@@ -136,14 +138,15 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">The house is open. Here's where your production stands.</p>
+        <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Dashboard</h1>
+        <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>The house is open. Here's where your production stands.</p>
       </div>
 
       {/* Key Metrics */}
       <div key={`metrics-${refreshKey}`} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div
-          className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg shadow-lg p-6 text-white cursor-pointer hover:ring-2 hover:ring-yellow-500 hover:ring-offset-1 hover:shadow-xl transition-all duration-150"
+          className="rounded-lg shadow-lg p-6 cursor-pointer hover:ring-2 hover:ring-yellow-500 hover:ring-offset-1 hover:shadow-xl transition-all duration-150"
+          style={{ background: 'linear-gradient(135deg, #8B1A2B, #6b1422)', color: '#ffffff' }}
           title="Go to Productions"
           onClick={() => { window.location.hash = '#/productions'; }}
         >
@@ -156,7 +159,8 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
         </div>
 
         <div
-          className="bg-gradient-to-br from-green-500 to-green-700 rounded-lg shadow-lg p-6 text-white cursor-pointer hover:ring-2 hover:ring-yellow-500 hover:ring-offset-1 hover:shadow-xl transition-all duration-150"
+          className="rounded-lg shadow-lg p-6 cursor-pointer hover:ring-2 hover:ring-yellow-500 hover:ring-offset-1 hover:shadow-xl transition-all duration-150"
+          style={{ background: 'linear-gradient(135deg, #c9a14a, #a07c2e)', color: '#ffffff' }}
           title="January 1 – today. Visit Financial for Fiscal Year view."
           onClick={() => { window.location.hash = '#/financial?view=donations'; }}
         >
@@ -169,7 +173,8 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
         </div>
 
         <div
-          className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg shadow-lg p-6 text-white cursor-pointer hover:ring-2 hover:ring-yellow-500 hover:ring-offset-1 hover:shadow-xl transition-all duration-150"
+          className="rounded-lg shadow-lg p-6 cursor-pointer hover:ring-2 hover:ring-yellow-500 hover:ring-offset-1 hover:shadow-xl transition-all duration-150"
+          style={{ background: 'linear-gradient(135deg, #2f2a26, #1c1413)', color: '#ffffff' }}
           title="Go to Donors"
           onClick={() => { window.location.hash = '#/financial?view=donors'; }}
         >
@@ -182,7 +187,8 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
         </div>
 
         <div
-          className="bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-lg shadow-lg p-6 text-white cursor-pointer hover:ring-2 hover:ring-yellow-500 hover:ring-offset-1 hover:shadow-xl transition-all duration-150"
+          className="rounded-lg shadow-lg p-6 cursor-pointer hover:ring-2 hover:ring-yellow-500 hover:ring-offset-1 hover:shadow-xl transition-all duration-150"
+          style={{ background: 'linear-gradient(135deg, #1c1413, #2f2a26)', color: '#ffffff' }}
           title="Go to Actor Roster"
           onClick={() => { window.location.hash = '#/actors'; }}
         >
@@ -211,10 +217,10 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
         if (!org.managesClientOrgs) return null;
         const clientOrgs = org.clientOrganizations || [];
         if (clientOrgs.length === 0) return (
-          <div className="rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm">
+          <div className="rounded-lg border p-6 text-center shadow-sm" style={{ backgroundColor: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
             <div className="text-3xl mb-2">🏛️</div>
-            <p className="font-medium text-gray-900">No client organizations yet</p>
-            <p className="text-sm mt-1 mb-3 text-gray-500">
+            <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>No client organizations yet</p>
+            <p className="text-sm mt-1 mb-3" style={{ color: 'var(--color-text-muted)' }}>
               Add client organizations in Settings → Organization Profile → Clients
             </p>
             <button
@@ -230,15 +236,16 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
           <div>
             <div className="flex items-center justify-between mb-3">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">🏛️ Client Organizations</h2>
-                <p className="text-sm text-gray-500">
+                <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>🏛️ Client Organizations</h2>
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                   {clientOrgs.length} client organization{clientOrgs.length !== 1 ? 's' : ''}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => { window.location.hash = '#/settings'; }}
-                className="text-sm px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+                className="text-sm px-3 py-1.5 rounded-lg border transition-colors"
+                style={{ backgroundColor: 'var(--color-bg-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
               >
                 Manage →
               </button>
@@ -248,14 +255,15 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
               {clientOrgs.map(org => (
                   <div
                     key={org.id}
-                    className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md hover:border-violet-300 transition-all cursor-pointer"
+                    className="rounded-lg border p-4 shadow-sm hover:shadow-md hover:border-violet-300 transition-all cursor-pointer"
+                    style={{ backgroundColor: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}
                     onClick={() => { window.location.hash = '#/settings'; }}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-gray-900 truncate">{org.name}</div>
+                        <div className="font-semibold truncate" style={{ color: 'var(--color-text-primary)' }}>{org.name}</div>
                         {org.contactName && (
-                          <div className="text-xs text-gray-500 mt-0.5">👤 {org.contactName}</div>
+                          <div className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>👤 {org.contactName}</div>
                         )}
                       </div>
                       <span className={`text-xs px-2 py-0.5 rounded-full ml-2 flex-shrink-0 font-medium ${
@@ -267,10 +275,10 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
                       </span>
                     </div>
                     {org.email && (
-                      <div className="text-xs text-gray-500 mb-1">✉️ {org.email}</div>
+                      <div className="text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>✉️ {org.email}</div>
                     )}
                     {org.phone && (
-                      <div className="text-xs text-gray-500 mb-1">📞 {org.phone}</div>
+                      <div className="text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>📞 {org.phone}</div>
                     )}
                   </div>
               ))}
@@ -281,8 +289,8 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
 
       {/* Active Productions */}
       {metrics.activeProductions.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Active Productions</h2>
+        <div className="rounded-lg shadow-sm border p-6" style={{ backgroundColor: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Active Productions</h2>
           <div className="grid gap-4">
             {metrics.activeProductions.map(prod => {
               const nextShow = prod.calendar
@@ -307,24 +315,25 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
               return (
                 <div
                   key={prod.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                  className="flex items-center justify-between p-4 rounded-lg transition-colors cursor-pointer"
+                  style={{ backgroundColor: 'var(--color-bg-elevated)' }}
                   onClick={() => { window.location.hash = `#/productions/${prod.id}`; }}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-gray-900">{prod.title}</h3>
+                      <h3 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{prod.title}</h3>
                       {prod.status && (
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${statusBadge(prod.status)}`}>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold" style={statusBadgeStyle(prod.status)}>
                           {prod.status}
                         </span>
                       )}
                     </div>
-                    <div className="text-xs text-gray-400 mt-0.5">
+                    <div className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
                       {prod.startDate
                         ? `Opens: ${new Date(prod.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
                         : 'No opening date set'}
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">
+                    <div className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                       {prod.author && `by ${prod.author} • `}
                       {rehearsalCount} rehearsals scheduled
                     </div>
@@ -332,7 +341,7 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
                   <div className="flex items-center gap-4 flex-shrink-0">
                     {nextShowDate && (
                       <div className="text-right">
-                        <div className="text-sm text-gray-500">Next Show</div>
+                        <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Next Show</div>
                         <div className="font-semibold text-purple-600">{nextShowDate}</div>
                       </div>
                     )}
@@ -346,40 +355,44 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
       )}
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+      <div className="rounded-lg shadow-sm border p-6" style={{ backgroundColor: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+        <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button
             type="button"
             onClick={() => window.location.hash = '/productions'}
-            className="flex flex-col items-center gap-2 p-5 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-200 cursor-pointer"
+            className="flex flex-col items-center gap-2 p-5 rounded-lg transition-colors cursor-pointer"
+            style={{ backgroundColor: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}
           >
             <span className="text-3xl">🎭</span>
-            <span className="text-sm font-medium text-gray-900">Productions</span>
+            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Productions</span>
           </button>
           <button
             type="button"
             onClick={() => setShowAddDonationModal(true)}
-            className="flex flex-col items-center gap-2 p-5 bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200 cursor-pointer"
+            className="flex flex-col items-center gap-2 p-5 rounded-lg transition-colors cursor-pointer"
+            style={{ backgroundColor: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}
           >
             <span className="text-3xl">💰</span>
-            <span className="text-sm font-medium text-gray-900">Log Donation</span>
+            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Log Donation</span>
           </button>
           <button
             type="button"
             onClick={() => window.location.hash = '/actors'}
-            className="flex flex-col items-center gap-2 p-5 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200 cursor-pointer"
+            className="flex flex-col items-center gap-2 p-5 rounded-lg transition-colors cursor-pointer"
+            style={{ backgroundColor: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}
           >
             <span className="text-3xl">🎬</span>
-            <span className="text-sm font-medium text-gray-900">Actors</span>
+            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Actors</span>
           </button>
           <button
             type="button"
             onClick={() => window.location.hash = '/donors'}
-            className="flex flex-col items-center gap-2 p-5 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-200 cursor-pointer"
+            className="flex flex-col items-center gap-2 p-5 rounded-lg transition-colors cursor-pointer"
+            style={{ backgroundColor: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}
           >
             <span className="text-3xl">👥</span>
-            <span className="text-sm font-medium text-gray-900">Donors</span>
+            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Donors</span>
           </button>
         </div>
       </div>
@@ -387,9 +400,9 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
       {/* Upcoming Events + Recent Donations */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Upcoming Events */}
-        <div key={`events-${refreshKey}`} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div key={`events-${refreshKey}`} className="rounded-lg shadow-sm border p-6" style={{ backgroundColor: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Upcoming Events</h2>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Upcoming Events</h2>
             <span className="text-2xl">📅</span>
           </div>
           {upcomingEvents.length > 0 ? (
@@ -399,18 +412,19 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
                 return (
                   <div
                     key={idx}
-                    className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="flex items-start gap-3 p-3 rounded-lg transition-colors cursor-pointer"
+                    style={{ backgroundColor: 'var(--color-bg-elevated)' }}
                     onClick={() => { window.location.hash = `/productions/${event.productionId}?tab=calendar`; }}
                     title={`Open ${event.productionTitle} calendar`}
                   >
                     <div className="flex-shrink-0 w-12 text-center">
-                      <div className="text-xs text-gray-500 font-medium">{month}</div>
-                      <div className="text-xl font-bold text-gray-900">{day}</div>
+                      <div className="text-xs font-medium" style={{ color: 'var(--color-text-muted)' }}>{month}</div>
+                      <div className="text-xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{day}</div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900 truncate">{event.title}</div>
-                      <div className="text-sm text-gray-600">{event.productionTitle}</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>{event.title}</div>
+                      <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{event.productionTitle}</div>
+                      <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                         {event.startTime || 'All day'} &bull; {event.location || 'TBD'}
                       </div>
                     </div>
@@ -422,7 +436,7 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
               })}
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>
               <div className="text-4xl mb-2">📅</div>
               <p>No events scheduled — <a href="#/calendar" className="text-red-800 hover:underline font-medium">Add one in Calendar →</a></p>
             </div>
@@ -430,9 +444,9 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
         </div>
 
         {/* Recent Donations */}
-        <div key={`donations-${refreshKey}`} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div key={`donations-${refreshKey}`} className="rounded-lg shadow-sm border p-6" style={{ backgroundColor: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Donations</h2>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Recent Donations</h2>
             <span className="text-2xl">💵</span>
           </div>
           {metrics.recentDonations.length > 0 ? (
@@ -441,16 +455,16 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
                 {metrics.recentDonations.map((donation, idx) => {
                   const donor = donors.find(d => d.id === donation.donorId || d.id === donation.contactId);
                   return (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div key={idx} className="flex items-center justify-between p-3 rounded-lg transition-colors" style={{ backgroundColor: 'var(--color-bg-elevated)' }}>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-gray-900 truncate">
+                        <div className="font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>
                           {donor ? `${donor.firstName || ''} ${donor.lastName || ''}`.trim() || donor.name || 'Anonymous' : 'Anonymous'}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                           {new Date(donation.date).toLocaleDateString()}
                         </div>
                         {donation.campaignName && (
-                          <div className="text-xs text-gray-400">{donation.campaignName}</div>
+                          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{donation.campaignName}</div>
                         )}
                       </div>
                       <div className="text-lg font-bold text-green-600">
@@ -465,7 +479,7 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
               </div>
             </>
           ) : (
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>
               <div className="text-4xl mb-2">💵</div>
               <p>No donations recorded yet</p>
             </div>
@@ -489,7 +503,8 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
             setGhostlightCollapsed(next);
             try { localStorage.setItem('banquo_dashboard_ghostlight_collapsed', String(next)); } catch {}
           }}
-          className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-700"
+          className="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-sm font-medium"
+          style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border)' }}
         >
           <span>GhostLight — Coming Soon</span>
           <span>{ghostlightCollapsed ? '▾' : '▴'}</span>
