@@ -190,7 +190,7 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                 <div className="bg-gradient-to-r from-[#8B1A2B] to-[#5a1019] text-white p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h2 className="text-2xl font-bold">Production Budget</h2>
+                            <h2 className="text-2xl font-bold text-white">Production Budget</h2>
                             <p className="text-white mt-1 opacity-80">{production.title}</p>
                         </div>
                         <button
@@ -244,7 +244,7 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                                 activeTab === tab.id && tab.id === 'ghost_light'
                                     ? 'border-purple-500 text-purple-400 font-semibold'
                                     : activeTab === tab.id
-                                    ? 'border-green-600 text-green-600 font-semibold'
+                                    ? 'border-[#8B1A2B] text-[#8B1A2B] font-semibold'
                                     : 'border-transparent text-gray-600 hover:text-gray-900'
                             }`}
                         >
