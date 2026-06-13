@@ -162,7 +162,7 @@ function GlobalCalendar() {
       {/* Header */}
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-1">📅 Global Calendar</h1>
+          <h1 className="text-3xl font-bold mb-1" style={{ color: 'var(--color-text-primary)' }}>📅 Global Calendar</h1>
           <p className="text-[var(--color-text-muted)]">
             All productions — {allEvents.length} event{allEvents.length !== 1 ? 's' : ''} across {productions.length} production{productions.length !== 1 ? 's' : ''}
           </p>
@@ -273,7 +273,7 @@ function GlobalCalendar() {
               ‹
             </button>
             <div className="flex items-center gap-3">
-              <span className="text-white font-semibold">{monthLabel}</span>
+              <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{monthLabel}</span>
               <button
                 type="button"
                 onClick={goToday}

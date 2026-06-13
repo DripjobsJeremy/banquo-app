@@ -8,8 +8,8 @@ function BudgetOverview({ budget, summary, canEditBudget = true, onUpdateTotalBu
     return (
         <div className="space-y-6">
             {/* Total Budget */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Total Production Budget</h3>
+            <div className="rounded-lg p-6 border border-[var(--color-border)]" style={{ backgroundColor: 'var(--color-bg-elevated)' }}>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Total Production Budget</h3>
                 <div className="flex items-center gap-4">
                     <div className="flex-1">
                         <label htmlFor="total-budget" className="block text-sm font-medium text-gray-700 mb-1">
@@ -43,37 +43,37 @@ function BudgetOverview({ budget, summary, canEditBudget = true, onUpdateTotalBu
 
             {/* Budget Breakdown */}
             <div className="grid grid-cols-2 gap-6">
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <h4 className="font-semibold text-gray-900 mb-4">Expense Summary</h4>
+                <div className="rounded-lg p-6 border border-[var(--color-border)]" style={{ backgroundColor: 'var(--color-bg-elevated)' }}>
+                    <h4 className="font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Expense Summary</h4>
                     <div className="space-y-3">
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Total Allocated:</span>
-                            <span className="font-semibold">${summary.totalAllocated.toLocaleString()}</span>
+                            <span style={{ color: 'var(--color-text-secondary)' }}>Total Allocated:</span>
+                            <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>${summary.totalAllocated.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Total Spent:</span>
+                            <span style={{ color: 'var(--color-text-secondary)' }}>Total Spent:</span>
                             <span className={`font-semibold ${summary.isOverBudget ? 'text-red-600' : 'text-gray-900'}`}>
                                 ${summary.totalSpent.toLocaleString()}
                             </span>
                         </div>
                         {royaltiesTotal > 0 && (
                             <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Royalties &amp; Licensing:</span>
+                                <span style={{ color: 'var(--color-text-secondary)' }}>Royalties &amp; Licensing:</span>
                                 <span className="font-semibold text-yellow-600">
                                     ${royaltiesTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                                 </span>
                             </div>
                         )}
                         <div className="flex justify-between items-center pt-3 border-t border-gray-200">
-                            <span className="text-gray-900 font-medium">Remaining:</span>
+                            <span className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>Remaining:</span>
                             <span className={`font-bold text-lg ${summary.remaining < 0 ? 'text-red-600' : 'text-green-600'}`}>
                                 ${summary.remaining.toLocaleString()}
                             </span>
                         </div>
                         {royaltiesTotal > 0 && (
                             <div className="flex justify-between items-center">
-                                <span className="text-gray-600 text-sm">Total incl. Royalties:</span>
-                                <span className="font-semibold text-gray-900">
+                                <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Total incl. Royalties:</span>
+                                <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
                                     ${(summary.totalSpent + royaltiesTotal).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                                 </span>
                             </div>
@@ -99,7 +99,7 @@ function BudgetOverview({ budget, summary, canEditBudget = true, onUpdateTotalBu
 
                     {/* Progress Bar */}
                     <div className="mt-4">
-                        <div className="flex justify-between text-xs text-gray-600 mb-1">
+                        <div className="flex justify-between text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>
                             <span>Budget Used</span>
                             <span>{summary.percentUsed.toFixed(1)}%</span>
                         </div>
@@ -126,19 +126,19 @@ function BudgetOverview({ budget, summary, canEditBudget = true, onUpdateTotalBu
                     </div>
                 </div>
 
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <h4 className="font-semibold text-gray-900 mb-4">Revenue Summary</h4>
+                <div className="rounded-lg p-6 border border-[var(--color-border)]" style={{ backgroundColor: 'var(--color-bg-elevated)' }}>
+                    <h4 className="font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Revenue Summary</h4>
                     <div className="space-y-3">
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Total Revenue:</span>
-                            <span className="font-semibold">${summary.totalRevenue.toLocaleString()}</span>
+                            <span style={{ color: 'var(--color-text-secondary)' }}>Total Revenue:</span>
+                            <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>${summary.totalRevenue.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Total Expenses:</span>
-                            <span className="font-semibold">${summary.totalSpent.toLocaleString()}</span>
+                            <span style={{ color: 'var(--color-text-secondary)' }}>Total Expenses:</span>
+                            <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>${summary.totalSpent.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between items-center pt-3 border-t border-gray-200">
-                            <span className="text-gray-900 font-medium">Net Income:</span>
+                            <span className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>Net Income:</span>
                             <span className={`font-bold text-lg ${summary.netIncome < 0 ? 'text-red-600' : 'text-green-600'}`}>
                                 ${summary.netIncome.toLocaleString()}
                             </span>
@@ -154,8 +154,8 @@ function BudgetOverview({ budget, summary, canEditBudget = true, onUpdateTotalBu
             </div>
 
             {/* Department Breakdown */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h4 className="font-semibold text-gray-900 mb-4">Department Breakdown</h4>
+            <div className="rounded-lg p-6 border border-[var(--color-border)]" style={{ backgroundColor: 'var(--color-bg-elevated)' }}>
+                <h4 className="font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Department Breakdown</h4>
                 <div className="grid grid-cols-2 gap-4">
                     {summary.departments.map(dept => (
                         <div key={dept.name} className="flex items-center justify-between p-3 bg-gray-50 rounded">
