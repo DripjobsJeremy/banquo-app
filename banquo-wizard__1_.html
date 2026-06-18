@@ -1860,6 +1860,138 @@
     .portal-save-bar-actions .btn { flex: 1; justify-content: center; }
     .portal-toggle-row { flex-wrap: wrap; }
   }
+  /* ── RESOURCES PANEL ── */
+  .resources-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .resource-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: rgba(201, 161, 74, 0.04);
+    border: 1px solid rgba(201, 161, 74, 0.18);
+    border-radius: var(--radius-md);
+    padding: 20px 22px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    transition: border-color 0.2s, background 0.2s;
+    font-family: inherit;
+  }
+  .resource-card:hover {
+    border-color: var(--gold);
+    background: rgba(201, 161, 74, 0.09);
+  }
+  .resource-card-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .resource-card-body {
+    flex: 1;
+  }
+  .resource-card-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--parchment);
+    margin-bottom: 5px;
+    letter-spacing: -0.01em;
+  }
+  .resource-card-desc {
+    font-size: 0.85rem;
+    color: var(--parchment-dim);
+    line-height: 1.55;
+  }
+  .resource-card-arrow {
+    font-size: 24px;
+    color: var(--gold-dim);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .resource-card:hover .resource-card-arrow {
+    transform: translateX(3px);
+    color: var(--gold);
+  }
+  .iw-step { display: none; animation: iw-in 0.3s ease; }
+  .iw-step.active { display: block; }
+  @keyframes iw-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .iw-btn-primary {
+    background: #E8622A;
+    border: none;
+    color: #fff;
+    padding: 0 28px;
+    border-radius: 14px;
+    font-size: 17px;
+    font-weight: 500;
+    cursor: pointer;
+    height: 56px;
+    min-width: 140px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'Playfair Display', Georgia, serif;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .iw-btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .iw-btn-back {
+    background: #fff;
+    border: 1px solid #B8D0E8;
+    color: #1A2E42;
+    padding: 0 22px;
+    border-radius: 14px;
+    font-size: 17px;
+    cursor: pointer;
+    height: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Source Serif 4', Georgia, serif;
+    transition: background 0.15s;
+    min-width: 100px;
+  }
+  .iw-btn-back:hover { background: #E4EFF8; }
+  .iw-ic {
+    background: #fff;
+    border: 1px solid #B8D0E8;
+    border-radius: 14px;
+    padding: 18px 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    text-align: center;
+    min-height: 88px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .iw-ic:hover { border-color: #E8622A; transform: translateY(-2px); }
+  .iw-ic.sel { border: 2px solid #E8622A; background: rgba(232,98,42,0.12); }
+  .iw-tcard {
+    background: #fff;
+    border: 1px solid #B8D0E8;
+    border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+  .iw-tcard:hover { border-color: #E8622A; transform: translateY(-1px); }
+  .iw-tcard.tsel { border: 2px solid #E8622A; background: rgba(232,98,42,0.12); }
+  .iw-pd {
+    height: 4px;
+    border-radius: 2px;
+    background: #B8D0E8;
+    flex: 1;
+    transition: background 0.3s;
+  }
+  .iw-pd.done { background: #E8622A; }
 </style>
 </head>
 <body data-act="1">
@@ -2246,6 +2378,9 @@
         <button type="button" class="portal-nav-item" data-panel="visibility">
           <span class="portal-nav-dot"></span>Visibility &amp; privacy
         </button>
+        <button type="button" class="portal-nav-item" data-panel="resources">
+          <span class="portal-nav-dot"></span>Resources
+        </button>
       </nav>
 
       <div class="portal-completion">
@@ -2490,6 +2625,24 @@
         </div>
       </div>
 
+      <!-- Panel: Resources -->
+      <div class="portal-panel" data-panel="resources">
+        <div class="portal-panel-head">
+          <h3>Resources</h3>
+          <p>Tools to deepen your craft and sharpen your work.</p>
+        </div>
+        <div class="resources-grid">
+          <button type="button" class="resource-card" onclick="openIntentionWizard()">
+            <div class="resource-card-icon">🎭</div>
+            <div class="resource-card-body">
+              <div class="resource-card-title">Intention Wizard</div>
+              <div class="resource-card-desc">An 8-step guided practice for finding the active intention behind any scene or line. Based on Stanislavski's foundational principle: emotion follows intention.</div>
+            </div>
+            <div class="resource-card-arrow">›</div>
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -2505,6 +2658,173 @@
 </section>
 
 </main>
+
+<!-- =========== Intention Wizard Modal =========== -->
+<div id="intention-wizard-overlay" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(10,7,6,0.85);backdrop-filter:blur(4px);overflow-y:auto;">
+  <div id="intention-wizard-modal" style="max-width:700px;margin:40px auto;background:#F0F6FB;border-radius:16px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.5);">
+
+    <div style="background:#1A2E42;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-style:italic;color:#F5F0DC;letter-spacing:0.02em;">The Green Room</div>
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.14em;color:#5B8DB8;margin-top:2px;">Intention Wizard</div>
+      </div>
+      <button onclick="closeIntentionWizard()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:7px 16px;cursor:pointer;font-size:13px;color:#F5F0DC;font-family:'Source Serif 4',Georgia,serif;display:flex;align-items:center;gap:6px;">✕ Close</button>
+    </div>
+
+    <div style="padding:32px 28px 48px;font-family:'Source Serif 4',Georgia,serif;font-size:17px;line-height:1.8;color:#1A2E42;">
+
+      <div id="iw-progress" style="display:flex;gap:6px;margin-bottom:36px;" role="progressbar" aria-label="Wizard progress"></div>
+
+      <div class="iw-step active" id="iw-step-1">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#E8622A;margin-bottom:14px;">Step 1 of 8 — The foundation</div>
+        <h2 style="font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:400;line-height:1.2;color:#1A2E42;margin:0 0 18px;">Emotion follows intention.</h2>
+        <p style="color:#2E4A62;margin:0 0 20px;">Human behavior doesn't begin with feeling. It begins somewhere else entirely.</p>
+        <ul style="list-style:none;padding:0;margin:0 0 24px;">
+          <li style="padding:11px 0;border-bottom:1px solid #CCE0F0;display:flex;align-items:center;gap:12px;color:#2E4A62;"><span style="width:8px;height:8px;border-radius:50%;background:#E8622A;flex-shrink:0;"></span>Before there is emotion.</li>
+          <li style="padding:11px 0;border-bottom:1px solid #CCE0F0;display:flex;align-items:center;gap:12px;color:#2E4A62;"><span style="width:8px;height:8px;border-radius:50%;background:#E8622A;flex-shrink:0;"></span>Before there is action.</li>
+          <li style="padding:11px 0;display:flex;align-items:center;gap:12px;color:#2E4A62;"><span style="width:8px;height:8px;border-radius:50%;background:#E8622A;flex-shrink:0;"></span>Before there is performance.</li>
+        </ul>
+        <p style="color:#2E4A62;margin:0 0 24px;">There is <strong style="color:#1A2E42;">imagination.</strong> There is <strong style="color:#1A2E42;">intention.</strong></p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+          <button onclick="iwGo(2)" class="iw-btn-primary">Keep going →</button>
+        </div>
+      </div>
+
+      <div class="iw-step" id="iw-step-2">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#E8622A;margin-bottom:14px;">Step 2 of 8 — The same words</div>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:30px;font-style:italic;font-weight:400;color:#1A2E42;text-align:center;padding:28px 24px;background:#E4EFF8;border-radius:14px;margin:0 0 24px;border:1px solid #B8D0E8;">"I love you."</div>
+        <p style="color:#2E4A62;margin:0 0 20px;">Three words. And yet — how many ways can they be performed?</p>
+        <p style="font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:400;color:#1A2E42;line-height:1.4;margin:0 0 24px;">Why are there so many different ways to say the same words?</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+          <button onclick="iwGo(1)" class="iw-btn-back">← Back</button>
+          <button onclick="iwGo(3)" class="iw-btn-primary">Find out →</button>
+        </div>
+      </div>
+
+      <div class="iw-step" id="iw-step-3">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#E8622A;margin-bottom:14px;">Step 3 of 8 — The discovery</div>
+        <p style="color:#2E4A62;margin:0 0 20px;">Because <strong style="color:#1A2E42;">words never determine the performance.</strong> The <em>intention</em> behind them does.</p>
+        <p style="color:#2E4A62;margin:0 0 16px;">You can say "I love you" to:</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:0 0 20px;">
+          <div class="iw-ic" onclick="iwSelInt(this,'Comfort','You want them to feel safe. To stop hurting. To know they are not alone.')" role="button" tabindex="0"><div style="font-size:26px;">🫶</div><p style="font-size:14px;font-weight:500;color:#1A2E42;margin:0;">Comfort</p></div>
+          <div class="iw-ic" onclick="iwSelInt(this,'Manipulate','You want something. The words are a lever. Emotion is the tool, not the truth.')" role="button" tabindex="0"><div style="font-size:26px;">👁</div><p style="font-size:14px;font-weight:500;color:#1A2E42;margin:0;">Manipulate</p></div>
+          <div class="iw-ic" onclick="iwSelInt(this,'Apologize','You need them to forgive you. The words carry the weight of guilt and regret.')" role="button" tabindex="0"><div style="font-size:26px;">🙏</div><p style="font-size:14px;font-weight:500;color:#1A2E42;margin:0;">Apologize</p></div>
+          <div class="iw-ic" onclick="iwSelInt(this,'Seduce','You want to draw them closer. Every syllable is a step across the distance.')" role="button" tabindex="0"><div style="font-size:26px;">🔥</div><p style="font-size:14px;font-weight:500;color:#1A2E42;margin:0;">Seduce</p></div>
+          <div class="iw-ic" onclick="iwSelInt(this,'Save','It may be the last thing you say. You need them to hold on.')" role="button" tabindex="0"><div style="font-size:26px;">🛡</div><p style="font-size:14px;font-weight:500;color:#1A2E42;margin:0;">Save</p></div>
+        </div>
+        <div id="iw-int-result" style="display:none;border-left:4px solid #E8622A;padding:16px 20px;background:#E4EFF8;border-radius:0 12px 12px 0;margin:0 0 20px;" aria-live="polite">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.14em;color:#7A9AB8;margin:0 0 4px;">Your intention</div>
+          <p id="iw-res-title" style="font-size:19px;font-weight:600;color:#1A2E42;margin:0 0 4px;"></p>
+          <p id="iw-res-desc" style="font-size:15px;color:#2E4A62;margin:0;line-height:1.65;"></p>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+          <button onclick="iwGo(2)" class="iw-btn-back">← Back</button>
+          <button onclick="iwGo(4)" class="iw-btn-primary">Same words. Different performance. →</button>
+        </div>
+      </div>
+
+      <div class="iw-step" id="iw-step-4">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#E8622A;margin-bottom:14px;">Step 4 of 8 — The insight</div>
+        <p style="font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:400;color:#1A2E42;line-height:1.4;margin:0 0 24px;">Same words. Different intentions. Different performances.</p>
+        <div style="background:#E4EFF8;border-radius:12px;padding:18px 20px;margin:0 0 20px;border:1px solid #B8D0E8;">
+          <p style="margin:0 0 10px;font-size:15px;color:#2E4A62;line-height:1.75;">Great acting doesn't begin with: <em>"How should I feel?"</em></p>
+          <p style="margin:0;font-size:15px;color:#2E4A62;line-height:1.75;">It begins with understanding <strong style="color:#1A2E42;">why your character is communicating</strong> in the first place.</p>
+        </div>
+        <p style="color:#2E4A62;margin:0 0 24px;">Emotions are a byproduct — the exhaust of genuine intention pursued through imagination. Chase the feeling and you perform a demonstration. Chase the intention and the feeling arrives on its own.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+          <button onclick="iwGo(3)" class="iw-btn-back">← Back</button>
+          <button onclick="iwGo(5)" class="iw-btn-primary">How do I find the right intention? →</button>
+        </div>
+      </div>
+
+      <div class="iw-step" id="iw-step-5">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#E8622A;margin-bottom:14px;">Step 5 of 8 — Finding the intention</div>
+        <p style="color:#2E4A62;margin:0 0 20px;">There is no single <em>right</em> intention waiting to be discovered. There's the most <strong style="color:#1A2E42;">useful</strong> one — the one that makes the scene live.</p>
+        <p style="color:#2E4A62;margin:0 0 16px;">Start here:</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:10px;margin:0 0 20px;">
+          <div style="background:#fff;border:1px solid #B8D0E8;border-radius:12px;padding:16px;"><div style="font-size:11px;font-weight:600;color:#E8622A;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 6px;">Step 1</div><p style="font-size:14px;color:#2E4A62;line-height:1.65;margin:0;">Inhabit the given circumstances. Where are you? What just happened? What do you believe is true right now?</p></div>
+          <div style="background:#fff;border:1px solid #B8D0E8;border-radius:12px;padding:16px;"><div style="font-size:11px;font-weight:600;color:#E8622A;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 6px;">Step 2</div><p style="font-size:14px;color:#2E4A62;line-height:1.65;margin:0;">Ask: what does my character need the other person to <em>do, feel, or believe</em> by the end of this scene?</p></div>
+          <div style="background:#fff;border:1px solid #B8D0E8;border-radius:12px;padding:16px;"><div style="font-size:11px;font-weight:600;color:#E8622A;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 6px;">Step 3</div><p style="font-size:14px;color:#2E4A62;line-height:1.65;margin:0;">Make it specific. "I need him to admit he was wrong so I can stop feeling like I'm losing my mind" beats "I want him to understand."</p></div>
+          <div style="background:#fff;border:1px solid #B8D0E8;border-radius:12px;padding:16px;"><div style="font-size:11px;font-weight:600;color:#E8622A;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 6px;">Step 4</div><p style="font-size:14px;color:#2E4A62;line-height:1.65;margin:0;">Test it against the text. A good intention makes the scene <em>harder</em>, not easier — it should create genuine obstacles.</p></div>
+        </div>
+        <p style="font-size:15px;color:#2E4A62;margin:0 0 24px;">Intentions are <strong style="color:#1A2E42;">transitive</strong> — they land on the other person. "I feel guilty" is a state. "I need her to forgive me" is an intention. States are passive. Intentions are active.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+          <button onclick="iwGo(4)" class="iw-btn-back">← Back</button>
+          <button onclick="iwGo(6)" class="iw-btn-primary">But what if it feels abstract? →</button>
+        </div>
+      </div>
+
+      <div class="iw-step" id="iw-step-6">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#E8622A;margin-bottom:14px;">Step 6 of 8 — Tactics</div>
+        <p style="color:#2E4A62;margin:0 0 20px;">Intentions don't stay static. You try something — it doesn't work — you try something else.</p>
+        <p style="font-size:15px;color:#2E4A62;margin:0 0 14px;">These are called <strong style="color:#1A2E42;">tactics</strong>: the different ways you pursue the same underlying want.</p>
+        <p style="font-size:15px;color:#2E4A62;margin:0 0 20px;">Say your intention is: <em>"I need her to trust me."</em> You might try:</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:0 0 20px;">
+          <div class="iw-tcard" onclick="iwSelTac(this)" role="button" tabindex="0"><p style="font-size:14px;font-weight:600;color:#1A2E42;margin:0 0 4px;">Charm</p><p style="font-size:13px;color:#2E4A62;line-height:1.5;margin:0;">Make her want to trust you.</p></div>
+          <div class="iw-tcard" onclick="iwSelTac(this)" role="button" tabindex="0"><p style="font-size:14px;font-weight:600;color:#1A2E42;margin:0 0 4px;">Reason</p><p style="font-size:13px;color:#2E4A62;line-height:1.5;margin:0;">Give her evidence. Logic.</p></div>
+          <div class="iw-tcard" onclick="iwSelTac(this)" role="button" tabindex="0"><p style="font-size:14px;font-weight:600;color:#1A2E42;margin:0 0 4px;">Plead</p><p style="font-size:13px;color:#2E4A62;line-height:1.5;margin:0;">Appeal to her sympathy.</p></div>
+          <div class="iw-tcard" onclick="iwSelTac(this)" role="button" tabindex="0"><p style="font-size:14px;font-weight:600;color:#1A2E42;margin:0 0 4px;">Provoke</p><p style="font-size:13px;color:#2E4A62;line-height:1.5;margin:0;">Shake her into responding.</p></div>
+          <div class="iw-tcard" onclick="iwSelTac(this)" role="button" tabindex="0"><p style="font-size:14px;font-weight:600;color:#1A2E42;margin:0 0 4px;">Confess</p><p style="font-size:13px;color:#2E4A62;line-height:1.5;margin:0;">Disarm her with honesty.</p></div>
+          <div class="iw-tcard" onclick="iwSelTac(this)" role="button" tabindex="0"><p style="font-size:14px;font-weight:600;color:#1A2E42;margin:0 0 4px;">Withdraw</p><p style="font-size:13px;color:#2E4A62;line-height:1.5;margin:0;">Make her come to you.</p></div>
+        </div>
+        <div style="background:#E4EFF8;border-radius:12px;padding:18px 20px;margin:0 0 20px;border:1px solid #B8D0E8;">
+          <p style="margin:0;font-size:15px;color:#2E4A62;line-height:1.75;">If you play the same thing at the same intensity from top to bottom, you've locked onto a <em>result</em>, not a live intention. Stay responsive. Let your partner's behavior change your tactics — not your want.</p>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+          <button onclick="iwGo(5)" class="iw-btn-back">← Back</button>
+          <button onclick="iwGo(7)" class="iw-btn-primary">The "as if" door →</button>
+        </div>
+      </div>
+
+      <div class="iw-step" id="iw-step-7">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#E8622A;margin-bottom:14px;">Step 7 of 8 — The "as if" door</div>
+        <p style="color:#2E4A62;margin:0 0 20px;">If the scene's circumstances feel distant or abstract, run them through an <em>as if.</em></p>
+        <div style="background:#E4EFF8;border-radius:12px;padding:18px 20px;margin:0 0 20px;border:1px solid #B8D0E8;">
+          <p style="margin:0;font-size:15px;color:#2E4A62;line-height:1.75;">You don't need to have been betrayed by a king to play Hamlet. But you've probably known what it feels like when everyone around you is pretending something false is true. Find the bridge from your life to theirs.</p>
+        </div>
+        <p style="font-size:15px;color:#2E4A62;margin:0 0 20px;">Try it now. Fill in what you know about your scene and let the door open.</p>
+        <div style="display:flex;flex-direction:column;gap:16px;margin:0 0 20px;">
+          <div>
+            <label style="font-size:14px;color:#2E4A62;margin:0 0 6px;display:block;" for="iw-ai-need">What does your character need from the other person in this scene?</label>
+            <input id="iw-ai-need" type="text" placeholder="e.g. I need her to believe I didn't betray her" style="width:100%;padding:13px 16px;font-size:16px;border:1px solid #B8D0E8;border-radius:12px;background:#fff;color:#1A2E42;font-family:'Source Serif 4',Georgia,serif;box-sizing:border-box;min-height:52px;transition:border-color 0.15s;" />
+          </div>
+          <div>
+            <label style="font-size:14px;color:#2E4A62;margin:0 0 6px;display:block;" for="iw-ai-life">When in your own life have you needed something like that?</label>
+            <input id="iw-ai-life" type="text" placeholder="e.g. When I was accused of something I didn't do…" style="width:100%;padding:13px 16px;font-size:16px;border:1px solid #B8D0E8;border-radius:12px;background:#fff;color:#1A2E42;font-family:'Source Serif 4',Georgia,serif;box-sizing:border-box;min-height:52px;transition:border-color 0.15s;" />
+          </div>
+        </div>
+        <button onclick="iwOpenDoor()" style="background:#1A2E42;border:none;color:#F5F0DC;padding:0 28px;border-radius:14px;font-size:17px;font-weight:500;cursor:pointer;height:56px;margin-bottom:20px;display:inline-flex;align-items:center;gap:8px;font-family:'Playfair Display',Georgia,serif;transition:opacity 0.15s;">Open the door ✦</button>
+        <div id="iw-asif-out" style="background:#E4EFF8;border-radius:14px;padding:20px;border:1px solid #B8D0E8;margin:0 0 20px;display:none;" aria-live="polite">
+          <div style="display:inline-block;font-size:11px;font-weight:600;background:rgba(232,98,42,0.12);color:#E8622A;border-radius:99px;padding:3px 12px;margin-bottom:10px;letter-spacing:0.08em;">Your "as if"</div>
+          <p id="iw-asif-text" style="margin:0;font-size:17px;color:#1A2E42;line-height:1.75;font-style:italic;"></p>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+          <button onclick="iwGo(6)" class="iw-btn-back">← Back</button>
+          <button onclick="iwGo(8)" class="iw-btn-primary">Bring it together →</button>
+        </div>
+      </div>
+
+      <div class="iw-step" id="iw-step-8">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#E8622A;margin-bottom:14px;">Step 8 of 8 — Your practice</div>
+        <p style="font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:400;color:#1A2E42;line-height:1.4;margin:0 0 24px;">Every time you approach a line, a scene, a role — work through this sequence.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;margin:0 0 24px;">
+          <div style="background:#fff;border:1px solid #B8D0E8;border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;"><div style="width:30px;height:30px;background:#E8622A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;margin-top:2px;">1</div><div style="font-size:15px;color:#2E4A62;line-height:1.65;">What are my <strong style="color:#1A2E42;">given circumstances</strong>? What do I know to be true right now?</div></div>
+          <div style="background:#fff;border:1px solid #B8D0E8;border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;"><div style="width:30px;height:30px;background:#E8622A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;margin-top:2px;">2</div><div style="font-size:15px;color:#2E4A62;line-height:1.65;">What am I trying to <strong style="color:#1A2E42;">do</strong> to the other person?</div></div>
+          <div style="background:#fff;border:1px solid #B8D0E8;border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;"><div style="width:30px;height:30px;background:#E8622A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;margin-top:2px;">3</div><div style="font-size:15px;color:#2E4A62;line-height:1.65;">What <strong style="color:#1A2E42;">matters</strong> to me — specifically, personally, urgently?</div></div>
+          <div style="background:#fff;border:1px solid #B8D0E8;border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;"><div style="width:30px;height:30px;background:#E8622A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;margin-top:2px;">4</div><div style="font-size:15px;color:#2E4A62;line-height:1.65;">When in my life have I needed something <strong style="color:#1A2E42;">like this</strong>? (The "as if" door.)</div></div>
+          <div style="background:#fff;border:1px solid #B8D0E8;border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;"><div style="width:30px;height:30px;background:#E8622A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;margin-top:2px;">5</div><div style="font-size:15px;color:#2E4A62;line-height:1.65;">What <strong style="color:#1A2E42;">tactics</strong> am I using — and what happens when they don't work?</div></div>
+        </div>
+        <p style="font-size:15px;color:#2E4A62;margin:0 0 24px;">Human behavior is driven by imagination and intention. So is great acting.</p>
+        <hr style="border:none;border-top:1px solid #CCE0F0;margin:28px 0;" />
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+          <button onclick="iwGo(7)" class="iw-btn-back">← Back</button>
+          <button onclick="iwRestart()" style="background:transparent;border:1px solid #E8622A;color:#E8622A;padding:0 28px;border-radius:14px;font-size:17px;font-weight:500;cursor:pointer;height:56px;display:inline-flex;align-items:center;gap:8px;font-family:'Playfair Display',Georgia,serif;transition:background 0.15s;">↩ Start again</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <!-- =========== GhostLight AI Easter Egg =========== -->
 <div class="ghostlight-overlay" id="ghostlight-overlay">
@@ -2961,6 +3281,108 @@
 
   // Init
   updateChrome(1);
+
+  // =========== Intention Wizard Modal ===========
+  let iwCur = 1;
+  const IW_TOTAL = 8;
+
+  function openIntentionWizard() {
+    document.getElementById('intention-wizard-overlay').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    iwRenderProgress(iwCur);
+  }
+
+  function closeIntentionWizard() {
+    document.getElementById('intention-wizard-overlay').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function iwRenderProgress(n) {
+    const p = document.getElementById('iw-progress');
+    if (!p) return;
+    p.innerHTML = '';
+    for (let i = 1; i <= IW_TOTAL; i++) {
+      const d = document.createElement('div');
+      d.className = 'iw-pd' + (i <= n ? ' done' : '');
+      p.appendChild(d);
+    }
+  }
+
+  function iwGo(n) {
+    const cur  = document.getElementById('iw-step-' + iwCur);
+    const next = document.getElementById('iw-step-' + n);
+    if (cur)  cur.classList.remove('active');
+    if (next) next.classList.add('active');
+    iwCur = n;
+    iwRenderProgress(n);
+    document.getElementById('intention-wizard-modal').scrollTop = 0;
+  }
+
+  function iwSelInt(el, title, desc) {
+    document.querySelectorAll('.iw-ic').forEach(c => c.classList.remove('sel'));
+    el.classList.add('sel');
+    document.getElementById('iw-res-title').textContent = title;
+    document.getElementById('iw-res-desc').textContent  = desc;
+    document.getElementById('iw-int-result').style.display = 'block';
+  }
+
+  function iwSelTac(el) {
+    document.querySelectorAll('.iw-tcard').forEach(c => c.classList.remove('tsel'));
+    el.classList.add('tsel');
+  }
+
+  function iwOpenDoor() {
+    const need = document.getElementById('iw-ai-need').value.trim();
+    const life = document.getElementById('iw-ai-life').value.trim();
+    const out  = document.getElementById('iw-asif-out');
+    const txt  = document.getElementById('iw-asif-text');
+    if (!need && !life) {
+      txt.textContent = 'Fill in at least one field to open the door.';
+      out.style.display = 'block';
+      return;
+    }
+    let result = '';
+    if (need && life) {
+      result = '"Act as if ' + need.toLowerCase().replace(/^i need /, 'you need ') +
+               ' — the way you needed ' + life.toLowerCase().replace(/^when /, '') + '"';
+    } else if (need) {
+      result = '"Play it as if everything depends on ' +
+               need.toLowerCase().replace(/^i need /, '') + '. Make it that urgent."';
+    } else {
+      result = '"Bring that feeling — ' + life.toLowerCase() +
+               ' — into the room with you. That\'s the emotional truth of the scene."';
+    }
+    txt.textContent = result;
+    out.style.display = 'block';
+  }
+
+  function iwRestart() {
+    document.querySelectorAll('.iw-ic').forEach(c => c.classList.remove('sel'));
+    document.querySelectorAll('.iw-tcard').forEach(c => c.classList.remove('tsel'));
+    document.getElementById('iw-int-result').style.display = 'none';
+    document.getElementById('iw-asif-out').style.display   = 'none';
+    document.getElementById('iw-ai-need').value = '';
+    document.getElementById('iw-ai-life').value = '';
+    iwCur = 1;
+    iwGo(1);
+  }
+
+  document.getElementById('intention-wizard-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeIntentionWizard();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (document.getElementById('intention-wizard-overlay').style.display === 'block') {
+        closeIntentionWizard();
+      }
+    }
+    if (e.key === 'Enter' || e.key === ' ') {
+      const t = e.target;
+      if (t.classList.contains('iw-ic'))    { e.preventDefault(); t.click(); }
+      if (t.classList.contains('iw-tcard')) { e.preventDefault(); t.click(); }
+    }
+  });
 </script>
 
 </body>
