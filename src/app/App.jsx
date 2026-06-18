@@ -611,7 +611,7 @@ function App() {
             <button
               type="button"
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors flex-shrink-0 ml-auto"
+              className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors flex-shrink-0 ml-auto"
               title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
               {sidebarCollapsed
@@ -654,7 +654,7 @@ function App() {
                 type="button"
                 title={themeMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
                 onClick={handleThemeToggle}
-                className="text-base opacity-50 hover:opacity-100 transition-opacity leading-none bg-transparent border-0 cursor-pointer px-1 py-0.5"
+                className="text-base opacity-50 hover:opacity-100 transition-opacity leading-none bg-transparent border-0 cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center"
               >
                 {themeMode === 'dark' ? '☀️' : '🌙'}
               </button>

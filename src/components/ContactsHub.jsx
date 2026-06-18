@@ -211,6 +211,7 @@ function AllContactsList({ contacts, donations }) {
         <input
           type="text"
           placeholder="Search by name, email or phone…"
+          aria-label="Search by name, email or phone"
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="hub-input flex-1 min-w-[200px]"
@@ -229,8 +230,8 @@ function AllContactsList({ contacts, donations }) {
           <option value="board">Board</option>
         </select>
         <div className="view-toggle">
-          <button type="button" onClick={() => setView('table')} className={`view-toggle-btn${viewMode === 'table' ? ' active' : ''}`}>≡ Table</button>
-          <button type="button" onClick={() => setView('cards')} className={`view-toggle-btn${viewMode === 'cards' ? ' active' : ''}`}>⊞ Cards</button>
+          <button type="button" onClick={() => setView('table')} className={`view-toggle-btn min-h-[44px]${viewMode === 'table' ? ' active' : ''}`}>≡ Table</button>
+          <button type="button" onClick={() => setView('cards')} className={`view-toggle-btn min-h-[44px]${viewMode === 'cards' ? ' active' : ''}`}>⊞ Cards</button>
         </div>
         <button
           type="button"
@@ -320,7 +321,11 @@ function AllContactsList({ contacts, donations }) {
                 const dCount = donationCountFor(c.id);
                 const prodCount = (c.staffProfile?.productions || []).length;
                 return (
-                  <tr key={c.id}>
+                  <tr
+                    key={c.id}
+                    onClick={() => window.showToast?.(`${name} — contact detail view coming soon`, 'info')}
+                    className="cursor-pointer hover:bg-gray-50 transition-colors"
+                  >
                     <td className="font-medium">
                       <div className="flex items-center gap-2">
                         <ContactAvatar contact={c} size="sm" />
@@ -380,7 +385,7 @@ function AllContactsList({ contacts, donations }) {
                 <div className="flex items-center gap-3 mb-2">
                   <ContactAvatar contact={c} size="lg" />
                   <div className="min-w-0">
-                    <div className="font-semibold truncate text-primary-color">{name}</div>
+                    <div className="font-semibold truncate text-primary-color" title={name}>{name}</div>
                     {c.email && <div className="text-xs truncate text-secondary-color">{c.email}</div>}
                   </div>
                 </div>
@@ -450,8 +455,8 @@ function BoardMembersView({ contacts }) {
         </div>
         <div className="flex items-center gap-3">
           <div className="view-toggle">
-            <button type="button" onClick={() => setView('cards')} className={`view-toggle-btn${viewMode === 'cards' ? ' active' : ''}`}>⊞ Cards</button>
-            <button type="button" onClick={() => setView('table')} className={`view-toggle-btn${viewMode === 'table' ? ' active' : ''}`}>≡ Table</button>
+            <button type="button" onClick={() => setView('cards')} className={`view-toggle-btn min-h-[44px]${viewMode === 'cards' ? ' active' : ''}`}>⊞ Cards</button>
+            <button type="button" onClick={() => setView('table')} className={`view-toggle-btn min-h-[44px]${viewMode === 'table' ? ' active' : ''}`}>≡ Table</button>
           </div>
           <button
             type="button"
@@ -535,13 +540,22 @@ function BoardMembersView({ contacts }) {
                     <div className="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{initial}</div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-primary-color truncate">{name}</div>
+                    <div className="font-semibold text-primary-color truncate" title={name}>{name}</div>
                     {member.email && <div className="text-sm text-secondary-color truncate">{member.email}</div>}
                     {member.phone && <div className="text-sm text-muted-color">{member.phone}</div>}
                     {boardTag && (
                       <span className="inline-block mt-2 text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full">{boardTag}</span>
                     )}
                   </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-gray-100 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => window.showToast?.('Contact detail editing coming soon', 'info')}
+                    className="text-xs font-medium text-violet-600 hover:text-violet-800 transition-colors"
+                  >
+                    Edit Profile →
+                  </button>
                 </div>
               </div>
             );
@@ -647,6 +661,7 @@ function VolunteerDirectory({ contacts }) {
         <input
           type="text"
           placeholder="Search volunteers…"
+          aria-label="Search volunteers"
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="hub-input flex-1 min-w-[200px]"
@@ -663,8 +678,8 @@ function VolunteerDirectory({ contacts }) {
           <option value="approved">Approved</option>
         </select>
         <div className="view-toggle">
-          <button type="button" onClick={() => setView('table')} className={`view-toggle-btn${viewMode === 'table' ? ' active' : ''}`}>≡ Table</button>
-          <button type="button" onClick={() => setView('cards')} className={`view-toggle-btn${viewMode === 'cards' ? ' active' : ''}`}>⊞ Cards</button>
+          <button type="button" onClick={() => setView('table')} className={`view-toggle-btn min-h-[44px]${viewMode === 'table' ? ' active' : ''}`}>≡ Table</button>
+          <button type="button" onClick={() => setView('cards')} className={`view-toggle-btn min-h-[44px]${viewMode === 'cards' ? ' active' : ''}`}>⊞ Cards</button>
         </div>
       </div>
 
@@ -795,7 +810,7 @@ function ContactsHub({ data, userRole }) {
             key={tab.id}
             type="button"
             onClick={() => setTab(tab.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 min-h-[44px] rounded-lg text-sm font-medium transition-colors ${
               activeTab === tab.id
                 ? 'bg-violet-600 text-white'
                 : 'text-gray-300 hover:bg-gray-700 hover:text-white'

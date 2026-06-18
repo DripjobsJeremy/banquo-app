@@ -10,6 +10,20 @@ const getExperienceLevelColor = (level) => {
   return colors[level?.toLowerCase()] || 'bg-gray-100 text-gray-700';
 };
 
+const UNION_OPTIONS = [
+  { value: 'all', label: 'Union: All Actors' },
+  { value: 'non-union', label: 'Non-Union Only' },
+  { value: 'union-any', label: 'Any Union Member' },
+  { value: 'AEA', label: 'AEA', group: 'Stage & Theatre' },
+  { value: 'AEA-EMC', label: 'AEA - Equity Eligible (EMC)', group: 'Stage & Theatre' },
+  { value: 'CAEA', label: 'CAEA - Canadian Equity', group: 'Stage & Theatre' },
+  { value: 'UK-Equity', label: 'UK Equity', group: 'Stage & Theatre' },
+  { value: 'SAG-AFTRA', label: 'SAG-AFTRA', group: 'Film & Television' },
+  { value: 'SAG-AFTRA-Eligible', label: 'SAG-AFTRA Eligible', group: 'Film & Television' },
+  { value: 'AGMA', label: 'AGMA', group: 'Opera & Dance' },
+  { value: 'AGVA', label: 'AGVA', group: 'Variety & Other' },
+];
+
 function ActorRoster({ onViewActor, onAddActor }) {
   const [actors, setActors] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,6 +36,11 @@ function ActorRoster({ onViewActor, onAddActor }) {
     unionAffiliation: 'all',
     contractPreference: 'all'
   });
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [showAdvancedFilters, setShowAdvancedFilters] = React.useState(false);
+  const [unionQuery, setUnionQuery] = useState('');
+  const [unionOpen, setUnionOpen] = useState(false);
+  const unionBlurTimeout = React.useRef(null);
 
   useEffect(() => {
     loadActors();
@@ -33,10 +52,20 @@ function ActorRoster({ onViewActor, onAddActor }) {
   };
 
   const handleDeleteActor = (actorId) => {
-    if (!confirm('Delete this actor? This will remove them from all productions.')) return;
+    setPendingDeleteId(actorId);
+  };
 
-    window.actorsService.deleteActor(actorId);
-    loadActors();
+  const confirmDelete = () => {
+    if (!pendingDeleteId) return;
+    try {
+      window.actorsService.deleteActor(pendingDeleteId);
+      loadActors();
+      window.showToast?.('Actor removed', 'success');
+    } catch (e) {
+      window.showToast?.('Error deleting actor', 'error');
+    } finally {
+      setPendingDeleteId(null);
+    }
   };
 
   const getFilteredActors = () => {
@@ -90,6 +119,29 @@ function ActorRoster({ onViewActor, onAddActor }) {
   };
 
   const filteredActors = getFilteredActors();
+
+  // Union combobox derived state
+  const selectedUnionOption = UNION_OPTIONS.find(o => o.value === filters.unionAffiliation);
+  const unionInputValue = unionOpen ? unionQuery : (selectedUnionOption && selectedUnionOption.value !== 'all' ? selectedUnionOption.label : '');
+  const filteredUnionOptions = UNION_OPTIONS.filter(o => o.label.toLowerCase().includes(unionQuery.toLowerCase()));
+  const unionMenuItems = [];
+  {
+    let lastGroup = null;
+    filteredUnionOptions.forEach(opt => {
+      if (opt.group !== lastGroup) {
+        if (opt.group) unionMenuItems.push({ type: 'header', label: opt.group, key: `h-${opt.group}` });
+        lastGroup = opt.group;
+      }
+      unionMenuItems.push({ type: 'option', ...opt });
+    });
+  }
+
+  const selectUnionOption = (value) => {
+    clearTimeout(unionBlurTimeout.current);
+    setFilters({ ...filters, unionAffiliation: value });
+    setUnionOpen(false);
+    setUnionQuery('');
+  };
 
   // Actor Card Component
   const ActorCard = ({ actor }) => {
@@ -289,7 +341,7 @@ function ActorRoster({ onViewActor, onAddActor }) {
 
       {/* Search and Filters */}
       <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Search */}
           <div className="lg:col-span-2">
             <input
@@ -317,80 +369,117 @@ function ActorRoster({ onViewActor, onAddActor }) {
             </select>
           </div>
 
-          {/* Has Resume Filter */}
+          {/* Advanced Filters Toggle */}
           <div>
-            <select
-              title="Resume Filter"
-              value={filters.hasResume}
-              onChange={(e) => setFilters({ ...filters, hasResume: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+            <button
+              type="button"
+              onClick={() => setShowAdvancedFilters(v => !v)}
+              className="relative w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-gray-700"
+              aria-expanded={!!showAdvancedFilters}
             >
-              <option value="all">Resume: Any</option>
-              <option value="yes">Has Resume</option>
-              <option value="no">No Resume</option>
-            </select>
-          </div>
-
-          {/* Has Headshot Filter */}
-          <div>
-            <select
-              title="Headshot Filter"
-              value={filters.hasHeadshot}
-              onChange={(e) => setFilters({ ...filters, hasHeadshot: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-            >
-              <option value="all">Headshot: Any</option>
-              <option value="yes">Has Headshot</option>
-              <option value="no">No Headshot</option>
-            </select>
-          </div>
-
-          {/* Union Filter */}
-          <div>
-            <select
-              title="Union Filter"
-              value={filters.unionAffiliation}
-              onChange={(e) => setFilters({ ...filters, unionAffiliation: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 text-sm"
-            >
-              <option value="all">Union: All Actors</option>
-              <option value="non-union">Non-Union Only</option>
-              <option value="union-any">Any Union Member</option>
-              <optgroup label="Stage &amp; Theatre">
-                <option value="AEA">AEA</option>
-                <option value="AEA-EMC">AEA - Equity Eligible (EMC)</option>
-                <option value="CAEA">CAEA - Canadian Equity</option>
-                <option value="UK-Equity">UK Equity</option>
-              </optgroup>
-              <optgroup label="Film &amp; Television">
-                <option value="SAG-AFTRA">SAG-AFTRA</option>
-                <option value="SAG-AFTRA-Eligible">SAG-AFTRA Eligible</option>
-              </optgroup>
-              <optgroup label="Opera &amp; Dance">
-                <option value="AGMA">AGMA</option>
-              </optgroup>
-              <optgroup label="Variety &amp; Other">
-                <option value="AGVA">AGVA</option>
-              </optgroup>
-            </select>
-          </div>
-
-          {/* Contract Preference Filter */}
-          <div>
-            <select
-              title="Contract Preference Filter"
-              value={filters.contractPreference}
-              onChange={(e) => setFilters({ ...filters, contractPreference: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 text-sm"
-            >
-              <option value="all">Contract: Any</option>
-              <option value="union-only">Union Only</option>
-              <option value="non-union-only">Non-Union Only</option>
-              <option value="union-and-non-union">Union & Non-Union</option>
-              <option value="open-to-all">Open to All</option>
-            </select>
+              <span>🔧</span>
+              <span>Filters</span>
+              <span>{showAdvancedFilters ? '▲' : '▼'}</span>
+              {(filters.hasResume !== 'all' || filters.hasHeadshot !== 'all' || filters.unionAffiliation !== 'all' || filters.contractPreference !== 'all') && (
+                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-violet-600" />
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Advanced Filters Row */}
+        {showAdvancedFilters && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 pt-4 border-t border-gray-200">
+            {/* Has Resume Filter */}
+            <div>
+              <select
+                title="Resume Filter"
+                value={filters.hasResume}
+                onChange={(e) => setFilters({ ...filters, hasResume: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+              >
+                <option value="all">Resume: Any</option>
+                <option value="yes">Has Resume</option>
+                <option value="no">No Resume</option>
+              </select>
+            </div>
+
+            {/* Has Headshot Filter */}
+            <div>
+              <select
+                title="Headshot Filter"
+                value={filters.hasHeadshot}
+                onChange={(e) => setFilters({ ...filters, hasHeadshot: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+              >
+                <option value="all">Headshot: Any</option>
+                <option value="yes">Has Headshot</option>
+                <option value="no">No Headshot</option>
+              </select>
+            </div>
+
+            {/* Union Filter */}
+            <div className="relative">
+              <input
+                type="text"
+                title="Union Filter"
+                autoComplete="off"
+                placeholder="All Actors"
+                value={unionInputValue}
+                onChange={(e) => { setUnionQuery(e.target.value); setUnionOpen(true); }}
+                onFocus={() => { clearTimeout(unionBlurTimeout.current); setUnionOpen(true); setUnionQuery(''); }}
+                onBlur={() => { unionBlurTimeout.current = setTimeout(() => { setUnionOpen(false); setUnionQuery(''); }, 150); }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setUnionOpen(false);
+                    setUnionQuery('');
+                    e.target.blur();
+                  }
+                }}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 text-sm"
+              />
+              {unionOpen && (
+                <ul className="absolute z-20 mt-1 w-full max-h-60 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg text-sm">
+                  {unionMenuItems.length === 0 ? (
+                    <li className="px-4 py-2 text-gray-400">No matches</li>
+                  ) : (
+                    unionMenuItems.map(item => (
+                      item.type === 'header' ? (
+                        <li key={item.key} className="px-4 py-1 text-xs font-semibold text-gray-400 uppercase bg-gray-50">
+                          {item.label}
+                        </li>
+                      ) : (
+                        <li
+                          key={item.value}
+                          onClick={() => selectUnionOption(item.value)}
+                          className={`px-4 py-2 cursor-pointer hover:bg-violet-50 ${filters.unionAffiliation === item.value ? 'bg-violet-100 font-medium' : ''}`}
+                        >
+                          {item.label}
+                        </li>
+                      )
+                    ))
+                  )}
+                </ul>
+              )}
+            </div>
+
+            {/* Contract Preference Filter */}
+            <div>
+              <select
+                title="Contract Preference Filter"
+                value={filters.contractPreference}
+                onChange={(e) => setFilters({ ...filters, contractPreference: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 text-sm"
+              >
+                <option value="all">Contract: Any</option>
+                <option value="union-only">Union Only</option>
+                <option value="non-union-only">Non-Union Only</option>
+                <option value="union-and-non-union">Union & Non-Union</option>
+                <option value="open-to-all">Open to All</option>
+              </select>
+            </div>
+          </div>
+        )}
 
         {/* View Mode Toggle */}
         <div className="flex justify-end mt-4">
@@ -516,6 +605,37 @@ function ActorRoster({ onViewActor, onAddActor }) {
           </table>
         </div>
       )}
+
+      {pendingDeleteId && (() => {
+        const actor = actors.find(a => a.id === pendingDeleteId);
+        const name = actor ? `${actor.firstName} ${actor.lastName}` : 'this actor';
+        return (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Actor</h3>
+              <p className="text-gray-600 mb-6">
+                Remove <strong>{name}</strong> from the roster? This cannot be undone.
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setPendingDeleteId(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmDelete}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

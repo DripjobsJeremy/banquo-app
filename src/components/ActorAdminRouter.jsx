@@ -3,6 +3,7 @@ const { useState, useEffect } = React;
 function PendingApprovalsView({ onApprove, onReject }) {
   const [pendingActors, setPendingActors] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null); // { type: 'approve'|'reject', actorId, actorName }
 
   useEffect(() => {
     loadPendingActors();
@@ -13,33 +14,43 @@ function PendingApprovalsView({ onApprove, onReject }) {
     setPendingActors(pending);
   };
 
-  const handleApprove = async (actorId) => {
-    if (!confirm('Approve this actor account?')) return;
+  const handleApprove = (actorId) => {
+    const actor = pendingActors.find(a => a.id === actorId);
+    setPendingAction({ type: 'approve', actorId, actorName: `${actor?.firstName || ''} ${actor?.lastName || ''}`.trim() });
+  };
 
+  const executeApprove = async (actorId) => {
     setLoading(true);
     try {
       window.actorAuthService.approveActorAccount(actorId);
       loadPendingActors();
       if (onApprove) onApprove();
+      window.showToast?.('Actor approved', 'success');
     } catch (error) {
-      alert('Error approving account: ' + error.message);
+      window.showToast?.('Error approving account: ' + error.message, 'error');
     } finally {
       setLoading(false);
+      setPendingAction(null);
     }
   };
 
-  const handleReject = async (actorId) => {
-    if (!confirm('Reject and delete this actor account? This cannot be undone.')) return;
+  const handleReject = (actorId) => {
+    const actor = pendingActors.find(a => a.id === actorId);
+    setPendingAction({ type: 'reject', actorId, actorName: `${actor?.firstName || ''} ${actor?.lastName || ''}`.trim() });
+  };
 
+  const executeReject = async (actorId) => {
     setLoading(true);
     try {
       window.actorsService.deleteActor(actorId);
       loadPendingActors();
       if (onReject) onReject();
+      window.showToast?.('Actor rejected and removed', 'info');
     } catch (error) {
-      alert('Error rejecting account: ' + error.message);
+      window.showToast?.('Error rejecting account: ' + error.message, 'error');
     } finally {
       setLoading(false);
+      setPendingAction(null);
     }
   };
 
@@ -107,6 +118,42 @@ function PendingApprovalsView({ onApprove, onReject }) {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {pendingAction && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              {pendingAction.type === 'approve' ? 'Approve Actor' : 'Reject Actor'}
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {pendingAction.type === 'approve'
+                ? `Approve ${pendingAction.actorName}'s account? They will be able to log into the Actor Portal.`
+                : `Reject and delete ${pendingAction.actorName}'s account? This cannot be undone.`
+              }
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => setPendingAction(null)}
+                disabled={loading}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => pendingAction.type === 'approve' ? executeApprove(pendingAction.actorId) : executeReject(pendingAction.actorId)}
+                disabled={loading}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 ${
+                  pendingAction.type === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
+                }`}
+              >
+                {loading ? 'Processing…' : pendingAction.type === 'approve' ? 'Approve' : 'Reject'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -250,7 +297,12 @@ function ActorProfileViewModal({ actor, onClose }) {
 
               <div>
                 <h4 className="text-sm font-medium text-gray-500 mb-1">Contract Preference</h4>
-                <p className="text-gray-900 capitalize">{(profile.contractPreference || '—').replace(/-/g, ' ')}</p>
+                <p className="text-gray-900 capitalize">
+                  {profile.contractPreference
+                    ? profile.contractPreference.replace(/-/g, ' ')
+                    : <span className="text-gray-400 italic">Not specified</span>
+                  }
+                </p>
               </div>
 
               <div>

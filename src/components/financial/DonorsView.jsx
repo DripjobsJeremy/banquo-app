@@ -219,7 +219,13 @@
           { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4' },
           React.createElement(StatCard, { icon: '👥', label: 'Total Donors', value: totalDonors, color: 'blue' }),
           React.createElement(StatCard, { icon: '✅', label: 'Active Donors', value: activeDonors, color: 'green' }),
-          React.createElement(StatCard, { icon: '🏆', label: 'Top Donor', value: topDonor ? formatCurrency(topDonor.totalGiven) : '$0', color: 'purple' }),
+          React.createElement(StatCard, {
+            icon: '🏆',
+            label: 'Top Donor',
+            value: topDonor ? formatCurrency(topDonor.totalGiven) : '$0',
+            nameLabel: topDonor ? (topDonor?.name ?? topDonor?.firstName + ' ' + topDonor?.lastName ?? 'N/A') : null,
+            color: 'purple'
+          }),
           React.createElement(StatCard, {
             icon: '💰',
             label: 'Avg Lifetime Value',
@@ -319,7 +325,7 @@
               'div',
               { className: 'flex items-center justify-between mb-3' },
               React.createElement('h3', { className: 'text-lg font-semibold text-gray-900' }, segmentName),
-              React.createElement(SegmentBar, { count: donors.length, total: Object.values(segments).flat().length })
+              React.createElement(SegmentBar, { count: donors.length, total: Object.values(segments).flat().length, segmentName })
             ),
             viewMode === 'directory'
               ? React.createElement(
@@ -349,7 +355,7 @@
   };
 
   // Helper Components
-  const StatCard = ({ icon, label, value, subtext, color }) => {
+  const StatCard = ({ icon, label, value, subtext, nameLabel, color }) => {
     const colorClasses = {
       blue: 'border-blue-200 bg-blue-50',
       green: 'border-green-200 bg-green-50',
@@ -367,19 +373,37 @@
       { className: `banquo-card stat-card border rounded-lg p-4 ${colorClasses[color]}` },
       React.createElement('div', { className: 'text-3xl mb-2' }, icon),
       React.createElement('div', { className: `text-2xl font-bold mb-1 ${textColors[color]}` }, value),
+      nameLabel && React.createElement('p', { className: 'text-sm text-[var(--color-text-muted)]' }, nameLabel),
       React.createElement('div', { className: 'text-sm text-gray-700' }, label),
       subtext && React.createElement('div', { className: 'text-xs text-gray-600 mt-1' }, subtext)
     );
   };
 
-      const SegmentBar = ({ count, total }) => {
+  // Tier-graduated progress bar fill, keyed by donor level segment name
+  const getSegmentBarFill = (segmentName) => {
+    switch (segmentName) {
+      case 'Supporter':
+        return { className: 'h-full bg-amber-300 transition-all duration-500' };
+      case 'Benefactor':
+        return { className: 'h-full bg-amber-500 transition-all duration-500' };
+      case 'Patron':
+        return { className: 'h-full transition-all duration-500', style: { backgroundColor: 'var(--color-accent-gold)' } };
+      case 'Angel':
+        return { className: 'h-full transition-all duration-500', style: { backgroundColor: 'var(--color-primary)' } };
+      default:
+        return { className: 'h-full bg-violet-500 transition-all duration-500' };
+    }
+  };
+
+  const SegmentBar = ({ count, total, segmentName }) => {
     const percentage = total > 0 ? (count / total) * 100 : 0;
+    const fill = getSegmentBarFill(segmentName);
     return React.createElement(
       'div',
       { className: 'flex items-center gap-2' },
       React.createElement('span', { className: 'text-sm font-medium text-gray-700' }, `${count} donor${count !== 1 ? 's' : ''}`),
       React.createElement('div', { className: 'w-32 bg-gray-200 rounded-full h-2 overflow-hidden' },
-        React.createElement('div', { className: 'h-full bg-violet-500 transition-all duration-500', style: { width: `${Math.min(percentage, 100)}%` } })
+        React.createElement('div', { className: fill.className, style: { width: `${Math.min(percentage, 100)}%`, ...(fill.style || {}) } })
       ),
       React.createElement('span', { className: 'text-xs text-gray-500' }, `${percentage.toFixed(1)}%`)
     );
