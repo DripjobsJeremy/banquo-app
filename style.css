@@ -1946,3 +1946,19 @@ html[data-theme="light"] {
 /* ── Calendar day number cells ──────────────────────────────────────────── */
 .cal-day-num { color: var(--color-text-primary); }
 .cal-day-num--today { background-color: #8B1A2B; color: #ffffff; }
+
+/* ── Intention Wizard / Resources — Banquo crimson buttons ── */
+.iw-btn-crimson {
+  background-color: var(--color-accent-crimson);
+  transition: background-color 0.15s ease;
+}
+.iw-btn-crimson:hover {
+  background-color: #6f151f;
+}
+.iw-card-crimson-selected {
+  border-color: var(--color-accent-crimson) !important;
+  background-color: rgba(139, 26, 43, 0.08) !important;
+}
+.iw-card-gold-hover:hover {
+  border-color: var(--color-accent-gold) !important;
+}

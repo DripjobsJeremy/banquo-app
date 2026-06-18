@@ -50,6 +50,7 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
     { id: 'productions', label: 'Productions',  icon: '🎭', expandable: true },
     { id: 'messages',    label: 'Messages',     icon: '💬' },
     { id: 'calendar',    label: 'Calendar',     icon: '📅' },
+    { id: 'resources',   label: 'Resources',    icon: '📚' },
   ];
 
   const navigate = (viewId, prodId = null) => {
@@ -86,6 +87,16 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
         },
         productions: actorProductions,
         userRole: 'actor',
+      });
+    }
+    if (portalView === 'resources' && window.ActorResourcesView) {
+      return React.createElement(window.ActorResourcesView, {
+        onLaunchIntentionWizard: () => navigate('intention-wizard'),
+      });
+    }
+    if (portalView === 'intention-wizard' && window.IntentionWizard) {
+      return React.createElement(window.IntentionWizard, {
+        onClose: () => navigate('resources'),
       });
     }
     // dashboard (default)
