@@ -146,7 +146,7 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
     }
     if (portalView === 'wizard-edit' && isWizardPreview) {
       return (
-        <div>
+        <div style={{ padding: '32px' }}>
           <h2 className="text-xl font-bold mb-4">Edit your submission</h2>
           <WizardPreviewEditForm
             data={wizardPreviewData || {}}
