@@ -1,14 +1,64 @@
 const { useState, useEffect } = React;
 
+function WizardPreviewEditForm({ data, onSave, onCancel }) {
+  const [formData, setFormData] = React.useState({
+    firstName: data.firstName || '',
+    lastName: data.lastName || '',
+    email: data.email || '',
+    artistLocation: data.artistLocation || '',
+  });
+
+  return (
+    <div className="space-y-4 max-w-md">
+      <div>
+        <label className="block text-sm font-medium mb-1">First name</label>
+        <input type="text" className="border rounded px-3 py-2 w-full" value={formData.firstName}
+          onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Last name</label>
+        <input type="text" className="border rounded px-3 py-2 w-full" value={formData.lastName}
+          onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Email</label>
+        <input type="email" className="border rounded px-3 py-2 w-full" value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Location</label>
+        <input type="text" className="border rounded px-3 py-2 w-full" value={formData.artistLocation}
+          onChange={(e) => setFormData({ ...formData, artistLocation: e.target.value })} />
+      </div>
+      <div className="flex gap-3 pt-2">
+        <button type="button" className="bg-gray-200 px-4 py-2 rounded" onClick={onCancel}>Cancel</button>
+        <button type="button" className="bg-red-800 text-white px-4 py-2 rounded"
+          onClick={() => onSave({ ...data, ...formData })}>Save</button>
+      </div>
+    </div>
+  );
+}
+
 function ActorPortalView({ onExitToApp, hasBanner }) {
-  const [portalView, setPortalView] = useState('dashboard');
+  const isWizardPreview = window.location.hash.includes('preview=wizard');
+
+  const [portalView, setPortalView] = useState(isWizardPreview ? 'resources' : 'dashboard');
   const [activeProductionId, setActiveProductionId] = useState(null);
   const [navExpanded, setNavExpanded] = useState({ productions: true });
   const [refreshKey, setRefreshKey] = useState(0);
   const [actorUnreadCount, setActorUnreadCount] = useState(0);
 
+  const wizardPreviewData = (() => {
+    if (!isWizardPreview) return null;
+    try {
+      return JSON.parse(localStorage.getItem('showsuite_wizard_actor_preview') || 'null');
+    } catch { return null; }
+  })();
+
   const session = window.actorAuthService?.loadSession();
-  const currentActor = session ? window.actorAuthService?.getCurrentActor() : null;
+  const currentActor = isWizardPreview
+    ? (wizardPreviewData || { firstName: 'Your', lastName: 'Profile', email: '', roles: [], artistLocation: '', geoOptIn: true })
+    : (session ? window.actorAuthService?.getCurrentActor() : null);
 
   useEffect(() => {
     const actorId = window.actorAuthService?.getCurrentActor()?.id;
@@ -19,7 +69,7 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
     return () => window.removeEventListener('messagesUpdated', refresh);
   }, [portalView]);
 
-  if (!currentActor) {
+  if (!currentActor && !isWizardPreview) {
     return window.ActorLogin ? React.createElement(window.ActorLogin, {
       onLoginSuccess: () => window.location.reload()
     }) : null;
@@ -45,13 +95,18 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
     } catch { return []; }
   })();
 
-  const navItems = [
-    { id: 'dashboard',   label: 'Dashboard',    icon: '🏠' },
-    { id: 'productions', label: 'Productions',  icon: '🎭', expandable: true },
-    { id: 'messages',    label: 'Messages',     icon: '💬' },
-    { id: 'calendar',    label: 'Calendar',     icon: '📅' },
-    { id: 'resources',   label: 'Resources',    icon: '📚' },
-  ];
+  const navItems = isWizardPreview
+    ? [
+        { id: 'resources',   label: 'Resources',    icon: '📚' },
+        { id: 'wizard-edit', label: 'Edit profile',  icon: '✏️' },
+      ]
+    : [
+        { id: 'dashboard',   label: 'Dashboard',    icon: '🏠' },
+        { id: 'productions', label: 'Productions',  icon: '🎭', expandable: true },
+        { id: 'messages',    label: 'Messages',     icon: '💬' },
+        { id: 'calendar',    label: 'Calendar',     icon: '📅' },
+        { id: 'resources',   label: 'Resources',    icon: '📚' },
+      ];
 
   const navigate = (viewId, prodId = null) => {
     setPortalView(viewId);
@@ -88,6 +143,22 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
         productions: actorProductions,
         userRole: 'actor',
       });
+    }
+    if (portalView === 'wizard-edit' && isWizardPreview) {
+      return (
+        <div>
+          <h2 className="text-xl font-bold mb-4">Edit your submission</h2>
+          <WizardPreviewEditForm
+            data={wizardPreviewData || {}}
+            onSave={(updated) => {
+              localStorage.setItem('showsuite_wizard_actor_preview', JSON.stringify(updated));
+              setRefreshKey(k => k + 1);
+              setPortalView('resources');
+            }}
+            onCancel={() => setPortalView('resources')}
+          />
+        </div>
+      );
     }
     if (portalView === 'resources' && window.ActorResourcesView) {
       return React.createElement(window.ActorResourcesView, {
@@ -204,15 +275,17 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
         </nav>
 
         {/* Logout */}
-        <div className="ap-sidebar-footer">
-          <button
-            type="button"
-            className="ap-logout-btn"
-            onClick={() => { window.actorAuthService.logout(); window.location.reload(); }}
-          >
-            Sign out
-          </button>
-        </div>
+        {!isWizardPreview && (
+          <div className="ap-sidebar-footer">
+            <button
+              type="button"
+              className="ap-logout-btn"
+              onClick={() => { window.actorAuthService.logout(); window.location.reload(); }}
+            >
+              Sign out
+            </button>
+          </div>
+        )}
       </aside>
 
       {/* ── Main content ── */}
