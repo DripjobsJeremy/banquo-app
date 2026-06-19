@@ -568,6 +568,12 @@
 .text-gray-800 { color: var(--color-text-primary)   !important; }
 .text-gray-900 { color: var(--color-text-primary)   !important; }
 
+.apc-header-gradient h1,
+.apc-header-gradient h2,
+.apc-header-gradient h3 {
+  color: #f4ede2 !important;
+}
+
 /* ── Background colors ────────────────────────────────────────────────────── */
 .bg-white    { background-color: var(--color-bg-surface)  !important; }
 .bg-gray-50  { background-color: var(--color-bg-base)     !important; }
