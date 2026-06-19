@@ -955,6 +955,32 @@
   }
   .field-hint strong { color: var(--parchment-dim); font-weight: 500; }
 
+  /* Temporary profile summary (Act VI) */
+  .profile-summary {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  .profile-summary-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(201, 161, 74, 0.15);
+  }
+  .profile-summary-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .profile-summary-value {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.05rem;
+    color: var(--parchment);
+  }
+
   /* Role chips (artist form) */
   .role-group-label {
     display: flex;
@@ -1832,6 +1858,7 @@
     .advance .btn { width: 100%; justify-content: center; }
 
     .field-row { grid-template-columns: 1fr; gap: 0; }
+    .profile-summary-row { grid-template-columns: 1fr; gap: 4px; padding: 14px 0; }
     .field input, .field select { font-size: 17px; /* iOS no-zoom */ }
 
     .form-actions { flex-direction: column-reverse; align-items: stretch; }
@@ -2669,8 +2696,49 @@
       <span class="portal-save-bar-text">Your changes save automatically.</span>
       <div class="portal-save-bar-actions">
         <button type="button" class="btn btn-ghost" onclick="goBack()">Back to curtain call</button>
-        <button type="button" class="btn btn-gold" onclick="finishProfile()">I'm done for now <span class="btn-arrow">›</span></button>
+        <button type="button" class="btn btn-gold" onclick="viewTemporaryProfile()">View temporary profile <span class="btn-arrow">›</span></button>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT VI: Temporary Profile Summary ============ -->
+<section class="act" id="act-6">
+  <div class="scene-label">Your temporary profile</div>
+
+  <div class="form-heading">
+    <h2>What we have <em>so far.</em></h2>
+    <p>This is a private preview. Nothing here is visible to theatres until Banquo goes live and you confirm your profile.</p>
+  </div>
+
+  <div class="profile-summary">
+    <div class="profile-summary-row">
+      <div class="profile-summary-label">Name</div>
+      <div class="profile-summary-value" id="summary-name">&mdash;</div>
+    </div>
+    <div class="profile-summary-row">
+      <div class="profile-summary-label">Email</div>
+      <div class="profile-summary-value" id="summary-email">&mdash;</div>
+    </div>
+    <div class="profile-summary-row">
+      <div class="profile-summary-label">Location</div>
+      <div class="profile-summary-value" id="summary-location">&mdash;</div>
+    </div>
+    <div class="profile-summary-row">
+      <div class="profile-summary-label">Roles</div>
+      <div class="profile-summary-value" id="summary-roles">&mdash;</div>
+    </div>
+    <div class="profile-summary-row">
+      <div class="profile-summary-label">Visible to theatres</div>
+      <div class="profile-summary-value" id="summary-visibility">&mdash;</div>
+    </div>
+  </div>
+
+  <div class="form-actions" style="margin-top: 40px;">
+    <span class="form-fine"></span>
+    <div style="display: flex; gap: 14px;">
+      <button type="button" class="btn btn-ghost" onclick="goToAct(5)">Edit profile</button>
+      <button type="button" class="btn btn-gold" id="summary-resources-btn" style="display:none;" onclick="window.location.href='https://banquo.app/#/actor-portal'">Resources <span class="btn-arrow">›</span></button>
     </div>
   </div>
 </section>
@@ -2950,7 +3018,8 @@
       '3-org':     { label: 'Act III · Scene i', dataAct: '3', seg: 3 },
       '3-artist':  { label: 'Act III · Scene i', dataAct: '3', seg: 3 },
       4:           { label: 'Curtain call',      dataAct: '4', seg: 4 },
-      5:           { label: 'Artist portal',     dataAct: '5', seg: 4 }
+      5:           { label: 'Artist portal',     dataAct: '5', seg: 4 },
+      6:           { label: 'Your profile',      dataAct: '5', seg: 4 }
     };
     const info = labels[id];
     document.getElementById('act-label').textContent = info.label;
@@ -2979,6 +3048,24 @@
     state.act = prev;
     updateChrome(prev);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function seedTemporaryProfile() {
+    document.getElementById('summary-name').textContent =
+      [state.firstName, state.lastName].filter(Boolean).join(' ') || '—';
+    document.getElementById('summary-email').textContent = state.email || '—';
+    document.getElementById('summary-location').textContent = state.artistLocation || '—';
+    const rolesList = Array.from(state.roles);
+    document.getElementById('summary-roles').textContent = rolesList.length ? rolesList.join(', ') : '—';
+    document.getElementById('summary-visibility').textContent = state.geoOptIn ? 'Yes, discoverable by local theatres' : 'No, hidden for now';
+
+    const resourcesBtn = document.getElementById('summary-resources-btn');
+    resourcesBtn.style.display = state.roles.has('Actor') ? 'inline-flex' : 'none';
+  }
+
+  function viewTemporaryProfile() {
+    seedTemporaryProfile();
+    goToAct(6);
   }
 
   function chooseFork(choice) {
@@ -3029,10 +3116,13 @@
     state.firstName = fd.get('firstName') || '';
     state.lastName  = fd.get('lastName')  || '';
     state.email     = fd.get('email')     || '';
+    state.artistLocation = fd.get('artistLocation') || '';
 
     // Show/hide the "Continue building your profile" block on Act IV
     const continueBlock = document.getElementById('continue-profile-block');
     if (type === 'artist') {
+      const geoCheckbox = document.getElementById('geo-opt-in');
+      state.geoOptIn = geoCheckbox ? geoCheckbox.checked : true;
       continueBlock.style.display = 'block';
       seedPortal();
     } else {
