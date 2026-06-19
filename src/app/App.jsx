@@ -11,22 +11,22 @@ function WizardPreviewEditForm({ data, onSave, onCancel }) {
   return (
     <div className="space-y-4 max-w-md">
       <div>
-        <label className="block text-sm font-medium mb-1">First name</label>
+        <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>First name</label>
         <input type="text" className="border rounded px-3 py-2 w-full" value={formData.firstName}
           onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Last name</label>
+        <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Last name</label>
         <input type="text" className="border rounded px-3 py-2 w-full" value={formData.lastName}
           onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Email</label>
+        <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Email</label>
         <input type="email" className="border rounded px-3 py-2 w-full" value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Location</label>
+        <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Location</label>
         <input type="text" className="border rounded px-3 py-2 w-full" value={formData.artistLocation}
           onChange={(e) => setFormData({ ...formData, artistLocation: e.target.value })} />
       </div>
@@ -147,7 +147,7 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
     if (portalView === 'wizard-edit' && isWizardPreview) {
       return (
         <div style={{ padding: '32px' }}>
-          <h2 className="text-xl font-bold mb-4">Edit your submission</h2>
+          <h2 className="text-xl font-bold mb-4" style={{ color: '#1a1a1a' }}>Edit your submission</h2>
           <WizardPreviewEditForm
             data={wizardPreviewData || {}}
             onSave={(updated) => {
