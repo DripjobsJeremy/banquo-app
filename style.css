@@ -1962,3 +1962,36 @@ html[data-theme="light"] {
 .iw-card-gold-hover:hover {
   border-color: var(--color-accent-gold) !important;
 }
+
+/* ── Actor Calendar — Banquo crimson/gold ── */
+.apc-header-gradient {
+  background: linear-gradient(to right, var(--color-accent-crimson), #6f151f);
+}
+.apc-btn-active {
+  background-color: var(--color-accent-crimson) !important;
+}
+.apc-today-btn {
+  background-color: rgba(201, 169, 97, 0.18);
+  color: var(--color-accent-crimson);
+}
+.apc-today-btn:hover {
+  background-color: rgba(201, 169, 97, 0.3);
+}
+.apc-pill-rehearsal-type {
+  background-color: rgba(201, 169, 97, 0.18);
+  color: var(--color-accent-crimson);
+}
+.apc-input-focus:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-accent-gold);
+  border-color: var(--color-accent-gold);
+}
+.apc-checkbox-crimson {
+  accent-color: var(--color-accent-crimson);
+}
+.apc-btn-submit-crimson {
+  background-color: var(--color-accent-crimson);
+}
+.apc-btn-submit-crimson:hover {
+  background-color: #6f151f;
+}

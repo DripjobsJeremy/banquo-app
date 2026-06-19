@@ -92,10 +92,16 @@ function ActorPortalView({ onExitToApp, hasBanner }) {
     if (portalView === 'resources' && window.ActorResourcesView) {
       return React.createElement(window.ActorResourcesView, {
         onLaunchIntentionWizard: () => navigate('intention-wizard'),
+        onLaunchBadActorWizard: () => navigate('bad-actor-wizard'),
       });
     }
     if (portalView === 'intention-wizard' && window.IntentionWizard) {
       return React.createElement(window.IntentionWizard, {
+        onClose: () => navigate('resources'),
+      });
+    }
+    if (portalView === 'bad-actor-wizard' && window.BadActorWizard) {
+      return React.createElement(window.BadActorWizard, {
         onClose: () => navigate('resources'),
       });
     }

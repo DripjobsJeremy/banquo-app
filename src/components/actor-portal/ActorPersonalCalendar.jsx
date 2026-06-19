@@ -482,7 +482,7 @@ function ActorPersonalCalendar({ actor, onBack }) {
                           </span>
                         )}
                         {event.rehearsalType && event.rehearsalType !== 'custom' && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-800 rounded text-xs font-medium">
+                          <span className="apc-pill-rehearsal-type inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium">
                             {event.rehearsalType === 'full-run' && '🎭 Full Run'}
                             {event.rehearsalType === 'act-1-run' && '📖 Act I Run'}
                             {event.rehearsalType === 'act-2-run' && '📖 Act II Run'}
@@ -514,7 +514,7 @@ function ActorPersonalCalendar({ actor, onBack }) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6">
+      <div className="apc-header-gradient text-white p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-4 mb-2">
             <button
@@ -525,7 +525,7 @@ function ActorPersonalCalendar({ actor, onBack }) {
             </button>
           </div>
           <h1 className="text-3xl font-bold mb-2">My Calendar</h1>
-          <p className="text-purple-100">
+          <p style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
             Rehearsals, performances, and conflicts for {actor.firstName} {actor.lastName}
           </p>
         </div>
@@ -541,7 +541,7 @@ function ActorPersonalCalendar({ actor, onBack }) {
                 onClick={() => setViewMode('month')}
                 className={`px-4 py-2 rounded-lg transition-colors ${
                   viewMode === 'month'
-                    ? 'bg-purple-600 text-white'
+                    ? 'apc-btn-active text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -551,7 +551,7 @@ function ActorPersonalCalendar({ actor, onBack }) {
                 onClick={() => setViewMode('list')}
                 className={`px-4 py-2 rounded-lg transition-colors ${
                   viewMode === 'list'
-                    ? 'bg-purple-600 text-white'
+                    ? 'apc-btn-active text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -579,7 +579,7 @@ function ActorPersonalCalendar({ actor, onBack }) {
                 </button>
                 <button
                   onClick={() => setCurrentDate(new Date())}
-                  className="px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200"
+                  className="apc-today-btn px-3 py-2 rounded-lg"
                 >
                   Today
                 </button>
@@ -590,7 +590,7 @@ function ActorPersonalCalendar({ actor, onBack }) {
             <select
               value={selectedProduction}
               onChange={(e) => setSelectedProduction(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="apc-input-focus px-4 py-2 border border-gray-300 rounded-lg"
             >
               <option value="all">All Productions</option>
               {productions.map(prod => (
@@ -681,7 +681,7 @@ function ConflictModal({ onClose, onSave }) {
               type="date"
               value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="apc-input-focus w-full px-3 py-2 border border-gray-300 rounded-lg"
               required
             />
           </div>
@@ -692,7 +692,7 @@ function ConflictModal({ onClose, onSave }) {
                 type="checkbox"
                 checked={formData.allDay}
                 onChange={(e) => setFormData({ ...formData, allDay: e.target.checked })}
-                className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                className="apc-checkbox-crimson w-4 h-4 rounded"
               />
               <span className="text-sm font-medium text-gray-700">All Day</span>
             </label>
@@ -706,7 +706,7 @@ function ConflictModal({ onClose, onSave }) {
                   type="time"
                   value={formData.startTime}
                   onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  className="apc-input-focus w-full px-3 py-2 border border-gray-300 rounded-lg"
                 />
               </div>
               <div>
@@ -715,7 +715,7 @@ function ConflictModal({ onClose, onSave }) {
                   type="time"
                   value={formData.endTime}
                   onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  className="apc-input-focus w-full px-3 py-2 border border-gray-300 rounded-lg"
                 />
               </div>
             </div>
@@ -727,7 +727,7 @@ function ConflictModal({ onClose, onSave }) {
               type="text"
               value={formData.reason}
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="apc-input-focus w-full px-3 py-2 border border-gray-300 rounded-lg"
               placeholder="e.g., Work, Vacation, Doctor's appointment"
               required
             />
@@ -743,7 +743,7 @@ function ConflictModal({ onClose, onSave }) {
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+              className="apc-btn-submit-crimson flex-1 px-4 py-2 text-white rounded-lg"
             >
               Add Conflict
             </button>
