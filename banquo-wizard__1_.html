@@ -2708,7 +2708,7 @@
 
   <div class="form-heading">
     <h2>What we have <em>so far.</em></h2>
-    <p>This is a private preview. Nothing here is visible to theatres until Banquo goes live and you confirm your profile.</p>
+    <p>This is a private preview. Nothing here is visible to theatres yet.</p>
   </div>
 
   <div class="profile-summary">
@@ -2738,7 +2738,7 @@
     <span class="form-fine"></span>
     <div style="display: flex; gap: 14px;">
       <button type="button" class="btn btn-ghost" onclick="goToAct(5)">Edit profile</button>
-      <button type="button" class="btn btn-gold" id="summary-resources-btn" style="display:none;" onclick="window.location.href='https://banquo.app/#/actor-portal'">Resources <span class="btn-arrow">›</span></button>
+      <button type="button" class="btn btn-gold" id="summary-resources-btn" style="display:none;" onclick="window.location.href='https://banquo.app/#/actor-portal?preview=wizard'">Resources <span class="btn-arrow">›</span></button>
     </div>
   </div>
 </section>
@@ -3051,6 +3051,18 @@
   }
 
   function seedTemporaryProfile() {
+    const previewPayload = {
+      firstName: state.firstName || '',
+      lastName: state.lastName || '',
+      email: state.email || '',
+      roles: Array.from(state.roles),
+      artistLocation: state.artistLocation || '',
+      geoOptIn: state.geoOptIn !== false,
+    };
+    try {
+      localStorage.setItem('showsuite_wizard_actor_preview', JSON.stringify(previewPayload));
+    } catch (e) {}
+
     document.getElementById('summary-name').textContent =
       [state.firstName, state.lastName].filter(Boolean).join(' ') || '—';
     document.getElementById('summary-email').textContent = state.email || '—';
