@@ -80,7 +80,7 @@ function BadActorWizard({ onClose }) {
 
       <div className="flex items-center justify-between mb-6 text-xs text-gray-400">
         <span>Content inspired by Actorisation</span>
-
+        <a
           href="https://www.instagram.com/actorisation"
           target="_blank"
           rel="noopener noreferrer"
