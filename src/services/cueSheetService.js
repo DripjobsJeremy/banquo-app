@@ -134,6 +134,17 @@
     return cue;
   };
 
+  const addCuesBulk = (productionId, cuesData) => {
+    const sheet = loadCueSheet(productionId);
+    const maxOrder = sheet.cues.reduce((max, c) => Math.max(max, c.order ?? -1), -1);
+    const newCues = (cuesData || []).map((cueData, idx) =>
+      newCue({ ...cueData, order: maxOrder + 1 + idx, importedFromFile: true })
+    );
+    sheet.cues = [...sheet.cues, ...newCues];
+    saveCueSheet(productionId, sheet);
+    return { imported: newCues.length };
+  };
+
   const updateCue = (productionId, cueId, updates) => {
     const sheet = loadCueSheet(productionId);
     sheet.cues = sheet.cues.map(c => c.id === cueId ? { ...c, ...updates } : c);
@@ -158,6 +169,7 @@
     saveCueSheet,
     generateCuesFromScenes,
     addCue,
+    addCuesBulk,
     updateCue,
     deleteCue,
     reorderCues,
