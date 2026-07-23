@@ -373,6 +373,21 @@ const CueSheetBuilder = ({ production, userRole }) => {
 
   // ─── BUILD MODE ────────────────────────────────────────────────────────────
 
+  const getAssignableNames = () => {
+    const staff = (window.contactsService?.getProductionStaff?.(production.id) || [])
+      .map(c => `${c.firstName || ''} ${c.lastName || ''}`.trim())
+      .filter(Boolean);
+    const cast = (production.characters || [])
+      .map(char => {
+        if (!char.actorId) return null;
+        const actor = window.actorsService?.getActorById?.(char.actorId);
+        const actorName = actor ? `${actor.firstName || ''} ${actor.lastName || ''}`.trim() : '';
+        return actorName ? `${actorName} (${char.name})` : null;
+      })
+      .filter(Boolean);
+    return Array.from(new Set([...staff, ...cast]));
+  };
+
   // Cue row — colors via data-cue-type, no inline styles
   const CueRow = ({ cue }) => {
     const typeConfig = getCueTypeConfig(cue.type);
@@ -407,6 +422,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
             <div className="cue-needs-review">⚠ Needs review — add cue number and trigger line</div>
           )}
           {cue.notes && <div className="cue-row-meta">📝 {cue.notes}</div>}
+          {cue.assignedTo && <div className="cue-row-meta">👤 {cue.assignedTo}</div>}
           {cue.autoFromScene && <div className="cue-row-meta">↗ Auto from Scene Builder</div>}
           {cue.status === 'completed' && <div className="cue-row-called">✓ Called</div>}
         </div>
@@ -487,6 +503,16 @@ const CueSheetBuilder = ({ production, userRole }) => {
             <input type="number" value={form.duration || ''} onChange={e => setForm({ ...form, duration: e.target.value ? parseInt(e.target.value) : null })}
               placeholder="e.g. 5"
               className="w-full px-3 py-2 rounded-lg text-sm bg-surface border-theme text-primary-color" />
+          </div>
+          <div>
+            <label className="text-xs font-medium mb-1 block text-muted-color">Assigned To</label>
+            <input value={form.assignedTo || ''} onChange={e => setForm({ ...form, assignedTo: e.target.value })}
+              list="cue-assignable-names"
+              placeholder="e.g. Jamie Torres, or Karen (actor)"
+              className="w-full px-3 py-2 rounded-lg text-sm bg-surface border-theme text-primary-color" />
+            <datalist id="cue-assignable-names">
+              {getAssignableNames().map(name => <option key={name} value={name} />)}
+            </datalist>
           </div>
           <div className="col-span-2">
             <label className="text-xs font-medium mb-1 block text-muted-color">SM Notes (private)</label>
