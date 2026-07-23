@@ -1122,6 +1122,13 @@ select:focus {
 .cue-header-warn  { color: var(--color-warning, #d97706); margin-left: 8px; }
 .cue-header-ready { color: var(--color-success, #059669); margin-left: 8px; }
 .cue-header-muted { color: var(--color-text-muted); margin-left: 8px; }
+.cue-header-badge {
+  display: inline-flex; align-items: center; margin-left: 8px;
+  padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;
+}
+.cue-header-badge--unassigned {
+  background: var(--color-warning-surface); color: var(--color-warning);
+}
 
 /* Needs-review badge on auto-generated cue rows */
 .cue-needs-review {

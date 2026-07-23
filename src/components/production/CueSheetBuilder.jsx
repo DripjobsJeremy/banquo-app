@@ -562,7 +562,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
             <span className="cue-header-warn">· ⚠ {needsReview} need review</span>
           )}
           {unassigned > 0 && (
-            <span className="cue-header-muted">· {unassigned} unassigned</span>
+            <span className="cue-header-badge cue-header-badge--unassigned">{unassigned} unassigned</span>
           )}
           {needsReview === 0 && unassigned === 0 && total > 0 && (
             <span className="cue-header-ready">· ✓ Ready to call</span>
