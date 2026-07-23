@@ -2052,7 +2052,7 @@ html[data-theme="light"] {
 .rs-card[data-rs-color="yellow"]   { border-left-color: #CA8A04; }
 .rs-card[data-rs-color="green"]    { border-left-color: #10B981; }
 .rs-card[data-rs-color="gray"]     { border-left-color: #94A3B8; }
-.rs-card[data-rs-color="props"]    { border-left-color: #CA8A04; }
+.rs-card[data-rs-color="props"]    { border-left-color: #EA580C; }
 .rs-card[data-rs-color="wardrobe"] { border-left-color: #DB2777; }
 
 .rs-hazard-banner {
