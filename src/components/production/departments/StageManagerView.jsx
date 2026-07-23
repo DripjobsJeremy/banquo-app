@@ -184,7 +184,7 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
           expandedActs[actIndex] && (act.scenes?.length > 0
             ? React.createElement(
                 'div',
-                { className: 'divide-y divide-gray-100' },
+                { className: 'rs-scene-list' },
                 act.scenes.map((scene, sceneIndex) =>
                   React.createElement(
                     'div',
@@ -203,7 +203,7 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                         ),
                         React.createElement(
                           'span',
-                          { className: 'px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded' },
+                          { className: 'rs-scene-badge px-2 py-1 text-xs font-medium rounded' },
                           'Scene ' + (scene.number || sceneIndex + 1)
                         ),
                         scene.label && scene.label !== 'Custom' && React.createElement(
@@ -232,7 +232,7 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                           min: 0,
                           value: scene.smRunTime || '',
                           onChange: (e) => handleSMUpdate(actIndex, sceneIndex, 'smRunTime', e.target.value),
-                          className: 'w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center',
+                          className: 'w-16 px-2 py-1 border-theme rounded text-sm text-center bg-surface text-primary-color',
                           placeholder: '0'
                         }),
                         React.createElement('span', { className: 'text-xs text-gray-500' }, 'min')
@@ -250,11 +250,11 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                         const charEmpty = isEmpty(charVal);
                         return React.createElement(
                           'div',
-                          { className: charEmpty ? 'p-2 rounded border-2 border-dashed border-gray-300 bg-gray-50 opacity-70' : 'p-2 bg-violet-50 rounded' },
-                          React.createElement('p', { className: 'text-xs font-medium text-violet-700 mb-1' }, '🎭 Characters'),
+                          { className: charEmpty ? 'rs-card rs-card--empty' : 'rs-card', 'data-rs-color': 'violet' },
+                          React.createElement('p', { className: 'rs-card-label', 'data-rs-color': 'violet' }, '🎭 Characters'),
                           charEmpty
                             ? React.createElement('span', { className: 'italic text-gray-400 text-xs' }, '⚠ None assigned')
-                            : React.createElement('p', { className: 'text-xs text-violet-600' }, charVal)
+                            : React.createElement('p', { className: 'rs-card-value' }, charVal)
                         );
                       })(),
                       // Lighting
@@ -263,11 +263,11 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                         const lightEmpty = isEmpty(lightVal);
                         return React.createElement(
                           'div',
-                          { className: lightEmpty ? 'p-2 rounded border-2 border-dashed border-gray-300 bg-gray-50 opacity-70' : 'p-2 bg-yellow-50 rounded' },
-                          React.createElement('p', { className: 'text-xs font-medium text-yellow-700 mb-1' }, '💡 Lighting'),
+                          { className: lightEmpty ? 'rs-card rs-card--empty' : 'rs-card', 'data-rs-color': 'yellow' },
+                          React.createElement('p', { className: 'rs-card-label', 'data-rs-color': 'yellow' }, '💡 Lighting'),
                           lightEmpty
                             ? React.createElement('span', { className: 'italic text-gray-400 text-xs' }, '⚠ Not set')
-                            : React.createElement('p', { className: 'text-xs text-yellow-600' }, lightVal)
+                            : React.createElement('p', { className: 'rs-card-value' }, lightVal)
                         );
                       })(),
                       // Sound
@@ -276,11 +276,11 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                         const soundEmpty = isEmpty(soundVal);
                         return React.createElement(
                           'div',
-                          { className: soundEmpty ? 'p-2 rounded border-2 border-dashed border-gray-300 bg-gray-50 opacity-70' : 'p-2 bg-green-50 rounded' },
-                          React.createElement('p', { className: 'text-xs font-medium text-green-700 mb-1' }, '🔊 Sound'),
+                          { className: soundEmpty ? 'rs-card rs-card--empty' : 'rs-card', 'data-rs-color': 'green' },
+                          React.createElement('p', { className: 'rs-card-label', 'data-rs-color': 'green' }, '🔊 Sound'),
                           soundEmpty
                             ? React.createElement('span', { className: 'italic text-gray-400 text-xs' }, '⚠ Not set')
-                            : React.createElement('p', { className: 'text-xs text-green-600' }, soundVal)
+                            : React.createElement('p', { className: 'rs-card-value' }, soundVal)
                         );
                       })(),
                       // Location/Time
@@ -289,23 +289,23 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                         const settingEmpty = isEmpty(settingVal);
                         return React.createElement(
                           'div',
-                          { className: settingEmpty ? 'p-2 rounded border-2 border-dashed border-gray-300 bg-gray-50 opacity-70' : 'p-2 bg-gray-100 rounded' },
-                          React.createElement('p', { className: 'text-xs font-medium text-gray-700 mb-1' }, '📍 Setting'),
+                          { className: settingEmpty ? 'rs-card rs-card--empty' : 'rs-card', 'data-rs-color': 'gray' },
+                          React.createElement('p', { className: 'rs-card-label', 'data-rs-color': 'gray' }, '📍 Setting'),
                           settingEmpty
                             ? React.createElement('span', { className: 'italic text-gray-400 text-xs' }, '⚠ Not set')
-                            : React.createElement('p', { className: 'text-xs text-gray-600' }, settingVal)
+                            : React.createElement('p', { className: 'rs-card-value' }, settingVal)
                         );
                       })()
                     ),
                     // SM Cue Notes (editable)
                     React.createElement(
                       'div',
-                      { className: 'mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200' },
-                      React.createElement('label', { className: 'block text-xs font-medium text-blue-700 mb-1' }, '📋 SM Cue Notes'),
+                      { className: 'rs-notes-box' },
+                      React.createElement('label', { className: 'block text-xs font-medium text-accent-gold mb-1' }, '📋 SM Cue Notes'),
                       React.createElement('textarea', {
                         value: scene.smCueNotes || '',
                         onChange: (e) => handleSMUpdate(actIndex, sceneIndex, 'smCueNotes', e.target.value),
-                        className: 'w-full px-3 py-2 border border-blue-300 rounded text-sm resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                        className: 'rs-notes-textarea w-full px-3 py-2 rounded text-sm resize-y',
                         rows: 2,
                         placeholder: 'Standby cues, warnings, calls, blocking notes...'
                       })
