@@ -7,6 +7,7 @@ const CUE_IMPORT_TARGET_FIELDS = [
   { key: 'triggerLine', label: 'Trigger Line', keywords: ['trigger', 'trigger line', 'cue line', 'calling line'] },
   { key: 'description', label: 'Description',  keywords: ['description', 'desc', 'action'] },
   { key: 'notes',       label: 'Notes',        keywords: ['notes', 'note', 'comments'] },
+  { key: 'assignedTo',  label: 'Assigned To',  keywords: ['assigned to', 'assignee', 'executed by', 'responsible', 'operator', 'run by', 'crew'] },
   { key: 'duration',    label: 'Duration',     keywords: ['duration', 'seconds', 'length'] },
 ];
 
