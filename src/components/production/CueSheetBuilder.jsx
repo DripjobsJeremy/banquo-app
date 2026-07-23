@@ -9,6 +9,19 @@ const CueSheetBuilder = ({ production, userRole }) => {
   const [showImportModal, setShowImportModal] = React.useState(false);
   const [selectedCueIds, setSelectedCueIds] = React.useState(() => new Set());
 
+  // Close Add/Edit cue modal on Escape
+  React.useEffect(() => {
+    if (!showAddForm && !editingCue) return;
+    const handleModalEscape = (e) => {
+      if (e.code === 'Escape') {
+        setShowAddForm(false);
+        setEditingCue(null);
+      }
+    };
+    window.addEventListener('keydown', handleModalEscape);
+    return () => window.removeEventListener('keydown', handleModalEscape);
+  }, [showAddForm, editingCue]);
+
   // Calling Mode state
   const [callingMode, setCallingMode] = React.useState(false);
   const [currentCueIdx, setCurrentCueIdx] = React.useState(0);
