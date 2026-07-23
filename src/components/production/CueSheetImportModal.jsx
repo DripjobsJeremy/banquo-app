@@ -3,6 +3,7 @@ const CUE_IMPORT_TARGET_FIELDS = [
   { key: 'type',        label: 'Type',         keywords: ['type', 'cue type', 'department'] },
   { key: 'actId',       label: 'Act',          keywords: ['act'] },
   { key: 'sceneId',     label: 'Scene',        keywords: ['scene', 'scene name'] },
+  { key: 'page',        label: 'Page',         keywords: ['page', 'pg', 'pgs', 'page number', 'pg #'] },
   { key: 'triggerLine', label: 'Trigger Line', keywords: ['trigger', 'trigger line', 'cue line', 'calling line'] },
   { key: 'description', label: 'Description',  keywords: ['description', 'desc', 'action'] },
   { key: 'notes',       label: 'Notes',        keywords: ['notes', 'note', 'comments'] },
@@ -42,6 +43,80 @@ const normalizeCueImportType = (value) => {
   if (v.includes('entrance') || v.includes('ent')) return 'entrance';
   if (v.includes('intermission')) return 'intermission';
   return 'other';
+};
+
+const ROMAN_TO_NUM = { i: 1, ii: 2, iii: 3, iv: 4, v: 5 };
+const WORD_TO_NUM = { one: 1, two: 2, three: 3, four: 4, five: 5 };
+const SPECIAL_ACT_ALIASES = {
+  'preshow': 'Pre-Show', 'pre-show': 'Pre-Show', 'pre show': 'Pre-Show',
+  'prologue': 'Prologue',
+  'intermission': 'Intermission',
+  'entracte': "Entr'acte", "entr'acte": "Entr'acte", 'entr acte': "Entr'acte",
+  'epilogue': 'Epilogue',
+  'postshow': 'Post-Show', 'post-show': 'Post-Show', 'post show': 'Post-Show',
+};
+
+const normalizeActText = (str) => (str || '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
+
+// Extracts a 1-5 position from an act label if it has one (digit, roman numeral, or word), else null
+const parseActPosition = (str) => {
+  const norm = normalizeActText(str);
+  if (!norm) return null;
+  const digitMatch = norm.match(/\d+/);
+  if (digitMatch) {
+    const n = parseInt(digitMatch[0], 10);
+    return (n >= 1 && n <= 5) ? n : null;
+  }
+  const tokens = norm.replace(/^act\s*/, '').trim();
+  if (ROMAN_TO_NUM[tokens] != null) return ROMAN_TO_NUM[tokens];
+  if (WORD_TO_NUM[tokens] != null) return WORD_TO_NUM[tokens];
+  return null;
+};
+
+// Resolves a raw uploaded Act value to an actual act object from production.acts, or null
+const matchActToProduction = (rawActValue, acts) => {
+  const norm = normalizeActText(rawActValue);
+  if (!norm || !acts || acts.length === 0) return null;
+
+  // 1. Exact case-insensitive match against actual act names
+  const exact = acts.find(a => normalizeActText(a.name) === norm);
+  if (exact) return exact;
+
+  // 2. Special named act aliases (Pre-Show, Prologue, Intermission, Entr'acte, Epilogue, Post-Show)
+  if (SPECIAL_ACT_ALIASES[norm]) {
+    const canonical = SPECIAL_ACT_ALIASES[norm];
+    const bySpecial = acts.find(a => normalizeActText(a.name) === normalizeActText(canonical));
+    if (bySpecial) return bySpecial;
+  }
+
+  // 3. Positional match (digit / roman / word all resolve to the same 1-5 position)
+  const position = parseActPosition(rawActValue);
+  if (position != null) {
+    const byPosition = acts.find(a => parseActPosition(a.name) === position);
+    if (byPosition) return byPosition;
+  }
+
+  return null;
+};
+
+// Resolves a raw uploaded Scene value to an actual scene name within the matched act, or null
+const matchSceneToAct = (rawSceneValue, matchedAct) => {
+  if (!matchedAct || !matchedAct.scenes || matchedAct.scenes.length === 0) return null;
+  const norm = normalizeActText(rawSceneValue);
+  if (!norm) return null;
+
+  // 1. Exact case-insensitive match against actual scene names in this act
+  const exact = matchedAct.scenes.find(s => normalizeActText(s.name) === norm);
+  if (exact) return exact.name;
+
+  // 2. Positional match — extract a leading number and use it as a 1-based index into this act's scenes
+  const numMatch = norm.match(/\d+/);
+  if (numMatch) {
+    const idx = parseInt(numMatch[0], 10) - 1;
+    if (matchedAct.scenes[idx]) return matchedAct.scenes[idx].name;
+  }
+
+  return null;
 };
 
 const CUE_IMPORT_TEMPLATE_HEADERS = ['Cue Number', 'Type', 'Act', 'Scene', 'Page', 'Trigger Line', 'Description', 'Notes', 'Duration (seconds)'];
@@ -226,6 +301,33 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
       }
     });
     if (!hasTypeMapping) cue.type = 'other';
+
+    let matchedAct = null;
+    if (cue.actId) {
+      const originalRawActValue = cue.actId;
+      matchedAct = matchActToProduction(cue.actId, production.acts || []);
+      cue.actId = matchedAct ? matchedAct.name : null;
+      if (!matchedAct) {
+        cue.notes = [cue.notes, `Act not matched: "${originalRawActValue}"`].filter(Boolean).join(' | ');
+      }
+    }
+
+    if (cue.sceneId) {
+      const originalRawSceneValue = cue.sceneId;
+      const matchedScene = matchSceneToAct(cue.sceneId, matchedAct);
+      cue.sceneId = matchedScene || null;
+      if (!matchedScene) {
+        cue.notes = [cue.notes, `Scene not matched: "${originalRawSceneValue}"`].filter(Boolean).join(' | ');
+      }
+    }
+
+    if ('page' in cue) {
+      if (cue.page) {
+        cue.notes = [cue.notes, `Page: ${cue.page}`].filter(Boolean).join(' | ');
+      }
+      delete cue.page;
+    }
+
     return cue;
   };
 
@@ -439,7 +541,12 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
             ),
             React.createElement('td', { style: tdStyle }, r.cue.number || '—'),
             React.createElement('td', { style: tdStyle }, r.willSkip ? 'Skipped — no description or number' : (r.cue.description || '—')),
-            React.createElement('td', { style: tdStyle }, [r.cue.sceneId, r.cue.actId].filter(Boolean).join(' / ') || '—')
+            React.createElement(
+              'td',
+              { style: tdStyle },
+              [r.cue.actId, r.cue.sceneId].filter(Boolean).join(' / ') ||
+                (/(?:Act|Scene) not matched:/.test(r.cue.notes || '') ? '⚠ Not matched — see notes' : '—')
+            )
           ))
         )
       )
