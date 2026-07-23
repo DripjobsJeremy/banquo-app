@@ -53,7 +53,7 @@ const CUE_TYPE_KEYWORD_MAP = [
   { type: 'fly',          keywords: ['fly', 'flying', 'drop', 'batten', 'counterweight'] },
   { type: 'follow_spot',  keywords: ['follow spot', 'followspot', 'follow-spot'] },
   { type: 'spot',         keywords: ['spot', 'spotlight'] },
-  { type: 'deck',         keywords: ['deck', 'set change', 'scene change', 'stagehand'] },
+  { type: 'deck',         keywords: ['deck', 'set change', 'scene change'] },
   { type: 'props',        keywords: ['prop', 'props', 'hand prop', 'hand off'] },
   { type: 'wardrobe',     keywords: ['wardrobe', 'costume', 'quick change', 'wig', 'dress'] },
   { type: 'entrance',     keywords: ['entrance', 'enters', 'enter', 'exits', 'exit'] },
