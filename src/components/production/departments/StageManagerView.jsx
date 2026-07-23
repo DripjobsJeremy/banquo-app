@@ -8,6 +8,8 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
   const [intermissionChecklist, setIntermissionChecklist] = useState(production?.smIntermissionChecklist || []);
   const [newPreShowItem, setNewPreShowItem] = useState('');
   const [newIntermissionItem, setNewIntermissionItem] = useState('');
+  const [newPreShowAssignee, setNewPreShowAssignee] = useState('');
+  const [newIntermissionAssignee, setNewIntermissionAssignee] = useState('');
   const [dismissedSuggestionKeys, setDismissedSuggestionKeys] = useState(production?.smDismissedSuggestions || []);
 
   // Toggle act expansion
@@ -37,16 +39,54 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
 
   // Checklist handlers
   const addChecklistItem = (type) => {
-    const newItem = { id: 'chk_' + Date.now(), text: type === 'preshow' ? newPreShowItem : newIntermissionItem, completed: false };
+    const newItem = {
+      id: 'chk_' + Date.now(),
+      text: type === 'preshow' ? newPreShowItem : newIntermissionItem,
+      assignedTo: type === 'preshow' ? newPreShowAssignee : newIntermissionAssignee,
+      completed: false
+    };
     if (type === 'preshow') {
       const updated = [...preShowChecklist, newItem];
       setPreShowChecklist(updated);
       setNewPreShowItem('');
+      setNewPreShowAssignee('');
       onUpdateProduction?.({ smPreShowChecklist: updated });
     } else {
       const updated = [...intermissionChecklist, newItem];
       setIntermissionChecklist(updated);
       setNewIntermissionItem('');
+      setNewIntermissionAssignee('');
+      onUpdateProduction?.({ smIntermissionChecklist: updated });
+    }
+  };
+
+  const getAssignableNames = () => {
+    const staff = (window.contactsService?.getProductionStaff?.(production.id) || [])
+      .map(c => `${c.firstName || ''} ${c.lastName || ''}`.trim())
+      .filter(Boolean);
+    const cast = (production.characters || [])
+      .map(char => {
+        if (!char.actorId) return null;
+        const actor = window.actorsService?.getActorById?.(char.actorId);
+        const actorName = actor ? `${actor.firstName || ''} ${actor.lastName || ''}`.trim() : '';
+        return actorName ? `${actorName} (${char.name})` : null;
+      })
+      .filter(Boolean);
+    return Array.from(new Set([...staff, ...cast]));
+  };
+
+  const updateChecklistItemAssignee = (type, itemId, assignedTo) => {
+    if (type === 'preshow') {
+      const updated = preShowChecklist.map(item =>
+        item.id === itemId ? { ...item, assignedTo } : item
+      );
+      setPreShowChecklist(updated);
+      onUpdateProduction?.({ smPreShowChecklist: updated });
+    } else {
+      const updated = intermissionChecklist.map(item =>
+        item.id === itemId ? { ...item, assignedTo } : item
+      );
+      setIntermissionChecklist(updated);
       onUpdateProduction?.({ smIntermissionChecklist: updated });
     }
   };
@@ -492,8 +532,9 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
   );
 
   // Checklists Section
-  const renderChecklist = (type, items, newItem, setNewItem, suggestions) => {
+  const renderChecklist = (type, items, newItem, setNewItem, suggestions, newAssignee, setNewAssignee) => {
     const title = type === 'preshow' ? '🎬 Pre-Show Checklist' : '⏸️ Intermission Checklist';
+    const assignableDatalistId = `checklist-assignable-names-${type}`;
 
     return React.createElement(
       'div',
@@ -547,6 +588,14 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                   { className: 'flex-1 text-sm ' + (item.completed ? 'line-through text-gray-400' : 'text-gray-700') },
                   item.text
                 ),
+                React.createElement('input', {
+                  type: 'text',
+                  value: item.assignedTo || '',
+                  onChange: (e) => updateChecklistItemAssignee(type, item.id, e.target.value),
+                  list: assignableDatalistId,
+                  placeholder: 'Assign to...',
+                  className: 'w-28 px-2 py-1 border border-gray-300 rounded text-xs'
+                }),
                 React.createElement(
                   'button',
                   {
@@ -562,6 +611,9 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
       React.createElement(
         'div',
         { className: 'flex gap-2' },
+        React.createElement('datalist', { id: assignableDatalistId },
+          getAssignableNames().map(name => React.createElement('option', { key: name, value: name }))
+        ),
         React.createElement('input', {
           type: 'text',
           value: newItem,
@@ -569,6 +621,14 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
           onKeyPress: (e) => e.key === 'Enter' && newItem.trim() && addChecklistItem(type),
           className: 'flex-1 px-3 py-2 border border-gray-300 rounded text-sm',
           placeholder: 'Add new item...'
+        }),
+        React.createElement('input', {
+          type: 'text',
+          value: newAssignee,
+          onChange: (e) => setNewAssignee(e.target.value),
+          list: assignableDatalistId,
+          placeholder: 'Assign to...',
+          className: 'w-28 px-2 py-2 border border-gray-300 rounded text-sm'
         }),
         React.createElement(
           'button',
@@ -586,8 +646,8 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
   const checklistsContent = React.createElement(
     'div',
     { className: 'grid grid-cols-1 md:grid-cols-2 gap-6' },
-    renderChecklist('preshow', preShowChecklist, newPreShowItem, setNewPreShowItem, activePreshowSuggestions),
-    renderChecklist('intermission', intermissionChecklist, newIntermissionItem, setNewIntermissionItem, activeIntermissionSuggestions)
+    renderChecklist('preshow', preShowChecklist, newPreShowItem, setNewPreShowItem, activePreshowSuggestions, newPreShowAssignee, setNewPreShowAssignee),
+    renderChecklist('intermission', intermissionChecklist, newIntermissionItem, setNewIntermissionItem, activeIntermissionSuggestions, newIntermissionAssignee, setNewIntermissionAssignee)
   );
 
   return React.createElement(
