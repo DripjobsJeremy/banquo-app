@@ -525,7 +525,7 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
             React.createElement('th', { style: thStyle }, 'Type'),
             React.createElement('th', { style: thStyle }, 'Number'),
             React.createElement('th', { style: thStyle }, 'Description'),
-            React.createElement('th', { style: thStyle }, 'Scene / Act')
+            React.createElement('th', { style: thStyle }, 'Act / Scene')
           )
         ),
         React.createElement(
