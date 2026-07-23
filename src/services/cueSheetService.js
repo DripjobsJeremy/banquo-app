@@ -157,6 +157,15 @@
     saveCueSheet(productionId, sheet);
   };
 
+  const deleteCuesBulk = (productionId, cueIds) => {
+    const sheet = loadCueSheet(productionId);
+    const idSet = new Set(cueIds || []);
+    const before = sheet.cues.length;
+    sheet.cues = sheet.cues.filter(c => !idSet.has(c.id));
+    saveCueSheet(productionId, sheet);
+    return { deleted: before - sheet.cues.length };
+  };
+
   const reorderCues = (productionId, cues) => {
     const sheet = loadCueSheet(productionId);
     sheet.cues = cues.map((c, idx) => ({ ...c, order: idx }));
@@ -172,6 +181,7 @@
     addCuesBulk,
     updateCue,
     deleteCue,
+    deleteCuesBulk,
     reorderCues,
     newCue,
   };
