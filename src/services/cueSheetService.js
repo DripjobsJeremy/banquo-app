@@ -30,6 +30,7 @@
     number: '',           // e.g. "LQ 45" or "SQ 12"
     type: 'lighting',     // from CUE_TYPES ids
     sceneId: null,        // which scene this belongs to
+    importFlags: [],      // import-time diagnostics, never shown as SM notes
     actId: null,
     assignedTo: '',       // display name of the person responsible (staff, crew, or cast member) — plain string, not an ID
     standbyWith: [],      // array of cue ids called on standby together

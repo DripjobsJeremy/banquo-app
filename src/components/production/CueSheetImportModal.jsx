@@ -372,7 +372,7 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
     cue.type = typeResult.type;
     cue.typeUncertain = typeResult.uncertain;
     if (typeResult.uncertain) {
-      cue.notes = [cue.notes, 'Type not confidently detected — please review'].filter(Boolean).join(' | ');
+      cue.importFlags = [...(cue.importFlags || []), 'Type not confidently detected'];
     }
 
     let matchedAct = null;
@@ -381,7 +381,7 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
       matchedAct = matchActToProduction(cue.actId, production.acts || []);
       cue.actId = matchedAct ? matchedAct.name : null;
       if (!matchedAct) {
-        cue.notes = [cue.notes, `Act not matched: "${originalRawActValue}"`].filter(Boolean).join(' | ');
+        cue.importFlags = [...(cue.importFlags || []), `Act not matched: "${originalRawActValue}"`];
       }
     }
 
@@ -390,7 +390,7 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
       const matchedScene = matchSceneToAct(cue.sceneId, matchedAct);
       cue.sceneId = matchedScene || null;
       if (!matchedScene) {
-        cue.notes = [cue.notes, `Scene not matched: "${originalRawSceneValue}"`].filter(Boolean).join(' | ');
+        cue.importFlags = [...(cue.importFlags || []), `Scene not matched: "${originalRawSceneValue}"`];
       }
     }
 

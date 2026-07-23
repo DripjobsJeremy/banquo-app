@@ -87,7 +87,9 @@ const CueSheetBuilder = ({ production, userRole }) => {
   // Group cues by scene for scene view
   const cuesByScene = React.useMemo(() => {
     const groups = {};
-    const filtered = filterType === 'all' ? cueSheet.cues : cueSheet.cues.filter(c => c.type === filterType);
+    const filtered = filterType === 'all' ? cueSheet.cues
+      : filterType === '__needs_review__' ? cueSheet.cues.filter(c => (c.autoFromScene && (!c.triggerLine || !c.number)) || (c.importFlags && c.importFlags.length > 0))
+      : cueSheet.cues.filter(c => c.type === filterType);
     filtered.forEach(cue => {
       const key = cue.sceneId || '__unassigned__';
       if (!groups[key]) groups[key] = [];
@@ -97,7 +99,9 @@ const CueSheetBuilder = ({ production, userRole }) => {
   }, [cueSheet.cues, filterType]);
 
   const visibleCues = React.useMemo(() =>
-    filterType === 'all' ? cueSheet.cues : cueSheet.cues.filter(c => c.type === filterType),
+    filterType === 'all' ? cueSheet.cues
+      : filterType === '__needs_review__' ? cueSheet.cues.filter(c => (c.autoFromScene && (!c.triggerLine || !c.number)) || (c.importFlags && c.importFlags.length > 0))
+      : cueSheet.cues.filter(c => c.type === filterType),
     [cueSheet.cues, filterType]
   );
 
@@ -404,7 +408,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
   // Cue row — colors via data-cue-type, no inline styles
   const CueRow = ({ cue }) => {
     const typeConfig = getCueTypeConfig(cue.type);
-    const rowNeedsReview = cue.autoFromScene && (!cue.triggerLine || !cue.number);
+    const rowNeedsReview = (cue.autoFromScene && (!cue.triggerLine || !cue.number)) || (cue.importFlags && cue.importFlags.length > 0);
     return (
       <div className="cue-row">
         {canEdit && (
@@ -432,7 +436,9 @@ const CueSheetBuilder = ({ production, userRole }) => {
             {cue.description || <span className="cue-row-desc--empty">No description</span>}
           </div>
           {rowNeedsReview && (
-            <div className="cue-needs-review">⚠ Needs review — add cue number and trigger line</div>
+            <div className="cue-needs-review">
+              ⚠ Needs review{cue.importFlags && cue.importFlags.length > 0 ? ` — ${cue.importFlags.join('; ')}` : ' — add cue number and trigger line'}
+            </div>
           )}
           {cue.notes && <div className="cue-row-meta">📝 {cue.notes}</div>}
           {cue.assignedTo && <div className="cue-row-meta">👤 {cue.assignedTo}</div>}
@@ -544,7 +550,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
     );
   };
 
-  const needsReview = cueSheet.cues.filter(c => c.autoFromScene && (!c.triggerLine || !c.number)).length;
+  const needsReview = cueSheet.cues.filter(c => (c.autoFromScene && (!c.triggerLine || !c.number)) || (c.importFlags && c.importFlags.length > 0)).length;
   const unassigned = cueSheet.cues.filter(c => !c.sceneId).length;
   const total = cueSheet.cues.length;
 
@@ -614,6 +620,17 @@ const CueSheetBuilder = ({ production, userRole }) => {
         >
           All ({cueSheet.cues.length})
         </button>
+        {needsReview > 0 && (
+          <button
+            type="button"
+            onClick={() => setFilterType('__needs_review__')}
+            className="cue-filter-chip"
+            data-active={filterType === '__needs_review__' ? 'true' : 'false'}
+            title="Cues flagged during import or missing required fields"
+          >
+            ⚠ Needs Review ({needsReview})
+          </button>
+        )}
         {CUE_TYPES.map(t => {
           const count = cueSheet.cues.filter(c => c.type === t.id).length;
           if (count === 0) return null;
