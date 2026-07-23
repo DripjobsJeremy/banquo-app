@@ -784,20 +784,29 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
               ),
               React.createElement(
                 'td',
-                { style: { ...tdStyle, display: 'flex', alignItems: 'center', gap: '6px' } },
+                { style: tdStyle },
                 React.createElement(
-                  'select',
-                  {
-                    value: currentValue,
-                    onChange: (e) => setTypeOverrides(prev => ({ ...prev, [tr.idx]: e.target.value })),
-                    style: { padding: '4px 6px', borderRadius: '4px', border: '1px solid var(--color-border)', fontSize: '0.8125rem' }
-                  },
-                  (window.cueSheetService?.CUE_TYPES || []).map(t => React.createElement('option', { key: t.id, value: t.id }, `${t.icon} ${t.label}`))
+                  'div',
+                  { style: { display: 'flex', alignItems: 'center', gap: '6px' } },
+                  React.createElement(
+                    'select',
+                    {
+                      value: currentValue,
+                      onChange: (e) => setTypeOverrides(prev => ({ ...prev, [tr.idx]: e.target.value })),
+                      style: { padding: '4px 6px', borderRadius: '4px', border: '1px solid var(--color-border)', fontSize: '0.8125rem' }
+                    },
+                    (window.cueSheetService?.CUE_TYPES || []).map(t => React.createElement('option', { key: t.id, value: t.id, title: t.description }, `${t.icon} ${t.label}`))
+                  ),
+                  typeOverrides[tr.idx] != null && React.createElement(
+                    'span',
+                    { style: { color: 'var(--color-success, #059669)' }, title: 'Resolved' },
+                    '✓'
+                  )
                 ),
-                typeOverrides[tr.idx] != null && React.createElement(
-                  'span',
-                  { style: { color: 'var(--color-success, #059669)' }, title: 'Resolved' },
-                  '✓'
+                React.createElement(
+                  'p',
+                  { style: { fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: '4px 0 0' } },
+                  (window.cueSheetService?.CUE_TYPES || []).find(t => t.id === currentValue)?.description
                 )
               )
             );
