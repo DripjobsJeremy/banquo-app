@@ -44,6 +44,33 @@ const normalizeCueImportType = (value) => {
   return 'other';
 };
 
+const CUE_IMPORT_TEMPLATE_HEADERS = ['Cue Number', 'Type', 'Act', 'Scene', 'Page', 'Trigger Line', 'Description', 'Notes', 'Duration (seconds)'];
+
+const CUE_IMPORT_TEMPLATE_ROWS = [
+  ['LQ 12', 'Lighting', 'Act One', 'Scene 2', '14', 'As Cinderella exits stage left', 'Fade to warm wash', '', '3'],
+  ['SQ 5', 'Sound', 'Act I', 'Scene 1', '3', 'Door slams offstage', 'Thunder crash effect', '', ''],
+  ['FLY 2', 'Fly', 'Prologue', 'Scene 1', '1', 'House lights dim', 'Drop in the forest backdrop', 'Check counterweight before every show', ''],
+  ['ENT 8', 'Entrance', 'Act Two', 'Scene 4', '22-25', "Wolf's howl fades", 'Wolf enters from house right', '', ''],
+  ['SQ 14', 'Sound', 'Intermission', '', '26', '', '15-minute intermission music', '', '900'],
+];
+
+const generateCueImportTemplate = () => {
+  const Papa = window.Papa;
+  if (Papa && typeof Papa.unparse === 'function') {
+    return Papa.unparse({ fields: CUE_IMPORT_TEMPLATE_HEADERS, data: CUE_IMPORT_TEMPLATE_ROWS });
+  }
+  const escapeCsvValue = (value) => {
+    const str = String(value ?? '');
+    if (/[",\n]/.test(str)) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+  return [CUE_IMPORT_TEMPLATE_HEADERS, ...CUE_IMPORT_TEMPLATE_ROWS]
+    .map(row => row.map(escapeCsvValue).join(','))
+    .join('\r\n');
+};
+
 function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) {
   const { useState, useRef } = React;
 
@@ -77,6 +104,19 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
   };
 
   const handleImportClick = () => fileInputRef.current?.click();
+
+  const handleDownloadTemplate = () => {
+    const csv = generateCueImportTemplate();
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'banquo-cue-sheet-template.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   const parseCSV = (file) => {
     return new Promise((resolve, reject) => {
@@ -244,6 +284,49 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
       'div',
       { style: { color: '#dc2626', fontSize: '0.875rem', marginBottom: '1rem' } },
       error
+    ),
+    React.createElement(
+      'button',
+      {
+        type: 'button',
+        onClick: handleDownloadTemplate,
+        style: {
+          color: 'var(--color-text-muted)',
+          textDecoration: 'underline',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: '0.8125rem',
+          padding: 0,
+          marginBottom: '0.75rem',
+          display: 'block'
+        }
+      },
+      'Download Template'
+    ),
+    React.createElement(
+      'div',
+      { style: { marginBottom: '1rem' } },
+      React.createElement(
+        'p',
+        { className: 'reset-dialog-body', style: { marginBottom: '0.375rem' } },
+        'Act accepts Pre-Show, Prologue, Act One–Five (or Act I–V), Intermission, Entr’acte, Epilogue, or Post-Show — matched automatically to however this production’s acts are actually named, in any of these formats (numbers, roman numerals, or spelled out).'
+      ),
+      React.createElement(
+        'p',
+        { className: 'reset-dialog-body', style: { marginBottom: '0.375rem' } },
+        'Scene should reference the scene number or name as it appears in Scene Builder for that act.'
+      ),
+      React.createElement(
+        'p',
+        { className: 'reset-dialog-body', style: { marginBottom: '0.375rem' } },
+        'Page is optional and stored as a note for reference — it does not affect scene matching.'
+      ),
+      React.createElement(
+        'p',
+        { className: 'reset-dialog-body', style: { marginBottom: 0 } },
+        'A Scene cell containing a range like "1-3" will prompt you to choose whether to split it into multiple cues during import.'
+      )
     ),
     React.createElement('input', {
       ref: fileInputRef,
