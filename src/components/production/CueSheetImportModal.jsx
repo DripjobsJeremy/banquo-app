@@ -119,6 +119,31 @@ const matchSceneToAct = (rawSceneValue, matchedAct) => {
   return null;
 };
 
+// Detects a range/list in a raw Scene cell value (e.g. "1-3", "1 to 3", "1,2,3"); returns an array of positions or null
+const detectSceneRange = (rawValue) => {
+  const norm = (rawValue || '').toString().trim().toLowerCase();
+  if (!norm) return null;
+
+  const commaMatch = norm.match(/^\d+(\s*,\s*\d+)+$/);
+  if (commaMatch) {
+    const values = norm.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+    return values.length > 1 ? values : null;
+  }
+
+  const rangeMatch = norm.match(/(\d+)\s*(?:-|–|to)\s*(\d+)/);
+  if (rangeMatch) {
+    const start = parseInt(rangeMatch[1], 10);
+    const end = parseInt(rangeMatch[2], 10);
+    if (!isNaN(start) && !isNaN(end) && end > start && (end - start) < 50) {
+      const values = [];
+      for (let i = start; i <= end; i++) values.push(i);
+      return values;
+    }
+  }
+
+  return null;
+};
+
 const CUE_IMPORT_TEMPLATE_HEADERS = ['Cue Number', 'Type', 'Act', 'Scene', 'Page', 'Trigger Line', 'Description', 'Notes', 'Duration (seconds)'];
 
 const CUE_IMPORT_TEMPLATE_ROWS = [
@@ -155,6 +180,7 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
   const [rows, setRows] = useState([]);
   const [mapping, setMapping] = useState({});
   const [result, setResult] = useState(null);
+  const [rangeChoices, setRangeChoices] = useState({});
 
   const fileInputRef = useRef(null);
 
@@ -331,6 +357,45 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
     return cue;
   };
 
+  const getMappedHeader = (targetKey) => Object.keys(mapping).find(h => mapping[h] === targetKey);
+
+  const buildCuesFromRow = (row, rowIndex) => {
+    const sceneHeader = getMappedHeader('sceneId');
+    const rawSceneValue = sceneHeader ? row[sceneHeader] : '';
+    const rangeValues = sceneHeader ? detectSceneRange(rawSceneValue) : null;
+    const baseCue = buildCueFromRow(row);
+
+    if (!rangeValues) return [baseCue];
+
+    const choice = rangeChoices[rowIndex] || 'expand';
+
+    if (choice === 'single') {
+      const cue = { ...baseCue, sceneId: null };
+      cue.notes = [cue.notes, `Scene range not split: "${rawSceneValue}" (needs manual assignment)`].filter(Boolean).join(' | ');
+      return [cue];
+    }
+
+    const matchedAct = (production.acts || []).find(a => a.name === baseCue.actId) || null;
+    return rangeValues.map(pos => {
+      const matchedScene = matchSceneToAct(String(pos), matchedAct);
+      const cue = { ...baseCue, sceneId: matchedScene || null };
+      if (!matchedScene) {
+        cue.notes = [cue.notes, `Scene ${pos} not found in ${matchedAct ? matchedAct.name : 'matched act'}`].filter(Boolean).join(' | ');
+      }
+      return cue;
+    });
+  };
+
+  const getRangeRows = () => {
+    const sceneHeader = getMappedHeader('sceneId');
+    if (!sceneHeader) return [];
+    return rows.reduce((acc, row, idx) => {
+      const rangeValues = detectSceneRange(row[sceneHeader]);
+      if (rangeValues) acc.push({ idx, rawValue: row[sceneHeader], count: rangeValues.length });
+      return acc;
+    }, []);
+  };
+
   const getColumnPreview = (header) => {
     for (const row of rows) {
       const v = row[header];
@@ -339,23 +404,23 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
     return '';
   };
 
-  const previewRows = rows.slice(0, 5).map(row => {
-    const cue = buildCueFromRow(row);
-    const willSkip = !cue.description && !cue.number;
-    return { cue, willSkip };
+  const previewRows = rows.slice(0, 5).map((row, idx) => {
+    const cues = buildCuesFromRow(row, idx);
+    const willSkip = cues.length > 0 && !cues[0].description && !cues[0].number;
+    return { cue: cues[0], willSkip, expandedCount: cues.length };
   });
 
   const handleConfirmImport = () => {
     const cuesToImport = [];
     let skippedCount = 0;
 
-    rows.forEach(row => {
-      const cue = buildCueFromRow(row);
-      if (!cue.description && !cue.number) {
-        skippedCount++;
+    rows.forEach((row, idx) => {
+      const cues = buildCuesFromRow(row, idx);
+      if (cues.length > 0 && !cues[0].description && !cues[0].number) {
+        skippedCount += cues.length;
         return;
       }
-      cuesToImport.push(cue);
+      cuesToImport.push(...cues);
     });
 
     const outcome = window.cueSheetService.addCuesBulk(production.id, cuesToImport);
@@ -544,8 +609,58 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
             React.createElement(
               'td',
               { style: tdStyle },
-              [r.cue.actId, r.cue.sceneId].filter(Boolean).join(' / ') ||
+              (r.expandedCount > 1 ? `→ will create ${r.expandedCount} cues` : null) ||
+                [r.cue.actId, r.cue.sceneId].filter(Boolean).join(' / ') ||
                 (/(?:Act|Scene) not matched:/.test(r.cue.notes || '') ? '⚠ Not matched — see notes' : '—')
+            )
+          ))
+        )
+      )
+    ),
+    getRangeRows().length > 0 && React.createElement(
+      'div',
+      { style: { marginBottom: '1.25rem' } },
+      React.createElement('h3', { className: 'reset-dialog-title', style: { fontSize: '0.9375rem' } }, `Scene Ranges Detected (${getRangeRows().length})`),
+      React.createElement(
+        'p',
+        { className: 'reset-dialog-body', style: { fontSize: '0.8125rem' } },
+        'Choose how to handle each row where the Scene column contains a range.'
+      ),
+      React.createElement(
+        'table',
+        { style: { width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' } },
+        React.createElement(
+          'thead',
+          null,
+          React.createElement(
+            'tr',
+            null,
+            React.createElement('th', { style: thStyle }, 'Row'),
+            React.createElement('th', { style: thStyle }, 'Scene Value'),
+            React.createElement('th', { style: thStyle }, 'Choice')
+          )
+        ),
+        React.createElement(
+          'tbody',
+          null,
+          getRangeRows().map(rr => React.createElement(
+            'tr',
+            { key: rr.idx },
+            React.createElement('td', { style: tdStyle }, `Row ${rr.idx + 1}`),
+            React.createElement('td', { style: tdStyle }, rr.rawValue),
+            React.createElement(
+              'td',
+              { style: tdStyle },
+              React.createElement(
+                'select',
+                {
+                  value: rangeChoices[rr.idx] || 'expand',
+                  onChange: (e) => setRangeChoices(prev => ({ ...prev, [rr.idx]: e.target.value })),
+                  style: { padding: '4px 6px', borderRadius: '4px', border: '1px solid var(--color-border)', fontSize: '0.8125rem' }
+                },
+                React.createElement('option', { value: 'expand' }, `Split into ${rr.count} cues`),
+                React.createElement('option', { value: 'single' }, 'Keep as one cue (flag for review)')
+              )
             )
           ))
         )
