@@ -4,15 +4,17 @@
   const CUE_SHEET_KEY = 'scenestave_cue_sheets'; // { [productionId]: CueSheet }
 
   const CUE_TYPES = [
-    { id: 'lighting',     label: 'LQ',   color: '#F59E0B', icon: '💡' },
-    { id: 'sound',        label: 'SQ',   color: '#3B82F6', icon: '🎵' },
-    { id: 'fly',          label: 'FLY',  color: '#8B5CF6', icon: '🪁' },
-    { id: 'spot',         label: 'SP',   color: '#EC4899', icon: '🔦' },
-    { id: 'follow_spot',  label: 'FS',   color: '#F97316', icon: '🎯' },
-    { id: 'deck',         label: 'DECK', color: '#10B981', icon: '🎭' },
-    { id: 'entrance',     label: 'ENT',  color: '#6366F1', icon: '🚶' },
-    { id: 'intermission', label: 'INT',  color: '#64748B', icon: '⏸' },
-    { id: 'other',        label: 'CUE',  color: '#94A3B8', icon: '📌' },
+    { id: 'lighting',     label: 'LQ',   color: '#F59E0B', icon: '💡', description: 'Lighting cue — a change on the light board, like a fade, blackout, or color/intensity shift.' },
+    { id: 'sound',        label: 'SQ',   color: '#3B82F6', icon: '🎵', description: 'Sound cue — playback of music, a sound effect, or other audio.' },
+    { id: 'fly',          label: 'FLY',  color: '#8B5CF6', icon: '🪁', description: 'Fly cue — scenery, a drop, or a batten flown in or out via the fly system above the stage.' },
+    { id: 'spot',         label: 'SP',   color: '#EC4899', icon: '🔦', description: 'Spotlight cue — a manually operated spotlight moving, focusing, or changing.' },
+    { id: 'follow_spot',  label: 'FS',   color: '#F97316', icon: '🎯', description: 'Follow spot cue — an operator tracking a performer with a spotlight as they move.' },
+    { id: 'deck',         label: 'DECK', color: '#10B981', icon: '🎭', description: 'Deck cue — a stage crew move, like shifting set pieces or furniture on the stage floor.' },
+    { id: 'props',        label: 'PROP', color: '#CA8A04', icon: '🧰', description: 'Props cue — a hand prop needs to be set, struck, moved, or handed off.' },
+    { id: 'wardrobe',     label: 'WARD', color: '#DB2777', icon: '👗', description: 'Wardrobe cue — a costume change, quick change, or wardrobe adjustment.' },
+    { id: 'entrance',     label: 'ENT',  color: '#6366F1', icon: '🚶', description: 'Entrance cue — a performer entering or exiting.' },
+    { id: 'intermission', label: 'INT',  color: '#64748B', icon: '⏸', description: 'Intermission — the scheduled break between acts.' },
+    { id: 'other',        label: 'CUE',  color: '#94A3B8', icon: '📌', description: 'General cue — anything that doesn\'t fit the categories above.' },
   ];
 
   const defaultCueSheet = (productionId) => ({
