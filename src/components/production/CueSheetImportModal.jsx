@@ -45,6 +45,48 @@ const normalizeCueImportType = (value) => {
   return 'other';
 };
 
+// Department-related keywords, checked in this order so more specific types
+// (e.g. follow_spot) are matched before generically-overlapping ones (spot).
+// No wardrobe/costume entry exists on purpose — that's not a real CUE_TYPES id.
+const CUE_TYPE_KEYWORD_MAP = [
+  { type: 'lighting',     keywords: ['light', 'lighting', 'lx', 'wash', 'blackout', 'fade'] },
+  { type: 'sound',        keywords: ['sound', 'sfx', 'audio', 'music', 'sq'] },
+  { type: 'fly',          keywords: ['fly', 'flying', 'drop', 'batten', 'counterweight'] },
+  { type: 'follow_spot',  keywords: ['follow spot', 'followspot', 'follow-spot'] },
+  { type: 'spot',         keywords: ['spot', 'spotlight'] },
+  { type: 'deck',         keywords: ['deck', 'set change', 'scene change', 'stagehand'] },
+  { type: 'entrance',     keywords: ['entrance', 'enters', 'enter', 'exits', 'exit'] },
+  { type: 'intermission', keywords: ['intermission', 'interval'] },
+];
+
+const matchCueTypeKeyword = (text) => {
+  const norm = (text || '').toString().toLowerCase();
+  if (!norm) return null;
+  for (const entry of CUE_TYPE_KEYWORD_MAP) {
+    for (const kw of entry.keywords) {
+      if (norm.includes(kw)) return entry.type;
+    }
+  }
+  return null;
+};
+
+// Infers a cue's type: a stated Type-column value is confident; anything
+// inferred from other cells (or the 'other' fallback) is flagged uncertain.
+const inferCueType = (row, mapping, headers) => {
+  const typeHeader = headers.find(h => mapping[h] === 'type');
+  if (typeHeader) {
+    const matched = matchCueTypeKeyword(row[typeHeader]);
+    if (matched) return { type: matched, uncertain: false };
+  }
+
+  const fallbackHeaders = headers.filter(h => ['number', 'triggerLine', 'description', 'notes'].includes(mapping[h]));
+  const combinedText = fallbackHeaders.map(h => row[h]).filter(Boolean).join(' ');
+  const inferred = matchCueTypeKeyword(combinedText);
+  if (inferred) return { type: inferred, uncertain: true };
+
+  return { type: 'other', uncertain: true };
+};
+
 const ROMAN_TO_NUM = { i: 1, ii: 2, iii: 3, iv: 4, v: 5 };
 const WORD_TO_NUM = { one: 1, two: 2, three: 3, four: 4, five: 5 };
 const SPECIAL_ACT_ALIASES = {
@@ -181,6 +223,7 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
   const [mapping, setMapping] = useState({});
   const [result, setResult] = useState(null);
   const [rangeChoices, setRangeChoices] = useState({});
+  const [typeOverrides, setTypeOverrides] = useState({});
 
   const fileInputRef = useRef(null);
 
@@ -309,24 +352,26 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
     setMapping(prev => ({ ...prev, [header]: value }));
   };
 
-  const hasTypeMapping = Object.values(mapping).includes('type');
-
   const buildCueFromRow = (row) => {
     const cue = {};
     headers.forEach(h => {
       const target = mapping[h];
-      if (!target || target === 'skip') return;
+      if (!target || target === 'skip' || target === 'type') return;
       const raw = row[h];
       if (target === 'duration') {
         const n = parseInt(raw, 10);
         if (!isNaN(n)) cue.duration = n;
-      } else if (target === 'type') {
-        cue.type = normalizeCueImportType(raw);
       } else {
         cue[target] = (raw === undefined || raw === null) ? '' : String(raw).trim();
       }
     });
-    if (!hasTypeMapping) cue.type = 'other';
+
+    const typeResult = inferCueType(row, mapping, headers);
+    cue.type = typeResult.type;
+    cue.typeUncertain = typeResult.uncertain;
+    if (typeResult.uncertain) {
+      cue.notes = [cue.notes, 'Type not confidently detected — please review'].filter(Boolean).join(' | ');
+    }
 
     let matchedAct = null;
     if (cue.actId) {
@@ -365,25 +410,41 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
     const rangeValues = sceneHeader ? detectSceneRange(rawSceneValue) : null;
     const baseCue = buildCueFromRow(row);
 
-    if (!rangeValues) return [baseCue];
+    let cues;
+    if (!rangeValues) {
+      cues = [baseCue];
+    } else {
+      const choice = rangeChoices[rowIndex] || 'expand';
 
-    const choice = rangeChoices[rowIndex] || 'expand';
-
-    if (choice === 'single') {
-      const cue = { ...baseCue, sceneId: null };
-      cue.notes = [cue.notes, `Scene range not split: "${rawSceneValue}" (needs manual assignment)`].filter(Boolean).join(' | ');
-      return [cue];
+      if (choice === 'single') {
+        const cue = { ...baseCue, sceneId: null };
+        cue.notes = [cue.notes, `Scene range not split: "${rawSceneValue}" (needs manual assignment)`].filter(Boolean).join(' | ');
+        cues = [cue];
+      } else {
+        const matchedAct = (production.acts || []).find(a => a.name === baseCue.actId) || null;
+        cues = rangeValues.map(pos => {
+          const matchedScene = matchSceneToAct(String(pos), matchedAct);
+          const cue = { ...baseCue, sceneId: matchedScene || null };
+          if (!matchedScene) {
+            cue.notes = [cue.notes, `Scene ${pos} not found in ${matchedAct ? matchedAct.name : 'matched act'}`].filter(Boolean).join(' | ');
+          }
+          return cue;
+        });
+      }
     }
 
-    const matchedAct = (production.acts || []).find(a => a.name === baseCue.actId) || null;
-    return rangeValues.map(pos => {
-      const matchedScene = matchSceneToAct(String(pos), matchedAct);
-      const cue = { ...baseCue, sceneId: matchedScene || null };
-      if (!matchedScene) {
-        cue.notes = [cue.notes, `Scene ${pos} not found in ${matchedAct ? matchedAct.name : 'matched act'}`].filter(Boolean).join(' | ');
-      }
-      return cue;
-    });
+    const override = typeOverrides[rowIndex];
+    if (override) {
+      cues = cues.map(cue => {
+        const notes = (cue.notes || '')
+          .split(' | ')
+          .filter(part => part !== 'Type not confidently detected — please review')
+          .join(' | ');
+        return { ...cue, type: override, typeUncertain: false, notes };
+      });
+    }
+
+    return cues;
   };
 
   const getRangeRows = () => {
@@ -392,6 +453,14 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
     return rows.reduce((acc, row, idx) => {
       const rangeValues = detectSceneRange(row[sceneHeader]);
       if (rangeValues) acc.push({ idx, rawValue: row[sceneHeader], count: rangeValues.length });
+      return acc;
+    }, []);
+  };
+
+  const getTypeReviewRows = () => {
+    return rows.reduce((acc, row, idx) => {
+      const result = inferCueType(row, mapping, headers);
+      if (result.uncertain) acc.push({ idx, inferredType: result.type });
       return acc;
     }, []);
   };
@@ -602,7 +671,12 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
             React.createElement(
               'td',
               { style: tdStyle },
-              React.createElement('span', { className: 'cue-type-badge', 'data-cue-type': r.cue.type }, getCueTypeLabel(r.cue.type))
+              React.createElement('span', { className: 'cue-type-badge', 'data-cue-type': r.cue.type }, getCueTypeLabel(r.cue.type)),
+              (r.cue.typeUncertain && typeOverrides[idx] == null) && React.createElement(
+                'span',
+                { style: { marginLeft: '4px', color: 'var(--color-warning, #d97706)' }, title: 'Type not confidently detected' },
+                '⚠'
+              )
             ),
             React.createElement('td', { style: tdStyle }, r.cue.number || '—'),
             React.createElement('td', { style: tdStyle }, r.willSkip ? 'Skipped — no description or number' : (r.cue.description || '—')),
@@ -663,6 +737,70 @@ function CueSheetImportModal({ production, isOpen, onClose, onImportComplete }) 
               )
             )
           ))
+        )
+      )
+    ),
+    getTypeReviewRows().length > 0 && React.createElement(
+      'div',
+      { style: { marginBottom: '1.25rem' } },
+      React.createElement('h3', { className: 'reset-dialog-title', style: { fontSize: '0.9375rem' } }, `Type Needs Review (${getTypeReviewRows().length})`),
+      React.createElement(
+        'p',
+        { className: 'reset-dialog-body', style: { fontSize: '0.8125rem' } },
+        'Confirm or correct the cue type for rows where it could not be confidently detected.'
+      ),
+      React.createElement(
+        'table',
+        { style: { width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' } },
+        React.createElement(
+          'thead',
+          null,
+          React.createElement(
+            'tr',
+            null,
+            React.createElement('th', { style: thStyle }, 'Row'),
+            React.createElement('th', { style: thStyle }, 'Preview'),
+            React.createElement('th', { style: thStyle }, 'Type')
+          )
+        ),
+        React.createElement(
+          'tbody',
+          null,
+          getTypeReviewRows().map(tr => {
+            const descHeader = getMappedHeader('description');
+            const numberHeader = getMappedHeader('number');
+            const row = rows[tr.idx];
+            const previewText = (descHeader && row[descHeader]) || (numberHeader && row[numberHeader]) || '—';
+            const currentValue = typeOverrides[tr.idx] ?? tr.inferredType;
+            return React.createElement(
+              'tr',
+              { key: tr.idx },
+              React.createElement('td', { style: tdStyle }, `Row ${tr.idx + 1}`),
+              React.createElement(
+                'td',
+                { style: { ...tdStyle, color: 'var(--color-text-muted)', maxWidth: '220px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } },
+                previewText
+              ),
+              React.createElement(
+                'td',
+                { style: { ...tdStyle, display: 'flex', alignItems: 'center', gap: '6px' } },
+                React.createElement(
+                  'select',
+                  {
+                    value: currentValue,
+                    onChange: (e) => setTypeOverrides(prev => ({ ...prev, [tr.idx]: e.target.value })),
+                    style: { padding: '4px 6px', borderRadius: '4px', border: '1px solid var(--color-border)', fontSize: '0.8125rem' }
+                  },
+                  (window.cueSheetService?.CUE_TYPES || []).map(t => React.createElement('option', { key: t.id, value: t.id }, `${t.icon} ${t.label}`))
+                ),
+                typeOverrides[tr.idx] != null && React.createElement(
+                  'span',
+                  { style: { color: 'var(--color-success, #059669)' }, title: 'Resolved' },
+                  '✓'
+                )
+              )
+            );
+          })
         )
       )
     ),
