@@ -513,57 +513,54 @@ const CueSheetBuilder = ({ production, userRole }) => {
     <div className="bg-base min-h-full p-6">
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-primary-color">
-            📋 Cue Sheet — {production.title ?? 'Untitled'}
-          </h2>
-          <p className="text-sm mt-1 text-muted-color">
-            {total} cues
-            {needsReview > 0 && (
-              <span className="cue-header-warn">· ⚠ {needsReview} need review</span>
-            )}
-            {unassigned > 0 && (
-              <span className="cue-header-muted">· {unassigned} unassigned</span>
-            )}
-            {needsReview === 0 && unassigned === 0 && total > 0 && (
-              <span className="cue-header-ready">· ✓ Ready to call</span>
-            )}
-          </p>
-        </div>
-        <div className="flex gap-2 flex-wrap justify-end items-center">
-          <div className="view-toggle">
-            <button type="button" className={`view-toggle-btn ${viewMode === 'scene' ? 'active' : ''}`} onClick={() => setViewMode('scene')}>
-              By Scene
-            </button>
-            <button type="button" className={`view-toggle-btn ${viewMode === 'linear' ? 'active' : ''}`} onClick={() => setViewMode('linear')}>
-              Linear
-            </button>
-          </div>
-          {canEdit && (
-            <>
-              <button type="button" onClick={handleAutoGenerate} className="px-3 py-2 rounded-lg text-sm btn-secondary">
-                ↗ Import
-              </button>
-              <button type="button" onClick={() => setShowImportModal(true)} className="px-3 py-2 rounded-lg text-sm btn-secondary">
-                ↑ Upload
-              </button>
-              <button type="button" onClick={() => setShowAddForm(true)} className="px-3 py-2 rounded-lg text-sm btn-primary">
-                + Add Cue
-              </button>
-            </>
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-primary-color">
+          📋 Cue Sheet — {production.title ?? 'Untitled'}
+        </h2>
+        <p className="text-sm mt-1 mb-4 text-muted-color">
+          {total} cues
+          {needsReview > 0 && (
+            <span className="cue-header-warn">· ⚠ {needsReview} need review</span>
           )}
-          {cueSheet.cues.length > 0 && (
-            <>
-              <div className="cue-call-divider" />
-              <button
-                type="button"
-                onClick={handleEnterCallingMode}
-                className="btn-call-show"
-              >
-                ▶ Call Show
+          {unassigned > 0 && (
+            <span className="cue-header-muted">· {unassigned} unassigned</span>
+          )}
+          {needsReview === 0 && unassigned === 0 && total > 0 && (
+            <span className="cue-header-ready">· ✓ Ready to call</span>
+          )}
+        </p>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex gap-2 flex-wrap items-center">
+            <div className="view-toggle">
+              <button type="button" className={`view-toggle-btn ${viewMode === 'scene' ? 'active' : ''}`} onClick={() => setViewMode('scene')}>
+                By Scene
               </button>
-            </>
+              <button type="button" className={`view-toggle-btn ${viewMode === 'linear' ? 'active' : ''}`} onClick={() => setViewMode('linear')}>
+                Linear
+              </button>
+            </div>
+            {canEdit && (
+              <>
+                <button type="button" onClick={handleAutoGenerate} className="px-3 py-2 rounded-lg text-sm btn-secondary">
+                  ↗ Import
+                </button>
+                <button type="button" onClick={() => setShowImportModal(true)} className="px-3 py-2 rounded-lg text-sm btn-upload">
+                  ↑ Upload
+                </button>
+                <button type="button" onClick={() => setShowAddForm(true)} className="px-3 py-2 rounded-lg text-sm btn-primary">
+                  + Add Cue
+                </button>
+              </>
+            )}
+          </div>
+          {cueSheet.cues.length > 0 && (
+            <button
+              type="button"
+              onClick={handleEnterCallingMode}
+              className="btn-call-show flex-shrink-0"
+            >
+              ▶ Call Show
+            </button>
           )}
         </div>
       </div>
