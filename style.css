@@ -801,6 +801,8 @@ select:focus {
 .cue-type-badge[data-cue-type="spot"]         { background: #EC489922; color: #EC4899; border: 1px solid #EC489944; }
 .cue-type-badge[data-cue-type="follow_spot"]  { background: #F9731622; color: #F97316; border: 1px solid #F9731644; }
 .cue-type-badge[data-cue-type="deck"]         { background: #10B98122; color: #10B981; border: 1px solid #10B98144; }
+.cue-type-badge[data-cue-type="props"]        { background: #CA8A0422; color: #CA8A04; border: 1px solid #CA8A0444; }
+.cue-type-badge[data-cue-type="wardrobe"]     { background: #DB277722; color: #DB2777; border: 1px solid #DB277744; }
 .cue-type-badge[data-cue-type="entrance"]     { background: #6366F122; color: #6366F1; border: 1px solid #6366F144; }
 .cue-type-badge[data-cue-type="intermission"] { background: #64748B22; color: #64748B; border: 1px solid #64748B44; }
 .cue-type-badge[data-cue-type="other"]        { background: #94A3B822; color: #94A3B8; border: 1px solid #94A3B844; }
@@ -817,6 +819,8 @@ select:focus {
 .cue-type-num[data-cue-type="spot"]         { color: #EC4899; }
 .cue-type-num[data-cue-type="follow_spot"]  { color: #F97316; }
 .cue-type-num[data-cue-type="deck"]         { color: #10B981; }
+.cue-type-num[data-cue-type="props"]        { color: #CA8A04; }
+.cue-type-num[data-cue-type="wardrobe"]     { color: #DB2777; }
 .cue-type-num[data-cue-type="entrance"]     { color: #6366F1; }
 .cue-type-num[data-cue-type="intermission"] { color: #64748B; }
 .cue-type-num[data-cue-type="other"]        { color: #94A3B8; }
@@ -840,6 +844,8 @@ select:focus {
 .cue-filter-chip[data-active="true"][data-cue-type="spot"]         { background: #EC4899; border-color: #EC4899; color: #fff; }
 .cue-filter-chip[data-active="true"][data-cue-type="follow_spot"]  { background: #F97316; border-color: #F97316; color: #fff; }
 .cue-filter-chip[data-active="true"][data-cue-type="deck"]         { background: #10B981; border-color: #10B981; color: #fff; }
+.cue-filter-chip[data-active="true"][data-cue-type="props"]        { background: #CA8A04; border-color: #CA8A04; color: #fff; }
+.cue-filter-chip[data-active="true"][data-cue-type="wardrobe"]     { background: #DB2777; border-color: #DB2777; color: #fff; }
 .cue-filter-chip[data-active="true"][data-cue-type="entrance"]     { background: #6366F1; border-color: #6366F1; color: #fff; }
 .cue-filter-chip[data-active="true"][data-cue-type="intermission"] { background: #64748B; border-color: #64748B; color: #fff; }
 .cue-filter-chip[data-active="true"][data-cue-type="other"]        { background: #94A3B8; border-color: #94A3B8; color: #fff; }
@@ -1005,6 +1011,8 @@ select:focus {
 .cs-current-cue[data-cue-type="spot"]         { border-color: #831843; }
 .cs-current-cue[data-cue-type="follow_spot"]  { border-color: #7c3a00; }
 .cs-current-cue[data-cue-type="deck"]         { border-color: #065f46; }
+.cs-current-cue[data-cue-type="props"]        { border-color: #713f12; }
+.cs-current-cue[data-cue-type="wardrobe"]     { border-color: #500724; }
 .cs-current-cue[data-cue-type="entrance"]     { border-color: #4c1d95; }
 .cs-current-cue[data-cue-type="intermission"] { border-color: #334155; }
 .cs-current-cue[data-cue-type="other"]        { border-color: #334155; }
@@ -1036,6 +1044,8 @@ select:focus {
 .cs-dark-badge[data-cue-type="spot"]         { background: #280018; color: #f9a8d4; border: 1px solid #831843; }
 .cs-dark-badge[data-cue-type="follow_spot"]  { background: #2d1800; color: #fb923c; border: 1px solid #7c3a00; }
 .cs-dark-badge[data-cue-type="deck"]         { background: #001a0a; color: #34d399; border: 1px solid #065f46; }
+.cs-dark-badge[data-cue-type="props"]        { background: #2b2000; color: #fde047; border: 1px solid #713f12; }
+.cs-dark-badge[data-cue-type="wardrobe"]     { background: #280014; color: #fbcfe8; border: 1px solid #500724; }
 .cs-dark-badge[data-cue-type="entrance"]     { background: #1a0a28; color: #a78bfa; border: 1px solid #4c1d95; }
 .cs-dark-badge[data-cue-type="intermission"] { background: #1a1a1a; color: #94a3b8; border: 1px solid #334155; }
 .cs-dark-badge[data-cue-type="other"]        { background: #1a1a1a; color: #94a3b8; border: 1px solid #334155; }
@@ -1049,6 +1059,8 @@ select:focus {
 .cs-dark-badge-num[data-cue-type="spot"]         { color: #f9a8d4; }
 .cs-dark-badge-num[data-cue-type="follow_spot"]  { color: #fb923c; }
 .cs-dark-badge-num[data-cue-type="deck"]         { color: #34d399; }
+.cs-dark-badge-num[data-cue-type="props"]        { color: #fde047; }
+.cs-dark-badge-num[data-cue-type="wardrobe"]     { color: #fbcfe8; }
 .cs-dark-badge-num[data-cue-type="entrance"]     { color: #a78bfa; }
 .cs-dark-badge-num[data-cue-type="intermission"] { color: #94a3b8; }
 .cs-dark-badge-num[data-cue-type="other"]        { color: #94a3b8; }
