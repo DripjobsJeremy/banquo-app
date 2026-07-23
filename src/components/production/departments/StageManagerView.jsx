@@ -77,6 +77,84 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
     }
   };
 
+  // Scan Cue Sheet + Scene Builder data and produce suggested checklist items.
+  // Data/logic only — not yet called anywhere or wired into the UI.
+  const generateChecklistSuggestions = (production) => {
+    if (!window.cueSheetService) return { preshow: [], intermission: [] };
+
+    const cueSheet = window.cueSheetService.loadCueSheet(production.id);
+    const cues = cueSheet?.cues || [];
+
+    const TYPE_LABELS = {
+      lighting: 'Confirm all lighting cues loaded and tested',
+      sound: 'Confirm all sound cues loaded and tested',
+      fly: 'Confirm fly system rigged and safety-checked',
+      spot: 'Confirm spotlight positions and focus',
+      follow_spot: 'Confirm follow spot positions and focus',
+      deck: 'Confirm deck/set pieces preset',
+      props: 'Confirm props preset in position',
+      wardrobe: 'Confirm wardrobe quick-change stations set',
+      entrance: 'Confirm entrance points clear and ready',
+    };
+
+    const preshowSuggestions = [];
+    const intermissionSuggestions = [];
+
+    const presentTypes = new Set(
+      cues.map(c => c.type).filter(t => t && t !== 'intermission' && t !== 'other')
+    );
+    presentTypes.forEach(typeId => {
+      if (!TYPE_LABELS[typeId]) return;
+      preshowSuggestions.push({ key: `type:${typeId}`, text: TYPE_LABELS[typeId] });
+    });
+
+    (production.acts || []).forEach((act, actIdx) => {
+      (act.scenes || []).forEach((scene, sceneIdx) => {
+        const actLabel = act.name || `Act ${actIdx + 1}`;
+        const sceneLabel = scene.name || `Scene ${sceneIdx + 1}`;
+
+        if (scene.hazards) {
+          preshowSuggestions.push({
+            key: `hazard:${actIdx}-${sceneIdx}`,
+            text: `⚠️ Safety check: ${scene.hazards} (${actLabel} — ${sceneLabel})`
+          });
+        }
+
+        const costumesObj = scene.wardrobe?.costumes || {};
+        Object.keys(costumesObj).forEach(roleId => {
+          const costume = costumesObj[roleId] || {};
+          const desc = (costume.description || '').toLowerCase();
+          const notes = (costume.notes || '').toLowerCase();
+          if (desc.includes('quick change') || notes.includes('quick change')) {
+            const char = (production.characters || []).find(c => (c.id || c.name) === roleId);
+            const characterName = char?.name || roleId;
+            preshowSuggestions.push({
+              key: `quickchange:${actIdx}-${sceneIdx}-${roleId}`,
+              text: `Confirm quick-change setup for ${characterName} (${actLabel} — ${sceneLabel})`
+            });
+          }
+        });
+      });
+    });
+
+    cues.forEach(cue => {
+      if (cue.type === 'intermission') {
+        intermissionSuggestions.push({
+          key: `intermission:${cue.id}`,
+          text: `Intermission: ${cue.description || cue.number}`
+        });
+      }
+    });
+
+    const existingPreshowTexts = new Set((production?.smPreShowChecklist || []).map(item => item.text));
+    const existingIntermissionTexts = new Set((production?.smIntermissionChecklist || []).map(item => item.text));
+
+    return {
+      preshow: preshowSuggestions.filter(s => !existingPreshowTexts.has(s.text)),
+      intermission: intermissionSuggestions.filter(s => !existingIntermissionTexts.has(s.text)),
+    };
+  };
+
   // Get character name by ID
   const getCharacterName = (charId) => {
     const char = (production?.characters || []).find(c => c.id === charId);
