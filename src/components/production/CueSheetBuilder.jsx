@@ -6,6 +6,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
   const [showAddForm, setShowAddForm] = React.useState(false);
   const [filterType, setFilterType] = React.useState('all');
   const [viewMode, setViewMode] = React.useState('scene'); // 'scene' | 'linear'
+  const [showImportModal, setShowImportModal] = React.useState(false);
 
   // Calling Mode state
   const [callingMode, setCallingMode] = React.useState(false);
@@ -519,6 +520,9 @@ const CueSheetBuilder = ({ production, userRole }) => {
               <button type="button" onClick={handleAutoGenerate} className="px-3 py-2 rounded-lg text-sm btn-secondary">
                 ↗ Import
               </button>
+              <button type="button" onClick={() => setShowImportModal(true)} className="px-3 py-2 rounded-lg text-sm btn-secondary">
+                ↑ Upload
+              </button>
               <button type="button" onClick={() => setShowAddForm(true)} className="px-3 py-2 rounded-lg text-sm btn-primary">
                 + Add Cue
               </button>
@@ -671,6 +675,15 @@ const CueSheetBuilder = ({ production, userRole }) => {
           </div>
         );
       })()}
+      {window.CueSheetImportModal && React.createElement(window.CueSheetImportModal, {
+        production,
+        isOpen: showImportModal,
+        onClose: () => setShowImportModal(false),
+        onImportComplete: () => {
+          setCueSheet(window.cueSheetService.loadCueSheet(production.id));
+          setShowImportModal(false);
+        },
+      })}
     </div>
   );
 };
