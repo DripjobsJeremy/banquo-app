@@ -629,29 +629,37 @@ const CueSheetBuilder = ({ production, userRole }) => {
 
       {/* Add form */}
       {showAddForm && (
-        <CueForm
-          onSave={(form) => {
-            window.cueSheetService.addCue(production.id, form);
-            setCueSheet(window.cueSheetService.loadCueSheet(production.id));
-            setShowAddForm(false);
-            if (window.showToast) window.showToast('Cue added', 'success');
-          }}
-          onCancel={() => setShowAddForm(false)}
-        />
+        <div className="reset-dialog-overlay" onClick={() => setShowAddForm(false)}>
+          <div className="reset-dialog-panel" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '640px', maxHeight: '85vh', overflowY: 'auto' }}>
+            <CueForm
+              onSave={(form) => {
+                window.cueSheetService.addCue(production.id, form);
+                setCueSheet(window.cueSheetService.loadCueSheet(production.id));
+                setShowAddForm(false);
+                if (window.showToast) window.showToast('Cue added', 'success');
+              }}
+              onCancel={() => setShowAddForm(false)}
+            />
+          </div>
+        </div>
       )}
 
       {/* Edit form */}
       {editingCue && (
-        <CueForm
-          cue={editingCue}
-          onSave={(form) => {
-            window.cueSheetService.updateCue(production.id, form.id, form);
-            setCueSheet(window.cueSheetService.loadCueSheet(production.id));
-            setEditingCue(null);
-            if (window.showToast) window.showToast('Cue updated', 'success');
-          }}
-          onCancel={() => setEditingCue(null)}
-        />
+        <div className="reset-dialog-overlay" onClick={() => setEditingCue(null)}>
+          <div className="reset-dialog-panel" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '640px', maxHeight: '85vh', overflowY: 'auto' }}>
+            <CueForm
+              cue={editingCue}
+              onSave={(form) => {
+                window.cueSheetService.updateCue(production.id, form.id, form);
+                setCueSheet(window.cueSheetService.loadCueSheet(production.id));
+                setEditingCue(null);
+                if (window.showToast) window.showToast('Cue updated', 'success');
+              }}
+              onCancel={() => setEditingCue(null)}
+            />
+          </div>
+        </div>
       )}
 
       {/* Empty state */}
