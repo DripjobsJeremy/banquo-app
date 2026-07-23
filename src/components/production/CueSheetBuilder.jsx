@@ -712,39 +712,57 @@ const CueSheetBuilder = ({ production, userRole }) => {
       )}
 
       {/* Scene view */}
-      {viewMode === 'scene' && cueSheet.cues.length > 0 && (
-        <div className="space-y-6">
-          {(production.acts || []).map(act =>
-            (act.scenes || []).map(scene => {
-              const sceneCues = cueSheet.cues.filter(c => c.sceneId === scene.name &&
-                (filterType === 'all' || c.type === filterType));
-              if (sceneCues.length === 0) return null;
-              return (
-                <div key={scene.name}>
-                  <div className="flex items-center gap-2 mb-2">
-                    {act.name && <span className="cue-act-label">{act.name}</span>}
-                    <span className="cue-scene-title">{scene.name || 'Untitled Scene'}</span>
-                    {scene.hazards && <span className="cue-scene-hazard">⚠️ {scene.hazards}</span>}
-                    <span className="cue-scene-count">({sceneCues.length} cues)</span>
+      {viewMode === 'scene' && cueSheet.cues.length > 0 && (() => {
+        const renderedSceneNames = new Set();
+        const matchedSceneNames = new Set(
+          (production.acts || []).flatMap(act => (act.scenes || []).map(scene => scene.name))
+        );
+        const orphanedCues = cueSheet.cues.filter(c =>
+          c.sceneId && !matchedSceneNames.has(c.sceneId) &&
+          (filterType === 'all' || c.type === filterType)
+        );
+        return (
+          <div className="space-y-6">
+            {(production.acts || []).map(act =>
+              (act.scenes || []).map(scene => {
+                if (renderedSceneNames.has(scene.name)) return null;
+                renderedSceneNames.add(scene.name);
+                const sceneCues = cueSheet.cues.filter(c => c.sceneId === scene.name &&
+                  (filterType === 'all' || c.type === filterType));
+                if (sceneCues.length === 0) return null;
+                return (
+                  <div key={scene.name}>
+                    <div className="flex items-center gap-2 mb-2">
+                      {act.name && <span className="cue-act-label">{act.name}</span>}
+                      <span className="cue-scene-title">{scene.name || 'Untitled Scene'}</span>
+                      {scene.hazards && <span className="cue-scene-hazard">⚠️ {scene.hazards}</span>}
+                      <span className="cue-scene-count">({sceneCues.length} cues)</span>
+                    </div>
+                    {sceneCues.sort((a, b) => a.order - b.order).map(cue => <CueRow key={cue.id} cue={cue} />)}
+                    {canEdit && (
+                      <button type="button" onClick={() => setShowAddForm(true)} className="cue-add-dashed">
+                        + Add cue to this scene
+                      </button>
+                    )}
                   </div>
-                  {sceneCues.sort((a, b) => a.order - b.order).map(cue => <CueRow key={cue.id} cue={cue} />)}
-                  {canEdit && (
-                    <button type="button" onClick={() => setShowAddForm(true)} className="cue-add-dashed">
-                      + Add cue to this scene
-                    </button>
-                  )}
-                </div>
-              );
-            })
-          )}
-          {cuesByScene['__unassigned__']?.length > 0 && (
-            <div>
-              <div className="cue-unassigned-label">Unassigned Cues</div>
-              {cuesByScene['__unassigned__'].map(cue => <CueRow key={cue.id} cue={cue} />)}
-            </div>
-          )}
-        </div>
-      )}
+                );
+              })
+            )}
+            {orphanedCues.length > 0 && (
+              <div>
+                <div className="cue-unassigned-label">⚠ Unmatched Scene (scene may have been renamed or removed)</div>
+                {orphanedCues.map(cue => <CueRow key={cue.id} cue={cue} />)}
+              </div>
+            )}
+            {cuesByScene['__unassigned__']?.length > 0 && (
+              <div>
+                <div className="cue-unassigned-label">Unassigned Cues</div>
+                {cuesByScene['__unassigned__'].map(cue => <CueRow key={cue.id} cue={cue} />)}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Linear view */}
       {viewMode === 'linear' && cueSheet.cues.length > 0 && (() => {
