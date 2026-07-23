@@ -31,6 +31,7 @@
     type: 'lighting',     // from CUE_TYPES ids
     sceneId: null,        // which scene this belongs to
     actId: null,
+    assignedTo: '',       // display name of the person responsible (staff, crew, or cast member) — plain string, not an ID
     standbyWith: [],      // array of cue ids called on standby together
     goWith: [],           // array of cue ids fired on GO together
     triggerLine: '',      // what SM listens for to call GO
