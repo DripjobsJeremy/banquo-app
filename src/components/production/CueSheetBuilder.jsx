@@ -586,12 +586,22 @@ const CueSheetBuilder = ({ production, userRole }) => {
             </div>
             {canEdit && (
               <>
-                <button type="button" onClick={handleAutoGenerate} className="px-3 py-2 rounded-lg text-sm btn-secondary">
-                  ↗ Import
-                </button>
-                <button type="button" onClick={() => setShowImportModal(true)} className="px-3 py-2 rounded-lg text-sm btn-upload">
-                  ↑ Upload
-                </button>
+                <div className="cue-add-menu-wrap">
+                  <select
+                    title="Add cues"
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value === 'generate') handleAutoGenerate();
+                      if (e.target.value === 'upload') setShowImportModal(true);
+                      e.target.value = '';
+                    }}
+                    className="px-3 py-2 rounded-lg text-sm btn-secondary"
+                  >
+                    <option value="">+ Add Cues...</option>
+                    <option value="generate">↗ Import from Scene Builder</option>
+                    <option value="upload">↑ Upload CSV</option>
+                  </select>
+                </div>
                 <button type="button" onClick={() => setShowAddForm(true)} className="px-3 py-2 rounded-lg text-sm btn-primary">
                   + Add Cue
                 </button>
