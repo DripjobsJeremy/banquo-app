@@ -2048,10 +2048,24 @@ html[data-theme="light"] {
   font-size: 0.75rem;
   color: var(--color-text-primary);
 }
-.rs-card[data-rs-color="violet"] { border-left-color: #8B5CF6; }
-.rs-card[data-rs-color="yellow"] { border-left-color: #CA8A04; }
-.rs-card[data-rs-color="green"]  { border-left-color: #10B981; }
-.rs-card[data-rs-color="gray"]   { border-left-color: #94A3B8; }
+.rs-card[data-rs-color="violet"]   { border-left-color: #8B5CF6; }
+.rs-card[data-rs-color="yellow"]   { border-left-color: #CA8A04; }
+.rs-card[data-rs-color="green"]    { border-left-color: #10B981; }
+.rs-card[data-rs-color="gray"]     { border-left-color: #94A3B8; }
+.rs-card[data-rs-color="props"]    { border-left-color: #CA8A04; }
+.rs-card[data-rs-color="wardrobe"] { border-left-color: #DB2777; }
+
+.rs-hazard-banner {
+  background-color: rgba(217, 119, 6, 0.15);
+  border: 1px solid #d97706;
+  color: var(--color-warning, #d97706);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
 
 .rs-notes-box {
   margin-top: 0.75rem;

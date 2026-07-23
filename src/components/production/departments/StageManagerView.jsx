@@ -238,10 +238,16 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                         React.createElement('span', { className: 'text-xs text-gray-500' }, 'min')
                       )
                     ),
+                    // Hazard warning banner
+                    scene.hazards && React.createElement(
+                      'div',
+                      { className: 'rs-hazard-banner' },
+                      `⚠️ Hazard: ${scene.hazards}`
+                    ),
                     // Department data summary (read-only)
                     React.createElement(
                       'div',
-                      { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-3' },
+                      { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-3' },
                       // Characters
                       (() => {
                         const charVal = scene.characterIds?.length > 0
@@ -283,9 +289,10 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                             : React.createElement('p', { className: 'rs-card-value' }, soundVal)
                         );
                       })(),
-                      // Location/Time
+                      // Setting (location/time + set notes)
                       (() => {
-                        const settingVal = [scene.location, scene.time].filter(Boolean).join(' — ') || null;
+                        const locationTime = [scene.location, scene.time].filter(Boolean).join(' — ');
+                        const settingVal = [locationTime, scene.set?.notes].filter(Boolean).join(' • ') || null;
                         const settingEmpty = isEmpty(settingVal);
                         return React.createElement(
                           'div',
@@ -295,20 +302,71 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                             ? React.createElement('span', { className: 'italic text-gray-400 text-xs' }, '⚠ Not set')
                             : React.createElement('p', { className: 'rs-card-value' }, settingVal)
                         );
+                      })(),
+                      // Props
+                      (() => {
+                        const propsArr = Array.isArray(scene.props) ? scene.props : [];
+                        const propsVal = propsArr
+                          .map(p => {
+                            const name = (p.name || '').trim();
+                            if (!name) return null;
+                            return p.character ? `${name} (${p.character})` : name;
+                          })
+                          .filter(Boolean)
+                          .join(', ') || null;
+                        const propsEmpty = isEmpty(propsVal);
+                        return React.createElement(
+                          'div',
+                          { className: propsEmpty ? 'rs-card rs-card--empty' : 'rs-card', 'data-rs-color': 'props' },
+                          React.createElement('p', { className: 'rs-card-label', 'data-rs-color': 'props' }, '🧰 Props'),
+                          propsEmpty
+                            ? React.createElement('span', { className: 'italic text-gray-400 text-xs' }, '⚠ None assigned')
+                            : React.createElement('p', { className: 'rs-card-value' }, propsVal)
+                        );
+                      })(),
+                      // Wardrobe
+                      (() => {
+                        const costumesObj = scene.wardrobe?.costumes || {};
+                        const wardrobeVal = Object.keys(costumesObj)
+                          .map(roleId => {
+                            const data = costumesObj[roleId] || {};
+                            if (!data.description) return null;
+                            const char = (production.characters || []).find(c => (c.id || c.name) === roleId);
+                            const charName = char?.name || roleId;
+                            return `${charName}: ${data.description}`;
+                          })
+                          .filter(Boolean)
+                          .join('; ') || null;
+                        const wardrobeEmpty = isEmpty(wardrobeVal);
+                        return React.createElement(
+                          'div',
+                          { className: wardrobeEmpty ? 'rs-card rs-card--empty' : 'rs-card', 'data-rs-color': 'wardrobe' },
+                          React.createElement('p', { className: 'rs-card-label', 'data-rs-color': 'wardrobe' }, '👗 Wardrobe'),
+                          wardrobeEmpty
+                            ? React.createElement('span', { className: 'italic text-gray-400 text-xs' }, '⚠ None assigned')
+                            : React.createElement('p', { className: 'rs-card-value' }, wardrobeVal)
+                        );
                       })()
                     ),
-                    // SM Cue Notes (editable)
+                    // SM Calling Note (editable — same field as Scene Builder's SM Calling Note)
                     React.createElement(
                       'div',
                       { className: 'rs-notes-box' },
-                      React.createElement('label', { className: 'block text-xs font-medium text-accent-gold mb-1' }, '📋 SM Cue Notes'),
+                      React.createElement('label', { className: 'block text-xs font-medium text-accent-gold mb-1' }, '📋 SM Calling Note'),
                       React.createElement('textarea', {
-                        value: scene.smCueNotes || '',
-                        onChange: (e) => handleSMUpdate(actIndex, sceneIndex, 'smCueNotes', e.target.value),
+                        value: scene.smNotes || '',
+                        onChange: (e) => handleSMUpdate(actIndex, sceneIndex, 'smNotes', e.target.value),
                         className: 'rs-notes-textarea w-full px-3 py-2 rounded text-sm resize-y',
                         rows: 2,
-                        placeholder: 'Standby cues, warnings, calls, blocking notes...'
+                        placeholder: 'SM notes for calling this scene — standby cues, special calls...'
                       })
+                    ),
+                    // Director's Notes to SM (read-only — edited in Scene Builder's Director view)
+                    scene.smDirectorNotes && React.createElement(
+                      'div',
+                      { className: 'mt-2' },
+                      React.createElement('p', { className: 'text-xs font-medium text-muted-color mb-1' }, "📋 Director's Notes to SM"),
+                      React.createElement('p', { className: 'text-xs italic text-muted-color' }, scene.smDirectorNotes)
                     )
                   )
                 )
