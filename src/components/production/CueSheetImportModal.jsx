@@ -47,7 +47,6 @@ const normalizeCueImportType = (value) => {
 
 // Department-related keywords, checked in this order so more specific types
 // (e.g. follow_spot) are matched before generically-overlapping ones (spot).
-// No wardrobe/costume entry exists on purpose — that's not a real CUE_TYPES id.
 const CUE_TYPE_KEYWORD_MAP = [
   { type: 'lighting',     keywords: ['light', 'lighting', 'lx', 'wash', 'blackout', 'fade'] },
   { type: 'sound',        keywords: ['sound', 'sfx', 'audio', 'music', 'sq'] },
@@ -55,6 +54,8 @@ const CUE_TYPE_KEYWORD_MAP = [
   { type: 'follow_spot',  keywords: ['follow spot', 'followspot', 'follow-spot'] },
   { type: 'spot',         keywords: ['spot', 'spotlight'] },
   { type: 'deck',         keywords: ['deck', 'set change', 'scene change', 'stagehand'] },
+  { type: 'props',        keywords: ['prop', 'props', 'hand prop', 'hand off'] },
+  { type: 'wardrobe',     keywords: ['wardrobe', 'costume', 'quick change', 'wig', 'dress'] },
   { type: 'entrance',     keywords: ['entrance', 'enters', 'enter', 'exits', 'exit'] },
   { type: 'intermission', keywords: ['intermission', 'interval'] },
 ];
