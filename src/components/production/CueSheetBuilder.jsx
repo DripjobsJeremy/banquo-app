@@ -389,7 +389,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
           />
         )}
         <div className="cue-row-badge-col">
-          <div className="cue-type-badge" data-cue-type={cue.type}>
+          <div className="cue-type-badge" data-cue-type={cue.type} title={typeConfig.description}>
             {typeConfig.icon} {typeConfig.label}
           </div>
           {cue.number && (
@@ -446,8 +446,11 @@ const CueSheetBuilder = ({ production, userRole }) => {
             <label className="text-xs font-medium mb-1 block text-muted-color">Cue Type</label>
             <select title="Cue Type" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}
               className="w-full px-3 py-2 rounded-lg text-sm bg-surface border-theme text-primary-color">
-              {CUE_TYPES.map(t => <option key={t.id} value={t.id}>{t.icon} {t.label} — {t.id}</option>)}
+              {CUE_TYPES.map(t => <option key={t.id} value={t.id} title={t.description}>{t.icon} {t.label} — {t.id}</option>)}
             </select>
+            <p className="text-xs mt-1 text-muted-color">
+              {CUE_TYPES.find(t => t.id === form.type)?.description}
+            </p>
           </div>
           <div>
             <label className="text-xs font-medium mb-1 block text-muted-color">Cue Number</label>
@@ -586,6 +589,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
               className="cue-filter-chip"
               data-cue-type={t.id}
               data-active={filterType === t.id ? 'true' : 'false'}
+              title={t.description}
             >
               {t.icon} {t.label} ({count})
             </button>
