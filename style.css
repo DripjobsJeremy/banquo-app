@@ -855,6 +855,7 @@ select:focus {
   border: 1px solid var(--color-border);
   margin-bottom: 4px;
 }
+.cue-row-checkbox { flex-shrink: 0; width: 16px; height: 16px; margin-top: 4px; cursor: pointer; }
 .cue-row-badge-col { flex-shrink: 0; text-align: center; min-width: 52px; }
 .cue-row-body { flex: 1; min-width: 0; }
 .cue-row-trigger { font-size: 0.75rem; font-style: italic; margin-bottom: 4px; color: var(--color-text-muted); }
@@ -869,6 +870,10 @@ select:focus {
 }
 .cue-row-btn-delete {
   font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; min-height: 28px; cursor: pointer;
+  background: var(--color-danger-surface); color: var(--color-danger); border: 1px solid var(--color-danger);
+}
+.cue-bulk-delete-btn {
+  cursor: pointer;
   background: var(--color-danger-surface); color: var(--color-danger); border: 1px solid var(--color-danger);
 }
 

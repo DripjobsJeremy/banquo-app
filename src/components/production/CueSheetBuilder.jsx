@@ -7,6 +7,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
   const [filterType, setFilterType] = React.useState('all');
   const [viewMode, setViewMode] = React.useState('scene'); // 'scene' | 'linear'
   const [showImportModal, setShowImportModal] = React.useState(false);
+  const [selectedCueIds, setSelectedCueIds] = React.useState(() => new Set());
 
   // Calling Mode state
   const [callingMode, setCallingMode] = React.useState(false);
@@ -81,6 +82,18 @@ const CueSheetBuilder = ({ production, userRole }) => {
     });
     return groups;
   }, [cueSheet.cues, filterType]);
+
+  const visibleCues = React.useMemo(() =>
+    filterType === 'all' ? cueSheet.cues : cueSheet.cues.filter(c => c.type === filterType),
+    [cueSheet.cues, filterType]
+  );
+
+  const toggleCueSelection = (cueId) => {
+    const next = new Set(selectedCueIds);
+    if (next.has(cueId)) next.delete(cueId);
+    else next.add(cueId);
+    return next;
+  };
 
   const getSceneLabel = (sceneName) => {
     if (!sceneName || sceneName === '__unassigned__') return 'Unassigned Cues';
@@ -366,6 +379,15 @@ const CueSheetBuilder = ({ production, userRole }) => {
     const rowNeedsReview = cue.autoFromScene && (!cue.triggerLine || !cue.number);
     return (
       <div className="cue-row">
+        {canEdit && (
+          <input
+            type="checkbox"
+            className="cue-row-checkbox"
+            aria-label={`Select cue ${cue.number || cue.description || ''}`.trim()}
+            checked={selectedCueIds.has(cue.id)}
+            onChange={() => setSelectedCueIds(toggleCueSelection(cue.id))}
+          />
+        )}
         <div className="cue-row-badge-col">
           <div className="cue-type-badge" data-cue-type={cue.type}>
             {typeConfig.icon} {typeConfig.label}
@@ -570,6 +592,40 @@ const CueSheetBuilder = ({ production, userRole }) => {
           );
         })}
       </div>
+
+      {/* Bulk action bar */}
+      {selectedCueIds.size > 0 && (
+        <div className="flex items-center gap-2 mb-4 flex-wrap rounded-lg p-4 bg-elevated">
+          <span className="text-sm font-medium text-primary-color">{selectedCueIds.size} selected</span>
+          <button
+            type="button"
+            onClick={() => setSelectedCueIds(new Set(visibleCues.map(c => c.id)))}
+            className="px-3 py-2 rounded-lg text-sm btn-secondary"
+          >
+            Select all ({visibleCues.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedCueIds(new Set())}
+            className="px-3 py-2 rounded-lg text-sm btn-secondary"
+          >
+            Clear
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!window.confirm(`Delete ${selectedCueIds.size} cue(s)? This cannot be undone.`)) return;
+              const result = window.cueSheetService.deleteCuesBulk(production.id, Array.from(selectedCueIds));
+              setCueSheet(window.cueSheetService.loadCueSheet(production.id));
+              setSelectedCueIds(new Set());
+              if (window.showToast) window.showToast(`Deleted ${result.deleted} cue(s)`, 'success');
+            }}
+            className="px-3 py-2 rounded-lg text-sm cue-bulk-delete-btn"
+          >
+            Delete Selected
+          </button>
+        </div>
+      )}
 
       {/* Add form */}
       {showAddForm && (
