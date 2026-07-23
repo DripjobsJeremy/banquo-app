@@ -409,8 +409,9 @@ const CueSheetBuilder = ({ production, userRole }) => {
   const CueRow = ({ cue }) => {
     const typeConfig = getCueTypeConfig(cue.type);
     const rowNeedsReview = (cue.autoFromScene && (!cue.triggerLine || !cue.number)) || (cue.importFlags && cue.importFlags.length > 0);
+    const [expanded, setExpanded] = React.useState(false);
     return (
-      <div className="cue-row">
+      <div className="cue-row" onClick={() => setExpanded(e => !e)} style={{ cursor: 'pointer' }}>
         {canEdit && (
           <input
             type="checkbox"
@@ -429,24 +430,28 @@ const CueSheetBuilder = ({ production, userRole }) => {
           )}
         </div>
         <div className="cue-row-body">
-          {cue.triggerLine && (
-            <div className="cue-row-trigger">"{cue.triggerLine}"</div>
-          )}
           <div className="cue-row-desc">
-            {cue.description || <span className="cue-row-desc--empty">No description</span>}
+            {cue.description || <span className="cue-row-desc--empty">No description — click Edit to add one</span>}
           </div>
           {rowNeedsReview && (
             <div className="cue-needs-review">
               ⚠ Needs review{cue.importFlags && cue.importFlags.length > 0 ? ` — ${cue.importFlags.join('; ')}` : ' — add cue number and trigger line'}
             </div>
           )}
-          {cue.notes && <div className="cue-row-meta">📝 {cue.notes}</div>}
-          {cue.assignedTo && <div className="cue-row-meta">👤 {cue.assignedTo}</div>}
-          {cue.autoFromScene && <div className="cue-row-meta">↗ Auto from Scene Builder</div>}
-          {cue.status === 'completed' && <div className="cue-row-called">✓ Called</div>}
+          {expanded && (
+            <>
+              {cue.triggerLine && (
+                <div className="cue-row-trigger">"{cue.triggerLine}"</div>
+              )}
+              {cue.notes && <div className="cue-row-meta">📝 {cue.notes}</div>}
+              {cue.assignedTo && <div className="cue-row-meta">👤 {cue.assignedTo}</div>}
+              {cue.autoFromScene && <div className="cue-row-meta">↗ Auto from Scene Builder</div>}
+              {cue.status === 'completed' && <div className="cue-row-called">✓ Called</div>}
+            </>
+          )}
         </div>
         {canEdit && (
-          <div className="cue-row-actions">
+          <div className="cue-row-actions" onClick={(e) => e.stopPropagation()}>
             <button
               type="button"
               onClick={() => setEditingCue(cue)}
