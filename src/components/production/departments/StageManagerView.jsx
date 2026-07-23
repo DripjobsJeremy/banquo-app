@@ -8,6 +8,7 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
   const [intermissionChecklist, setIntermissionChecklist] = useState(production?.smIntermissionChecklist || []);
   const [newPreShowItem, setNewPreShowItem] = useState('');
   const [newIntermissionItem, setNewIntermissionItem] = useState('');
+  const [dismissedSuggestionKeys, setDismissedSuggestionKeys] = useState(production?.smDismissedSuggestions || []);
 
   // Toggle act expansion
   const toggleAct = (actIndex) => {
@@ -26,6 +27,7 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
     }
     setPreShowChecklist(production?.smPreShowChecklist || []);
     setIntermissionChecklist(production?.smIntermissionChecklist || []);
+    setDismissedSuggestionKeys(production?.smDismissedSuggestions || []);
   }, [production?.id]);
 
   // Handle SM-specific field updates
@@ -75,6 +77,30 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
       setIntermissionChecklist(updated);
       onUpdateProduction?.({ smIntermissionChecklist: updated });
     }
+  };
+
+  // Accept a suggestion: add it to the real checklist, then dismiss it from Suggested
+  const acceptSuggestion = (type, suggestion) => {
+    const newItem = { id: 'chk_' + Date.now(), text: suggestion.text, completed: false };
+    if (type === 'preshow') {
+      const updated = [...preShowChecklist, newItem];
+      setPreShowChecklist(updated);
+      onUpdateProduction?.({ smPreShowChecklist: updated });
+    } else {
+      const updated = [...intermissionChecklist, newItem];
+      setIntermissionChecklist(updated);
+      onUpdateProduction?.({ smIntermissionChecklist: updated });
+    }
+    const updatedDismissed = [...dismissedSuggestionKeys, suggestion.key];
+    setDismissedSuggestionKeys(updatedDismissed);
+    onUpdateProduction?.({ smDismissedSuggestions: updatedDismissed });
+  };
+
+  // Dismiss a suggestion without adding it — persisted so it doesn't reappear
+  const dismissSuggestion = (key) => {
+    const updated = [...dismissedSuggestionKeys, key];
+    setDismissedSuggestionKeys(updated);
+    onUpdateProduction?.({ smDismissedSuggestions: updated });
   };
 
   // Scan Cue Sheet + Scene Builder data and produce suggested checklist items.
@@ -154,6 +180,11 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
       intermission: intermissionSuggestions.filter(s => !existingIntermissionTexts.has(s.text)),
     };
   };
+
+  // Computed once per render so both checklist sections share the same filtered lists
+  const activeSuggestions = generateChecklistSuggestions(production);
+  const activePreshowSuggestions = activeSuggestions.preshow.filter(s => !dismissedSuggestionKeys.includes(s.key));
+  const activeIntermissionSuggestions = activeSuggestions.intermission.filter(s => !dismissedSuggestionKeys.includes(s.key));
 
   // Get character name by ID
   const getCharacterName = (charId) => {
@@ -461,13 +492,40 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
   );
 
   // Checklists Section
-  const renderChecklist = (type, items, newItem, setNewItem) => {
+  const renderChecklist = (type, items, newItem, setNewItem, suggestions) => {
     const title = type === 'preshow' ? '🎬 Pre-Show Checklist' : '⏸️ Intermission Checklist';
-    
+
     return React.createElement(
       'div',
       { className: 'bg-white rounded-lg border border-gray-200 p-4' },
       React.createElement('h4', { className: 'font-semibold text-gray-800 mb-3' }, title),
+      // Suggested items (pending review — not yet part of the real checklist)
+      suggestions && suggestions.length > 0 && React.createElement(
+        'div',
+        { className: 'mb-3' },
+        React.createElement('p', { className: 'text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2' }, '💡 Suggested'),
+        React.createElement(
+          'div',
+          { className: 'space-y-2' },
+          suggestions.map(s =>
+            React.createElement(
+              'div',
+              { key: s.key, className: 'flex items-center gap-2 p-2 border border-dashed border-gray-300 bg-gray-50 rounded' },
+              React.createElement('span', { className: 'flex-1 text-sm italic text-gray-600' }, s.text),
+              React.createElement(
+                'button',
+                { onClick: () => acceptSuggestion(type, s), className: 'text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200' },
+                '✓ Add'
+              ),
+              React.createElement(
+                'button',
+                { onClick: () => dismissSuggestion(s.key), className: 'text-gray-400 hover:text-red-600 text-sm' },
+                '✕'
+              )
+            )
+          )
+        )
+      ),
       // Checklist items
       React.createElement(
         'div',
@@ -528,8 +586,8 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
   const checklistsContent = React.createElement(
     'div',
     { className: 'grid grid-cols-1 md:grid-cols-2 gap-6' },
-    renderChecklist('preshow', preShowChecklist, newPreShowItem, setNewPreShowItem),
-    renderChecklist('intermission', intermissionChecklist, newIntermissionItem, setNewIntermissionItem)
+    renderChecklist('preshow', preShowChecklist, newPreShowItem, setNewPreShowItem, activePreshowSuggestions),
+    renderChecklist('intermission', intermissionChecklist, newIntermissionItem, setNewIntermissionItem, activeIntermissionSuggestions)
   );
 
   return React.createElement(
