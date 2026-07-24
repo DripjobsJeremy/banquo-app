@@ -905,6 +905,16 @@ select:focus {
   color: var(--color-text-muted); background: transparent; border: 1px dashed var(--color-border);
 }
 .cue-unassigned-label { font-weight: 600; margin-bottom: 8px; color: var(--color-text-muted); display: flex; align-items: center; gap: 8px; }
+.cue-back-to-top {
+  position: fixed; bottom: 32px; right: 32px; z-index: 40;
+  width: 48px; height: 48px; border-radius: 9999px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem; cursor: pointer;
+  background: var(--color-primary); color: #fff; border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: opacity 150ms, transform 150ms;
+}
+.cue-back-to-top:hover { transform: translateY(-2px); }
 .cue-section-header { cursor: pointer; -webkit-user-select: none; user-select: none; }
 .cue-section-header:hover { opacity: 0.8; }
 .cue-section-chevron { font-size: 0.7rem; color: var(--color-text-muted); flex-shrink: 0; width: 12px; display: inline-block; }

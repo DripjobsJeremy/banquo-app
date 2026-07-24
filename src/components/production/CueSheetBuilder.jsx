@@ -9,6 +9,22 @@ const CueSheetBuilder = ({ production, userRole }) => {
   const [showImportModal, setShowImportModal] = React.useState(false);
   const [selectedCueIds, setSelectedCueIds] = React.useState(() => new Set());
   const [collapsedSections, setCollapsedSections] = React.useState(() => new Set());
+  const [showBackToTop, setShowBackToTop] = React.useState(false);
+  const rootRef = React.useRef(null);
+
+  // Track scroll position on the app's scrollable container (this component's own div doesn't scroll)
+  React.useEffect(() => {
+    const scrollContainer = rootRef.current?.closest('main');
+    if (!scrollContainer) return;
+    const handleScroll = () => setShowBackToTop(scrollContainer.scrollTop > 400);
+    scrollContainer.addEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => scrollContainer.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    rootRef.current?.closest('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const toggleSection = (key) => {
     setCollapsedSections(prev => {
@@ -594,7 +610,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
   const total = cueSheet.cues.length;
 
   return (
-    <div className="bg-base min-h-full p-6">
+    <div className="bg-base min-h-full p-6" ref={rootRef}>
 
       {/* Header */}
       <div className="mb-6">
@@ -902,6 +918,17 @@ const CueSheetBuilder = ({ production, userRole }) => {
           setShowImportModal(false);
         },
       })}
+      {showBackToTop && (
+        <button
+          type="button"
+          onClick={scrollToTop}
+          className="cue-back-to-top"
+          aria-label="Back to top"
+          title="Back to top"
+        >
+          ↑
+        </button>
+      )}
     </div>
   );
 };
