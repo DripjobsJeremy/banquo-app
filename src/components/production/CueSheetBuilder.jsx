@@ -28,6 +28,15 @@ const CueSheetBuilder = ({ production, userRole }) => {
 
   const CUE_TYPES = window.cueSheetService.CUE_TYPES;
 
+  // Single source of truth for filter-chip matching — used by every cue list/count below
+  const matchesFilter = (cue) => {
+    if (filterType === 'all') return true;
+    if (filterType === '__needs_review__') {
+      return (cue.autoFromScene && (!cue.triggerLine || !cue.number)) || (cue.importFlags && cue.importFlags.length > 0);
+    }
+    return cue.type === filterType;
+  };
+
   // Flatten nested acts[].scenes[] into a single array for lookups/selects
   const flatScenes = React.useMemo(() =>
     (production.acts || []).flatMap(act => (act.scenes || []).map(scene => ({
@@ -87,9 +96,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
   // Group cues by scene for scene view
   const cuesByScene = React.useMemo(() => {
     const groups = {};
-    const filtered = filterType === 'all' ? cueSheet.cues
-      : filterType === '__needs_review__' ? cueSheet.cues.filter(c => (c.autoFromScene && (!c.triggerLine || !c.number)) || (c.importFlags && c.importFlags.length > 0))
-      : cueSheet.cues.filter(c => c.type === filterType);
+    const filtered = cueSheet.cues.filter(matchesFilter);
     filtered.forEach(cue => {
       const key = cue.sceneId || '__unassigned__';
       if (!groups[key]) groups[key] = [];
@@ -99,9 +106,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
   }, [cueSheet.cues, filterType]);
 
   const visibleCues = React.useMemo(() =>
-    filterType === 'all' ? cueSheet.cues
-      : filterType === '__needs_review__' ? cueSheet.cues.filter(c => (c.autoFromScene && (!c.triggerLine || !c.number)) || (c.importFlags && c.importFlags.length > 0))
-      : cueSheet.cues.filter(c => c.type === filterType),
+    cueSheet.cues.filter(matchesFilter),
     [cueSheet.cues, filterType]
   );
 
@@ -763,8 +768,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
           (production.acts || []).flatMap(act => (act.scenes || []).map(scene => scene.name))
         );
         const orphanedCues = cueSheet.cues.filter(c =>
-          c.sceneId && !matchedSceneNames.has(c.sceneId) &&
-          (filterType === 'all' || c.type === filterType)
+          c.sceneId && !matchedSceneNames.has(c.sceneId) && matchesFilter(c)
         );
         return (
           <div className="space-y-6">
@@ -772,8 +776,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
               (act.scenes || []).map(scene => {
                 if (renderedSceneNames.has(scene.name)) return null;
                 renderedSceneNames.add(scene.name);
-                const sceneCues = cueSheet.cues.filter(c => c.sceneId === scene.name &&
-                  (filterType === 'all' || c.type === filterType));
+                const sceneCues = cueSheet.cues.filter(c => c.sceneId === scene.name && matchesFilter(c));
                 if (sceneCues.length === 0) return null;
                 return (
                   <div key={scene.name}>
@@ -812,7 +815,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
       {/* Linear view */}
       {viewMode === 'linear' && cueSheet.cues.length > 0 && (() => {
         const sorted = [...cueSheet.cues]
-          .filter(c => filterType === 'all' || c.type === filterType)
+          .filter(matchesFilter)
           .sort((a, b) => a.order - b.order);
         return (
           <div className="space-y-1">
