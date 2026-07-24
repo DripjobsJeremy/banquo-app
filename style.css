@@ -772,11 +772,11 @@ select:focus {
 }
 .btn-upload:hover { background-color: rgba(201, 169, 97, 0.12); }
 
-/* ▶ Call Show button (dark-green theatre style) */
+/* ▶ Call Show button — the single primary action on the cue sheet */
 .btn-call-show {
-  background: #065f46;
-  color: #34d399;
-  border: 2px solid #34d399;
+  background: var(--color-accent-crimson, #8B1A2B);
+  color: #fff;
+  border: none;
   padding: 8px 20px;
   border-radius: 8px;
   font-size: 14px;
@@ -786,7 +786,7 @@ select:focus {
   letter-spacing: 0.5px;
   transition: background 0.15s;
 }
-.btn-call-show:hover { background: #047857; }
+.btn-call-show:hover { background: #6e1522; }
 
 /* Vertical divider before Call Show button */
 .cue-call-divider {
@@ -795,44 +795,26 @@ select:focus {
   margin: 0 4px; flex-shrink: 0;
 }
 
-/* Cue type badge — build mode (light themed) */
+/* Cue type badge — build mode: neutral text tag, color reserved for state (review/hazard) */
 .cue-type-badge {
   font-size: 0.75rem;
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 4px;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: none;
 }
-.cue-type-badge[data-cue-type="lighting"]     { background: #F59E0B22; color: #F59E0B; border: 1px solid #F59E0B44; }
-.cue-type-badge[data-cue-type="sound"]        { background: #3B82F622; color: #3B82F6; border: 1px solid #3B82F644; }
-.cue-type-badge[data-cue-type="fly"]          { background: #8B5CF622; color: #8B5CF6; border: 1px solid #8B5CF644; }
-.cue-type-badge[data-cue-type="spot"]         { background: #EC489922; color: #EC4899; border: 1px solid #EC489944; }
-.cue-type-badge[data-cue-type="follow_spot"]  { background: #F9731622; color: #F97316; border: 1px solid #F9731644; }
-.cue-type-badge[data-cue-type="deck"]         { background: #10B98122; color: #10B981; border: 1px solid #10B98144; }
-.cue-type-badge[data-cue-type="props"]        { background: #CA8A0422; color: #CA8A04; border: 1px solid #CA8A0444; }
-.cue-type-badge[data-cue-type="wardrobe"]     { background: #DB277722; color: #DB2777; border: 1px solid #DB277744; }
-.cue-type-badge[data-cue-type="entrance"]     { background: #6366F122; color: #6366F1; border: 1px solid #6366F144; }
-.cue-type-badge[data-cue-type="intermission"] { background: #64748B22; color: #64748B; border: 1px solid #64748B44; }
-.cue-type-badge[data-cue-type="other"]        { background: #94A3B822; color: #94A3B8; border: 1px solid #94A3B844; }
 
 .cue-type-num {
   font-size: 0.75rem;
   font-weight: 600;
   font-family: monospace;
   margin-top: 2px;
+  color: var(--color-text-muted);
 }
-.cue-type-num[data-cue-type="lighting"]     { color: #F59E0B; }
-.cue-type-num[data-cue-type="sound"]        { color: #3B82F6; }
-.cue-type-num[data-cue-type="fly"]          { color: #8B5CF6; }
-.cue-type-num[data-cue-type="spot"]         { color: #EC4899; }
-.cue-type-num[data-cue-type="follow_spot"]  { color: #F97316; }
-.cue-type-num[data-cue-type="deck"]         { color: #10B981; }
-.cue-type-num[data-cue-type="props"]        { color: #CA8A04; }
-.cue-type-num[data-cue-type="wardrobe"]     { color: #DB2777; }
-.cue-type-num[data-cue-type="entrance"]     { color: #6366F1; }
-.cue-type-num[data-cue-type="intermission"] { color: #64748B; }
-.cue-type-num[data-cue-type="other"]        { color: #94A3B8; }
 
-/* Type filter chips */
+/* Type filter chips — one neutral active style for every chip; needs-review chip keeps its own amber styling below */
 .cue-filter-chip {
   font-size: 0.75rem;
   padding: 6px 12px;
@@ -844,19 +826,8 @@ select:focus {
   color: var(--color-text-secondary);
   cursor: pointer;
 }
-.cue-filter-chip--all[data-active="true"]          { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+.cue-filter-chip[data-active="true"] { background: var(--color-ink, #1c1413); border-color: var(--color-ink, #1c1413); color: #fff; }
 .cue-filter-chip--needs-review[data-active="true"] { background: var(--color-warning); border-color: var(--color-warning); color: #fff; }
-.cue-filter-chip[data-active="true"][data-cue-type="lighting"]     { background: #F59E0B; border-color: #F59E0B; color: #fff; }
-.cue-filter-chip[data-active="true"][data-cue-type="sound"]        { background: #3B82F6; border-color: #3B82F6; color: #fff; }
-.cue-filter-chip[data-active="true"][data-cue-type="fly"]          { background: #8B5CF6; border-color: #8B5CF6; color: #fff; }
-.cue-filter-chip[data-active="true"][data-cue-type="spot"]         { background: #EC4899; border-color: #EC4899; color: #fff; }
-.cue-filter-chip[data-active="true"][data-cue-type="follow_spot"]  { background: #F97316; border-color: #F97316; color: #fff; }
-.cue-filter-chip[data-active="true"][data-cue-type="deck"]         { background: #10B981; border-color: #10B981; color: #fff; }
-.cue-filter-chip[data-active="true"][data-cue-type="props"]        { background: #CA8A04; border-color: #CA8A04; color: #fff; }
-.cue-filter-chip[data-active="true"][data-cue-type="wardrobe"]     { background: #DB2777; border-color: #DB2777; color: #fff; }
-.cue-filter-chip[data-active="true"][data-cue-type="entrance"]     { background: #6366F1; border-color: #6366F1; color: #fff; }
-.cue-filter-chip[data-active="true"][data-cue-type="intermission"] { background: #64748B; border-color: #64748B; color: #fff; }
-.cue-filter-chip[data-active="true"][data-cue-type="other"]        { background: #94A3B8; border-color: #94A3B8; color: #fff; }
 
 /* Build mode cue row */
 .cue-row {
@@ -877,7 +848,8 @@ select:focus {
 .cue-row-desc--empty { color: var(--color-text-muted); }
 .cue-row-meta { font-size: 0.75rem; margin-top: 4px; color: var(--color-text-muted); }
 .cue-row-called { font-size: 0.75rem; margin-top: 4px; color: #059669; }
-.cue-row-actions { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+.cue-row-actions { display: flex; align-items: center; gap: 20px; flex-shrink: 0; opacity: 0; transition: opacity 0.15s; }
+.cue-row:hover .cue-row-actions { opacity: 1; }
 .cue-row-btn-edit {
   font-size: 0.8125rem; padding: 8px 16px; border-radius: 6px; min-width: 40px; min-height: 40px; cursor: pointer;
   background: var(--color-bg-elevated); color: var(--color-text-secondary); border: 1px solid var(--color-border);
