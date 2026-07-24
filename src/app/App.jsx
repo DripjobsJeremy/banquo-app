@@ -773,7 +773,6 @@ function App() {
 
         {/* Scrollable Content */}
         <main className="flex-1 overflow-y-auto">
-          {/* Debug: log active route and role on every render */}
           <Switch>
             <Route exact path="/">
               <div className="p-6 max-w-7xl mx-auto">
