@@ -845,6 +845,7 @@ select:focus {
   cursor: pointer;
 }
 .cue-filter-chip--all[data-active="true"]          { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+.cue-filter-chip--needs-review[data-active="true"] { background: var(--color-warning); border-color: var(--color-warning); color: #fff; }
 .cue-filter-chip[data-active="true"][data-cue-type="lighting"]     { background: #F59E0B; border-color: #F59E0B; color: #fff; }
 .cue-filter-chip[data-active="true"][data-cue-type="sound"]        { background: #3B82F6; border-color: #3B82F6; color: #fff; }
 .cue-filter-chip[data-active="true"][data-cue-type="fly"]          { background: #8B5CF6; border-color: #8B5CF6; color: #fff; }

@@ -645,7 +645,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
           <button
             type="button"
             onClick={() => setFilterType('__needs_review__')}
-            className="cue-filter-chip"
+            className="cue-filter-chip cue-filter-chip--needs-review"
             data-active={filterType === '__needs_review__' ? 'true' : 'false'}
             title="Cues flagged during import or missing required fields"
           >
