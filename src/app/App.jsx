@@ -774,11 +774,9 @@ function App() {
         {/* Scrollable Content */}
         <main className="flex-1 overflow-y-auto">
           {/* Debug: log active route and role on every render */}
-          {console.log('🔍 Route:', location.pathname, '| currentView:', currentView, '| userRole:', userRole) && null}
           <Switch>
             <Route exact path="/">
               <div className="p-6 max-w-7xl mx-auto">
-                {console.log('📍 Rendering / route | userRole:', userRole) && null}
                 {/* Only show SuperAdminDashboard for admin roles — non-admin roles are
                     redirected by the mount useEffect, but guard here as a safety net */}
                 {(userRole === 'admin' || userRole === 'super_admin' || userRole === 'venue_manager') && window.SuperAdminDashboard && (
@@ -875,7 +873,6 @@ function App() {
 
             <Route path="/volunteer-portal">
               <div className="p-6 max-w-7xl mx-auto">
-                {console.log('📍 Rendering /volunteer-portal route, userRole:', userRole) && null}
                 <VolunteerPortalView />
               </div>
             </Route>
