@@ -829,6 +829,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
         const orphanedCues = cueSheet.cues.filter(c =>
           c.sceneId && !matchedSceneNames.has(c.sceneId) && matchesFilter(c)
         );
+        let lastRenderedAct = null;
         return (
           <div className="space-y-6">
             {(production.acts || []).map(act =>
@@ -838,29 +839,40 @@ const CueSheetBuilder = ({ production, userRole }) => {
                 const sceneCues = cueSheet.cues.filter(c => c.sceneId === scene.name && matchesFilter(c));
                 if (sceneCues.length === 0) return null;
                 const isCollapsed = collapsedSections.has(scene.name);
+                const isNewAct = !!act.name && act.name !== lastRenderedAct;
+                if (isNewAct) lastRenderedAct = act.name;
                 return (
-                  <div key={scene.name}>
-                    <div
-                      className="flex items-center gap-2 mb-2 cue-section-header"
-                      onClick={() => toggleSection(scene.name)}
-                    >
-                      <span className="cue-section-chevron">{isCollapsed ? '▶' : '▼'}</span>
-                      {act.name && <span className="cue-act-label">{act.name}</span>}
-                      <span className="cue-scene-title">{scene.name || 'Untitled Scene'}</span>
-                      {scene.hazards && <span className="cue-scene-hazard">⚠️ {scene.hazards}</span>}
-                      <span className="cue-scene-count">({sceneCues.length} cues)</span>
-                    </div>
-                    {!isCollapsed && (
-                      <>
-                        {sceneCues.sort((a, b) => a.order - b.order).map(cue => <CueRow key={cue.id} cue={cue} />)}
-                        {canEdit && (
-                          <button type="button" onClick={() => setShowAddForm(true)} className="cue-add-dashed">
-                            + Add cue to this scene
-                          </button>
-                        )}
-                      </>
+                  <React.Fragment key={scene.name}>
+                    {isNewAct && (
+                      <div className="cue-act-divider">
+                        <span className="cue-act-divider-label">{act.name}</span>
+                      </div>
                     )}
-                  </div>
+                    <div>
+                      <div
+                        className="flex items-center gap-2 mb-2 cue-section-header"
+                        onClick={() => toggleSection(scene.name)}
+                      >
+                        <span className="cue-section-chevron">{isCollapsed ? '▶' : '▼'}</span>
+                        {act.name && <span className="cue-act-label">{act.name}</span>}
+                        <span className="cue-scene-title">{scene.name || 'Untitled Scene'}</span>
+                        <span className="cue-scene-count">({sceneCues.length} cues)</span>
+                      </div>
+                      {scene.hazards && (
+                        <div className="cue-hazard-banner">⚠️ {scene.hazards}</div>
+                      )}
+                      {!isCollapsed && (
+                        <>
+                          {sceneCues.sort((a, b) => a.order - b.order).map(cue => <CueRow key={cue.id} cue={cue} />)}
+                          {canEdit && (
+                            <button type="button" onClick={() => setShowAddForm(true)} className="cue-add-dashed">
+                              + Add cue to this scene
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </React.Fragment>
                 );
               })
             )}

@@ -863,15 +863,38 @@ select:focus {
   background: var(--color-danger-surface); color: var(--color-danger); border: 1px solid var(--color-danger);
 }
 
-/* Scene view labels */
+/* Scene view labels — act name is now plain text; the act itself is separated by .cue-act-divider below */
 .cue-act-label {
   font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.05em; padding: 2px 8px; border-radius: 4px;
-  background: var(--color-primary-surface); color: var(--color-primary);
+  letter-spacing: 0.05em; padding: 0; border-radius: 0;
+  background: transparent; color: var(--color-accent-gold, #C9A961);
 }
 .cue-scene-title { font-weight: 600; color: var(--color-text-primary); }
-.cue-scene-hazard { font-size: 0.75rem; color: var(--color-warning); }
 .cue-scene-count { font-size: 0.75rem; color: var(--color-text-muted); }
+
+/* Act divider — thin gold rule shown once, at the first scene of each act */
+.cue-act-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 24px 0 4px;
+}
+.cue-act-divider::before {
+  content: ''; flex: 1; height: 2px;
+  background: linear-gradient(90deg, var(--color-accent-gold, #C9A961) 0%, transparent 100%);
+}
+.cue-act-divider-label {
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--color-accent-gold, #C9A961);
+  white-space: nowrap;
+}
+
+/* Hazard banner — pulled out of the inline scene-header text */
+.cue-hazard-banner {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.8125rem; font-weight: 500;
+  padding: 6px 12px; border-radius: 8px; margin-bottom: 8px;
+  background: var(--color-danger-surface); color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+}
 .cue-add-dashed {
   font-size: 0.75rem; margin-top: 4px; padding: 4px 12px; border-radius: 4px; cursor: pointer;
   color: var(--color-text-muted); background: transparent; border: 1px dashed var(--color-border);
