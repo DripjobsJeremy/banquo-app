@@ -399,9 +399,9 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                       { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-3' },
                       // Characters
                       (() => {
-                        const charVal = scene.characterIds?.length > 0
-                          ? scene.characterIds.map(id => getCharacterName(id)).join(', ')
-                          : null;
+                        const idNames = (scene.characterIds || []).map(id => getCharacterName(id));
+                        const nameList = scene.characters || [];
+                        const charVal = [...idNames, ...nameList].filter(Boolean).join(', ') || null;
                         const charEmpty = isEmpty(charVal);
                         return React.createElement(
                           'div',
