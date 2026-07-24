@@ -250,7 +250,7 @@ const DepartmentDashboard = () => {
     React.createElement('div', {
       className: 'bg-surface rounded-lg p-4 border border-gray-700'
     },
-      React.createElement('div', { className: 'text-3xl font-bold text-white mb-1' }, value),
+      React.createElement('div', { className: 'text-3xl font-bold text-primary-color mb-1' }, value),
       React.createElement('div', { className: 'text-sm text-gray-400' }, label)
     );
 
@@ -261,7 +261,7 @@ const DepartmentDashboard = () => {
     // Header
     React.createElement('div', { className: 'flex items-center justify-between flex-wrap gap-3' },
       React.createElement('div', null,
-        React.createElement('h1', { className: 'text-3xl font-bold text-white mb-1' },
+        React.createElement('h1', { className: 'text-3xl font-bold text-primary-color mb-1' },
           `${config.icon} ${config.label} Dashboard`
         ),
         React.createElement('p', { className: 'text-gray-400' },
@@ -286,7 +286,7 @@ const DepartmentDashboard = () => {
       // ── Budget panel (only when budgetField is configured) ──
       config.budgetField
         ? React.createElement('div', { className: 'bg-surface rounded-lg p-5 border border-gray-700' },
-            React.createElement('h3', { className: 'text-lg font-semibold text-white mb-4' }, '💰 Budget'),
+            React.createElement('h3', { className: 'text-lg font-semibold text-primary-color mb-4' }, '💰 Budget'),
             totalAllocated === 0
               ? React.createElement('p', { className: 'text-gray-500 text-sm italic' }, 'No budget allocated yet')
               : React.createElement('div', { className: 'space-y-3' },
@@ -294,7 +294,7 @@ const DepartmentDashboard = () => {
                   React.createElement('div', null,
                     React.createElement('div', { className: 'flex justify-between text-sm mb-1' },
                       React.createElement('span', { className: 'text-gray-400' }, 'Total Allocated'),
-                      React.createElement('span', { className: 'text-white font-medium' }, fmt(totalAllocated))
+                      React.createElement('span', { className: 'text-primary-color font-medium' }, fmt(totalAllocated))
                     ),
                     React.createElement('div', { className: 'w-full bg-gray-700 rounded-full h-2' },
                       React.createElement('div', {
@@ -332,7 +332,7 @@ const DepartmentDashboard = () => {
 
       // ── Alerts ──
       React.createElement('div', { className: 'bg-surface rounded-lg p-5 border border-gray-700' },
-        React.createElement('h3', { className: 'text-lg font-semibold text-white mb-4' },
+        React.createElement('h3', { className: 'text-lg font-semibold text-primary-color mb-4' },
           `🔔 Alerts${budgetAlerts.length + overdueItems.length > 0 ? ` (${budgetAlerts.length + overdueItems.length})` : ''}`
         ),
         budgetAlerts.length === 0 && overdueItems.length === 0
@@ -378,7 +378,7 @@ const DepartmentDashboard = () => {
 
       // ── Upcoming Events ──
       React.createElement('div', { className: 'bg-surface rounded-lg p-5 border border-gray-700' },
-        React.createElement('h3', { className: 'text-lg font-semibold text-white mb-4' }, '📅 Upcoming Events'),
+        React.createElement('h3', { className: 'text-lg font-semibold text-primary-color mb-4' }, '📅 Upcoming Events'),
         upcomingEvents.length === 0
           ? React.createElement('p', { className: 'text-gray-500 text-sm italic' }, 'No upcoming events')
           : React.createElement('div', { className: 'space-y-1' },
@@ -394,12 +394,12 @@ const DepartmentDashboard = () => {
                     React.createElement('div', { className: 'text-gray-400 uppercase' },
                       ev._date.toLocaleString('default', { month: 'short' })
                     ),
-                    React.createElement('div', { className: 'text-white font-bold text-base' },
+                    React.createElement('div', { className: 'text-primary-color font-bold text-base' },
                       ev._date.getDate()
                     )
                   ),
                   React.createElement('div', { className: 'flex-1 min-w-0' },
-                    React.createElement('div', { className: 'text-white text-sm font-medium truncate' },
+                    React.createElement('div', { className: 'text-primary-color text-sm font-medium truncate' },
                       ev.title || ev.type
                     ),
                     React.createElement('div', { className: 'text-gray-400 text-xs' },
@@ -413,7 +413,7 @@ const DepartmentDashboard = () => {
 
       // ── My Productions ──
       React.createElement('div', { className: 'bg-surface rounded-lg p-5 border border-gray-700' },
-        React.createElement('h3', { className: 'text-lg font-semibold text-white mb-4' }, '🎭 My Productions'),
+        React.createElement('h3', { className: 'text-lg font-semibold text-primary-color mb-4' }, '🎭 My Productions'),
         assignedProductions.length === 0
           ? React.createElement('div', { className: 'text-center py-6' },
               React.createElement('p', { className: 'text-gray-500 text-sm' }, 'No productions assigned yet'),
@@ -434,7 +434,7 @@ const DepartmentDashboard = () => {
                   onClick: () => { window.location.hash = `#/productions/${prod.id}`; }
                 },
                   React.createElement('div', { className: 'flex-1 min-w-0' },
-                    React.createElement('div', { className: 'text-white font-medium truncate' }, prod.title),
+                    React.createElement('div', { className: 'text-primary-color font-medium truncate' }, prod.title),
                     React.createElement('div', { className: 'text-gray-400 text-xs' }, prod.status || 'Active')
                   ),
                   pct !== null && React.createElement('div', { className: 'text-right shrink-0' },
