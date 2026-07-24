@@ -1,6 +1,5 @@
 function DepartmentCalendar() {
   const userRole = localStorage.getItem('showsuite_user_role') || '';
-  const currentUser = window.usersService?.getCurrentUser?.();
 
   // Normalize short role IDs → long form for dept lookups
   const ROLE_MAP = {
@@ -42,13 +41,23 @@ function DepartmentCalendar() {
     return allowed.includes(type);
   };
 
-  // Load assigned productions
+  const staffContactId = localStorage.getItem('showsuite_staff_contact_id') || '';
+  const SUPER_ROLES = ['super_admin', 'venue_manager', 'admin', 'client_admin'];
+
+  // Load assigned productions (mirrors DepartmentDashboard.jsx's contact-based lookup)
   const assignedProductions = React.useMemo(() => {
     const allProductions = window.productionsService?.getAll?.() || [];
-    const assigned = currentUser?.assignedProductions || [];
-    if (!assigned.length) return [];
-    return allProductions.filter(p => assigned.includes(p.id));
-  }, []);
+    if (SUPER_ROLES.includes(userRole)) return allProductions;
+    if (!staffContactId || staffContactId === '__test_manager__') return allProductions;
+    const contacts = window.contactsService?.loadContacts?.() || [];
+    const contact = contacts.find(c => c.id === staffContactId);
+    const assignedIds = new Set(
+      (contact?.staffProfile?.productions || [])
+        .filter(p => ['active', 'invited'].includes(p.status))
+        .map(p => p.productionId)
+    );
+    return allProductions.filter(p => assignedIds.has(p.id));
+  }, [staffContactId, userRole]);
 
   // Load + aggregate events from all assigned productions
   const allEvents = React.useMemo(() => {
