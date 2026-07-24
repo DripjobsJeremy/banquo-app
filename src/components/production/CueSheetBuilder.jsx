@@ -580,13 +580,14 @@ const CueSheetBuilder = ({ production, userRole }) => {
           </div>
           <div>
             <label className="text-xs font-medium mb-1 block text-muted-color">Assigned To</label>
-            <input value={form.assignedTo || ''} onChange={e => setForm({ ...form, assignedTo: e.target.value })}
-              list="cue-assignable-names"
-              placeholder="e.g. Jamie Torres, or Karen (actor)"
-              className="w-full px-3 py-2 rounded-lg text-sm bg-surface border-theme text-primary-color" />
-            <datalist id="cue-assignable-names">
-              {getAssignableNames().map(name => <option key={name} value={name} />)}
-            </datalist>
+            <select title="Assigned To" value={form.assignedTo || ''} onChange={e => setForm({ ...form, assignedTo: e.target.value })}
+              className="w-full px-3 py-2 rounded-lg text-sm bg-surface border-theme text-primary-color">
+              <option value="">— Unassigned —</option>
+              {form.assignedTo && !getAssignableNames().includes(form.assignedTo) && (
+                <option value={form.assignedTo}>{form.assignedTo}</option>
+              )}
+              {getAssignableNames().map(name => <option key={name} value={name}>{name}</option>)}
+            </select>
           </div>
           <div className="col-span-2">
             <label className="text-xs font-medium mb-1 block text-muted-color">SM Notes (private)</label>
