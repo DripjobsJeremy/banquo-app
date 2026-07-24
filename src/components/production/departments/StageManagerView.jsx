@@ -588,14 +588,19 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
                   { className: 'flex-1 text-sm ' + (item.completed ? 'line-through text-gray-400' : 'text-gray-700') },
                   item.text
                 ),
-                React.createElement('input', {
-                  type: 'text',
-                  value: item.assignedTo || '',
-                  onChange: (e) => updateChecklistItemAssignee(type, item.id, e.target.value),
-                  list: assignableDatalistId,
-                  placeholder: 'Assign to...',
-                  className: 'w-28 px-2 py-1 border border-gray-300 rounded text-xs'
-                }),
+                React.createElement(
+                  'select',
+                  {
+                    value: item.assignedTo || '',
+                    onChange: (e) => updateChecklistItemAssignee(type, item.id, e.target.value),
+                    title: 'Assign to',
+                    className: 'w-28 px-2 py-1 border border-gray-300 rounded text-xs bg-white'
+                  },
+                  React.createElement('option', { value: '' }, 'Assign to...'),
+                  item.assignedTo && !getAssignableNames().includes(item.assignedTo) &&
+                    React.createElement('option', { key: 'current-' + item.id, value: item.assignedTo }, item.assignedTo),
+                  getAssignableNames().map(name => React.createElement('option', { key: name, value: name }, name))
+                ),
                 React.createElement(
                   'button',
                   {
