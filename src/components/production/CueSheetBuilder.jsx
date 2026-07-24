@@ -8,6 +8,16 @@ const CueSheetBuilder = ({ production, userRole }) => {
   const [viewMode, setViewMode] = React.useState('scene'); // 'scene' | 'linear'
   const [showImportModal, setShowImportModal] = React.useState(false);
   const [selectedCueIds, setSelectedCueIds] = React.useState(() => new Set());
+  const [collapsedSections, setCollapsedSections] = React.useState(() => new Set());
+
+  const toggleSection = (key) => {
+    setCollapsedSections(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   // Close Add/Edit cue modal on Escape
   React.useEffect(() => {
@@ -36,6 +46,24 @@ const CueSheetBuilder = ({ production, userRole }) => {
     }
     return cue.type === filterType;
   };
+
+  // Keys of every collapsible section currently visible in By Scene view — used by Collapse All / Expand All
+  const sceneSectionKeys = React.useMemo(() => {
+    const seen = new Set();
+    const keys = [];
+    (production.acts || []).forEach(act => {
+      (act.scenes || []).forEach(scene => {
+        if (seen.has(scene.name)) return;
+        seen.add(scene.name);
+        const hasCues = cueSheet.cues.some(c => c.sceneId === scene.name && matchesFilter(c));
+        if (hasCues) keys.push(scene.name);
+      });
+    });
+    const hasOrphaned = cueSheet.cues.some(c => c.sceneId && !seen.has(c.sceneId) && matchesFilter(c));
+    if (hasOrphaned) keys.push('__orphaned__');
+    if (cueSheet.cues.some(c => !c.sceneId && matchesFilter(c))) keys.push('__unassigned__');
+    return keys;
+  }, [cueSheet.cues, production.acts, filterType]);
 
   // Flatten nested acts[].scenes[] into a single array for lookups/selects
   const flatScenes = React.useMemo(() =>
@@ -595,6 +623,17 @@ const CueSheetBuilder = ({ production, userRole }) => {
                 Linear
               </button>
             </div>
+            {viewMode === 'scene' && cueSheet.cues.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setCollapsedSections(
+                  collapsedSections.size >= sceneSectionKeys.length ? new Set() : new Set(sceneSectionKeys)
+                )}
+                className="px-3 py-2 rounded-lg text-sm btn-secondary"
+              >
+                {collapsedSections.size >= sceneSectionKeys.length ? '⌄ Expand All' : '⌃ Collapse All'}
+              </button>
+            )}
             {canEdit && (
               <>
                 <div className="cue-add-menu-wrap">
@@ -779,19 +818,28 @@ const CueSheetBuilder = ({ production, userRole }) => {
                 renderedSceneNames.add(scene.name);
                 const sceneCues = cueSheet.cues.filter(c => c.sceneId === scene.name && matchesFilter(c));
                 if (sceneCues.length === 0) return null;
+                const isCollapsed = collapsedSections.has(scene.name);
                 return (
                   <div key={scene.name}>
-                    <div className="flex items-center gap-2 mb-2">
+                    <div
+                      className="flex items-center gap-2 mb-2 cue-section-header"
+                      onClick={() => toggleSection(scene.name)}
+                    >
+                      <span className="cue-section-chevron">{isCollapsed ? '▶' : '▼'}</span>
                       {act.name && <span className="cue-act-label">{act.name}</span>}
                       <span className="cue-scene-title">{scene.name || 'Untitled Scene'}</span>
                       {scene.hazards && <span className="cue-scene-hazard">⚠️ {scene.hazards}</span>}
                       <span className="cue-scene-count">({sceneCues.length} cues)</span>
                     </div>
-                    {sceneCues.sort((a, b) => a.order - b.order).map(cue => <CueRow key={cue.id} cue={cue} />)}
-                    {canEdit && (
-                      <button type="button" onClick={() => setShowAddForm(true)} className="cue-add-dashed">
-                        + Add cue to this scene
-                      </button>
+                    {!isCollapsed && (
+                      <>
+                        {sceneCues.sort((a, b) => a.order - b.order).map(cue => <CueRow key={cue.id} cue={cue} />)}
+                        {canEdit && (
+                          <button type="button" onClick={() => setShowAddForm(true)} className="cue-add-dashed">
+                            + Add cue to this scene
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 );
@@ -799,14 +847,26 @@ const CueSheetBuilder = ({ production, userRole }) => {
             )}
             {orphanedCues.length > 0 && (
               <div>
-                <div className="cue-unassigned-label">⚠ Unmatched Scene (scene may have been renamed or removed)</div>
-                {orphanedCues.map(cue => <CueRow key={cue.id} cue={cue} />)}
+                <div
+                  className="cue-unassigned-label cue-section-header"
+                  onClick={() => toggleSection('__orphaned__')}
+                >
+                  <span className="cue-section-chevron">{collapsedSections.has('__orphaned__') ? '▶' : '▼'}</span>
+                  ⚠ Unmatched Scene (scene may have been renamed or removed)
+                </div>
+                {!collapsedSections.has('__orphaned__') && orphanedCues.map(cue => <CueRow key={cue.id} cue={cue} />)}
               </div>
             )}
             {cuesByScene['__unassigned__']?.length > 0 && (
               <div>
-                <div className="cue-unassigned-label">Unassigned Cues</div>
-                {cuesByScene['__unassigned__'].map(cue => <CueRow key={cue.id} cue={cue} />)}
+                <div
+                  className="cue-unassigned-label cue-section-header"
+                  onClick={() => toggleSection('__unassigned__')}
+                >
+                  <span className="cue-section-chevron">{collapsedSections.has('__unassigned__') ? '▶' : '▼'}</span>
+                  Unassigned Cues
+                </div>
+                {!collapsedSections.has('__unassigned__') && cuesByScene['__unassigned__'].map(cue => <CueRow key={cue.id} cue={cue} />)}
               </div>
             )}
           </div>
