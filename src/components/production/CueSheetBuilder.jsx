@@ -615,10 +615,10 @@ const CueSheetBuilder = ({ production, userRole }) => {
 
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-primary-color">
-          📋 Cue Sheet — {production.title ?? 'Untitled'}
+        <h2 className="text-lg font-semibold text-primary-color mb-1">
+          📋 Cue Sheet
         </h2>
-        <p className="text-sm mt-1 mb-4 text-muted-color">
+        <p className="text-sm mb-4 text-muted-color">
           {total} cues
           {needsReview > 0 && (
             <span className="cue-header-warn">· ⚠ {needsReview} need review</span>
@@ -651,6 +651,8 @@ const CueSheetBuilder = ({ production, userRole }) => {
                 {collapsedSections.size >= sceneSectionKeys.length ? '⌄ Expand All' : '⌃ Collapse All'}
               </button>
             )}
+          </div>
+          <div className="flex gap-2 flex-wrap items-center">
             {canEdit && (
               <>
                 <div className="cue-add-menu-wrap">
@@ -669,21 +671,21 @@ const CueSheetBuilder = ({ production, userRole }) => {
                     <option value="upload">↑ Upload CSV</option>
                   </select>
                 </div>
-                <button type="button" onClick={() => setShowAddForm(true)} className="px-3 py-2 rounded-lg text-sm btn-primary">
+                <button type="button" onClick={() => setShowAddForm(true)} className="px-3 py-2 rounded-lg text-sm btn-secondary">
                   + Add Cue
                 </button>
               </>
             )}
+            {cueSheet.cues.length > 0 && (
+              <button
+                type="button"
+                onClick={handleEnterCallingMode}
+                className="btn-call-show flex-shrink-0"
+              >
+                ▶ Call Show
+              </button>
+            )}
           </div>
-          {cueSheet.cues.length > 0 && (
-            <button
-              type="button"
-              onClick={handleEnterCallingMode}
-              className="btn-call-show flex-shrink-0"
-            >
-              ▶ Call Show
-            </button>
-          )}
         </div>
       </div>
 
