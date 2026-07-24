@@ -838,7 +838,7 @@ function SceneBuilder({ productionId: propId }) {
     const sceneKey = `${actIndex}-${sceneIndex}`;
     const isReadOnly = isDeptManager;
     const myDept = deptTabInfo ? deptTabInfo.id : null;
-    const readOnlyFieldStyle = isReadOnly ? { opacity: 0.7, cursor: 'not-allowed', background: 'var(--color-bg-elevated)', color: 'var(--color-text-disabled)' } : {};
+    const readOnlyFieldStyle = isReadOnly ? { opacity: 0.7, cursor: 'not-allowed', background: 'var(--color-bg-elevated)', color: 'var(--color-text-secondary)' } : {};
     return React.createElement(
       React.Fragment,
       null,
