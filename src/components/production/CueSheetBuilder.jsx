@@ -423,6 +423,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
             className="cue-row-checkbox"
             aria-label={`Select cue ${cue.number || cue.description || ''}`.trim()}
             checked={selectedCueIds.has(cue.id)}
+            onClick={(e) => e.stopPropagation()}
             onChange={() => setSelectedCueIds(toggleCueSelection(cue.id))}
           />
         )}
