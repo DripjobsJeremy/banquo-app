@@ -690,7 +690,7 @@ const CueSheetBuilder = ({ production, userRole }) => {
       </div>
 
       {/* Type filter chips */}
-      <div className="flex gap-2 mb-4 flex-wrap">
+      <div className="flex gap-1.5 mb-4 flex-wrap">
         <button
           type="button"
           onClick={() => setFilterType('all')}
