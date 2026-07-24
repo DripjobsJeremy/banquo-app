@@ -693,7 +693,7 @@ function App() {
                     className="h-8 w-8 object-contain flex-shrink-0 rounded"
                   />
                 )}
-                <h1 className="text-xl font-bold truncate">
+                <h1 className="text-xl font-bold truncate" title={orgInfo.name || 'Banquo'}>
                   {orgInfo.name || 'Banquo'}
                 </h1>
               </div>
