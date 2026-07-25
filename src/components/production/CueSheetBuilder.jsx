@@ -1,4 +1,4 @@
-const CueSheetBuilder = ({ production, userRole }) => {
+const CueSheetBuilder = ({ production, userRole, onUpdateProduction }) => {
   const [cueSheet, setCueSheet] = React.useState(() =>
     window.cueSheetService.loadCueSheet(production.id)
   );
@@ -10,6 +10,8 @@ const CueSheetBuilder = ({ production, userRole }) => {
   const [selectedCueIds, setSelectedCueIds] = React.useState(() => new Set());
   const [collapsedSections, setCollapsedSections] = React.useState(() => new Set());
   const [showBackToTop, setShowBackToTop] = React.useState(false);
+  const [pendingDeletion, setPendingDeletion] = React.useState(null);
+  const [itemDecisions, setItemDecisions] = React.useState({});
   const rootRef = React.useRef(null);
 
   // Track scroll position on the app's scrollable container (this component's own div doesn't scroll)
@@ -24,6 +26,78 @@ const CueSheetBuilder = ({ production, userRole }) => {
 
   const scrollToTop = () => {
     rootRef.current?.closest('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Which accepted-suggestion checklist items would no longer be supported if the given
+  // cues were removed. hazard:/quickchange: keys are scene-derived, never cue-derived,
+  // so they're never included here.
+  const getOrphanedChecklistItems = (cuesRemaining) => {
+    const remainingTypes = new Set(cuesRemaining.map(c => c.type).filter(t => t && t !== 'intermission' && t !== 'other'));
+    const remainingCueIds = new Set(cuesRemaining.map(c => c.id));
+    const checkList = (list, field) => (list || []).filter(item => {
+      if (!item.sourceKey) return false;
+      if (item.sourceKey.startsWith('type:')) {
+        return !remainingTypes.has(item.sourceKey.slice('type:'.length));
+      }
+      if (item.sourceKey.startsWith('intermission:')) {
+        return !remainingCueIds.has(item.sourceKey.slice('intermission:'.length));
+      }
+      return false;
+    }).map(item => ({ ...item, field }));
+    return [
+      ...checkList(production.smPreShowChecklist, 'smPreShowChecklist'),
+      ...checkList(production.smIntermissionChecklist, 'smIntermissionChecklist'),
+    ];
+  };
+
+  // Entry point for any cue deletion. Shows the plain confirm when nothing would be
+  // orphaned, the per-item Keep/Remove dialog when some cues remain, or the full-reset
+  // dialog when this deletion would empty the cue sheet entirely.
+  const confirmCueDeletion = (cueIds) => {
+    const cuesRemaining = cueSheet.cues.filter(c => !cueIds.includes(c.id));
+    const orphanedItems = getOrphanedChecklistItems(cuesRemaining);
+    if (orphanedItems.length === 0) {
+      const label = cueIds.length === 1 ? 'this cue' : `${cueIds.length} cue(s)`;
+      if (!window.confirm(`Delete ${label}?`)) return;
+      if (cueIds.length === 1) {
+        window.cueSheetService.deleteCue(production.id, cueIds[0]);
+      } else {
+        window.cueSheetService.deleteCuesBulk(production.id, cueIds);
+      }
+      setCueSheet(window.cueSheetService.loadCueSheet(production.id));
+      setSelectedCueIds(new Set());
+      return;
+    }
+    setItemDecisions({});
+    setPendingDeletion({ cueIds, orphanedItems, isFullReset: cuesRemaining.length === 0 });
+  };
+
+  const executeConfirmedDeletion = (removeItemIds) => {
+    const { cueIds, orphanedItems } = pendingDeletion;
+    if (cueIds.length === 1) {
+      window.cueSheetService.deleteCue(production.id, cueIds[0]);
+    } else {
+      window.cueSheetService.deleteCuesBulk(production.id, cueIds);
+    }
+    setCueSheet(window.cueSheetService.loadCueSheet(production.id));
+    setSelectedCueIds(new Set());
+
+    if (removeItemIds.length > 0) {
+      const removeSet = new Set(removeItemIds);
+      const removedKeys = orphanedItems.filter(i => removeSet.has(i.id)).map(i => i.sourceKey).filter(Boolean);
+      const updatedPreShow = (production.smPreShowChecklist || []).filter(i => !removeSet.has(i.id));
+      const updatedIntermission = (production.smIntermissionChecklist || []).filter(i => !removeSet.has(i.id));
+      const updatedDismissed = (production.smDismissedSuggestions || []).filter(k => !removedKeys.includes(k));
+      onUpdateProduction?.({
+        smPreShowChecklist: updatedPreShow,
+        smIntermissionChecklist: updatedIntermission,
+        smDismissedSuggestions: updatedDismissed,
+      });
+    }
+
+    setPendingDeletion(null);
+    setItemDecisions({});
+    if (window.showToast) window.showToast('Cue(s) deleted', 'success');
   };
 
   const toggleSection = (key) => {
@@ -933,6 +1007,84 @@ const CueSheetBuilder = ({ production, userRole }) => {
           setShowImportModal(false);
         },
       })}
+      {pendingDeletion && (
+        <div className="reset-dialog-overlay" onClick={() => setPendingDeletion(null)}>
+          <div className="reset-dialog-panel" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
+            {pendingDeletion.isFullReset ? (
+              <>
+                <h3 className="reset-dialog-title">Start over?</h3>
+                <p className="reset-dialog-body">
+                  You're about to delete all {pendingDeletion.cueIds.length} cue{pendingDeletion.cueIds.length === 1 ? '' : 's'}.
+                  {' '}{pendingDeletion.orphanedItems.length} checklist item{pendingDeletion.orphanedItems.length === 1 ? ' was' : 's were'} auto-generated from this cue sheet:
+                </p>
+                <ul className="cue-checklist-preview-list">
+                  {pendingDeletion.orphanedItems.map(item => (
+                    <li key={item.id}>{item.text}</li>
+                  ))}
+                </ul>
+                <p className="cue-checklist-preview-note">Manually added checklist items won't be touched either way.</p>
+                <div className="flex justify-end gap-2 flex-wrap mt-4">
+                  <button type="button" onClick={() => setPendingDeletion(null)} className="px-4 py-2 rounded-lg text-sm btn-secondary">
+                    Cancel
+                  </button>
+                  <button type="button" onClick={() => executeConfirmedDeletion([])} className="px-4 py-2 rounded-lg text-sm btn-secondary">
+                    Delete cues, keep checklist
+                  </button>
+                  <button type="button" onClick={() => executeConfirmedDeletion(pendingDeletion.orphanedItems.map(i => i.id))} className="px-4 py-2 rounded-lg text-sm btn-primary">
+                    Delete cues &amp; checklist items
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3 className="reset-dialog-title">
+                  Delete {pendingDeletion.cueIds.length} cue{pendingDeletion.cueIds.length === 1 ? '' : 's'}?
+                </h3>
+                <p className="reset-dialog-body">
+                  {pendingDeletion.orphanedItems.length === 1
+                    ? 'One checklist item was generated from a cue being deleted — choose whether to keep or remove it.'
+                    : `${pendingDeletion.orphanedItems.length} checklist items were generated from cues being deleted — choose whether to keep or remove each.`}
+                </p>
+                <div className="cue-checklist-decision-list">
+                  {pendingDeletion.orphanedItems.map(item => (
+                    <div key={item.id} className="cue-checklist-decision-row">
+                      <span className="cue-checklist-decision-text">💡 {item.text}</span>
+                      <div className="cue-checklist-decision-pill">
+                        <button
+                          type="button"
+                          className={itemDecisions[item.id] !== 'remove' ? 'active' : ''}
+                          onClick={() => setItemDecisions(prev => ({ ...prev, [item.id]: 'keep' }))}
+                        >
+                          Keep
+                        </button>
+                        <button
+                          type="button"
+                          className={itemDecisions[item.id] === 'remove' ? 'active' : ''}
+                          onClick={() => setItemDecisions(prev => ({ ...prev, [item.id]: 'remove' }))}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-end gap-2 mt-4">
+                  <button type="button" onClick={() => setPendingDeletion(null)} className="px-4 py-2 rounded-lg text-sm btn-secondary">
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => executeConfirmedDeletion(pendingDeletion.orphanedItems.filter(item => itemDecisions[item.id] === 'remove').map(item => item.id))}
+                    className="px-4 py-2 rounded-lg text-sm btn-primary"
+                  >
+                    {pendingDeletion.cueIds.length === 1 ? 'Delete cue' : 'Delete cues'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
       {showBackToTop && (
         <button
           type="button"
