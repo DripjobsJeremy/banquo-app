@@ -20,17 +20,25 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
     }));
   };
 
-  // Initialize all acts as expanded
+  // Initialize all acts as expanded (only when switching productions, so it never
+  // fights a user's manual collapse of an act)
   useEffect(() => {
     if (production?.acts) {
       const expanded = {};
       production.acts.forEach((_, idx) => expanded[idx] = true);
       setExpandedActs(expanded);
     }
+  }, [production?.id]);
+
+  // Keep local checklist state in sync with the production object whenever the
+  // checklist data itself changes — not just when switching productions. This matters
+  // because Cue Sheet can now write checklist updates via onUpdateProduction (e.g.
+  // removing items orphaned by a cue deletion) while this view stays mounted.
+  useEffect(() => {
     setPreShowChecklist(production?.smPreShowChecklist || []);
     setIntermissionChecklist(production?.smIntermissionChecklist || []);
     setDismissedSuggestionKeys(production?.smDismissedSuggestions || []);
-  }, [production?.id]);
+  }, [production?.smPreShowChecklist, production?.smIntermissionChecklist, production?.smDismissedSuggestions]);
 
   // Handle SM-specific field updates
   const handleSMUpdate = (actIndex, sceneIndex, field, value) => {
