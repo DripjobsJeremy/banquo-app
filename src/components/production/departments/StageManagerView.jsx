@@ -121,7 +121,7 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
 
   // Accept a suggestion: add it to the real checklist, then dismiss it from Suggested
   const acceptSuggestion = (type, suggestion) => {
-    const newItem = { id: 'chk_' + Date.now(), text: suggestion.text, completed: false };
+    const newItem = { id: 'chk_' + Date.now(), text: suggestion.text, completed: false, sourceKey: suggestion.key };
     if (type === 'preshow') {
       const updated = [...preShowChecklist, newItem];
       setPreShowChecklist(updated);
@@ -665,7 +665,7 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
       activeSection === 'runsheet' ? runSheetContent :
       activeSection === 'checklists' ? checklistsContent :
       (window.CueSheetBuilder
-        ? React.createElement(window.CueSheetBuilder, { production, userRole: 'stage_manager' })
+        ? React.createElement(window.CueSheetBuilder, { production, userRole: 'stage_manager', onUpdateProduction })
         : React.createElement('div', { className: 'text-center py-12 text-gray-400' }, 'Loading cue sheet...')
       )
     )
