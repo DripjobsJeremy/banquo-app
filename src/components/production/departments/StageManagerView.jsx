@@ -116,6 +116,8 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
   };
 
   const deleteChecklistItem = (type, itemId) => {
+    const sourceList = type === 'preshow' ? preShowChecklist : intermissionChecklist;
+    const removedItem = sourceList.find(item => item.id === itemId);
     if (type === 'preshow') {
       const updated = preShowChecklist.filter(item => item.id !== itemId);
       setPreShowChecklist(updated);
@@ -124,6 +126,13 @@ function StageManagerView({ production, onUpdateScene, onUpdateProduction }) {
       const updated = intermissionChecklist.filter(item => item.id !== itemId);
       setIntermissionChecklist(updated);
       onUpdateProduction?.({ smIntermissionChecklist: updated });
+    }
+    // If this item originated from an accepted suggestion, un-dismiss its key so it
+    // can resurface under Suggested rather than being silently gone forever.
+    if (removedItem?.sourceKey) {
+      const updatedDismissed = dismissedSuggestionKeys.filter(k => k !== removedItem.sourceKey);
+      setDismissedSuggestionKeys(updatedDismissed);
+      onUpdateProduction?.({ smDismissedSuggestions: updatedDismissed });
     }
   };
 
