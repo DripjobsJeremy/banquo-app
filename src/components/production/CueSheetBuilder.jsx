@@ -585,11 +585,7 @@ const CueSheetBuilder = ({ production, userRole, onUpdateProduction }) => {
             </button>
             <button
               type="button"
-              onClick={() => {
-                if (!window.confirm('Delete this cue?')) return;
-                window.cueSheetService.deleteCue(production.id, cue.id);
-                setCueSheet(window.cueSheetService.loadCueSheet(production.id));
-              }}
+              onClick={() => confirmCueDeletion([cue.id])}
               className="cue-row-btn-delete"
             >
               ×
@@ -823,13 +819,7 @@ const CueSheetBuilder = ({ production, userRole, onUpdateProduction }) => {
           </button>
           <button
             type="button"
-            onClick={() => {
-              if (!window.confirm(`Delete ${selectedCueIds.size} cue(s)? This cannot be undone.`)) return;
-              const result = window.cueSheetService.deleteCuesBulk(production.id, Array.from(selectedCueIds));
-              setCueSheet(window.cueSheetService.loadCueSheet(production.id));
-              setSelectedCueIds(new Set());
-              if (window.showToast) window.showToast(`Deleted ${result.deleted} cue(s)`, 'success');
-            }}
+            onClick={() => confirmCueDeletion(Array.from(selectedCueIds))}
             className="px-3 py-2 rounded-lg text-sm cue-bulk-delete-btn"
           >
             Delete Selected
