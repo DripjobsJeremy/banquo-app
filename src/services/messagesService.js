@@ -5,11 +5,11 @@
 
   // Permission matrix — who can message whom
   const CAN_MESSAGE = {
-    super_admin:   ['super_admin','venue_manager','admin','client_admin','director','stage_manager','lighting','sound','wardrobe','props','set','board_member','actor','volunteer','donor'],
-    venue_manager: ['super_admin','venue_manager','admin','director','stage_manager','board_member'],
-    admin:         ['super_admin','admin','director','stage_manager','lighting','sound','wardrobe','props','set','actor','volunteer'],
-    client_admin:  ['super_admin','client_admin','director','stage_manager'],
-    board_member:  ['super_admin','admin','board_member'],
+    super_admin:   ['super_admin','venue_manager','admin','client_admin','director','stage_manager','lighting','sound','wardrobe','props','set','board_member','actor','volunteer','donor','accounting_manager'],
+    venue_manager: ['super_admin','venue_manager','admin','director','stage_manager','board_member','accounting_manager','client_admin'],
+    admin:         ['super_admin','admin','venue_manager','director','stage_manager','lighting','sound','wardrobe','props','set','actor','volunteer','board_member','accounting_manager','client_admin'],
+    client_admin:  ['super_admin','admin','client_admin','director','stage_manager'],
+    board_member:  ['super_admin','admin','venue_manager','board_member'],
     director:      ['super_admin','admin','director','stage_manager','lighting','sound','wardrobe','props','set','actor'],
     stage_manager: ['super_admin','admin','director','stage_manager','lighting','sound','wardrobe','props','set'],
     lighting:      ['super_admin','admin','director','stage_manager','lighting'],
@@ -20,6 +20,7 @@
     actor:         ['director','stage_manager'],
     volunteer:     ['super_admin','admin'],
     donor:         ['super_admin','admin'],
+    accounting_manager: ['super_admin','admin','venue_manager'],
   };
 
   const load = () => {
