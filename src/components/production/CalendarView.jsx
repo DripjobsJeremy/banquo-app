@@ -826,6 +826,9 @@ function CalendarView({ production, onSave, userRole }) {
       costumesNeeded: [],
       attendees: [],
       attendance: {},
+      callTime: '',
+      crewCallTime: '',
+      curtainTime: '',
       createdAt: new Date().toISOString()
     };
     return buildFormEvent(newEvent, { date: dateStr, startTime, endTime });
@@ -2524,6 +2527,47 @@ function CalendarView({ production, onSave, userRole }) {
                 onChange: (e) => setEditingEvent({ ...editingEvent, endTime: e.target.value }),
                 className: 'w-full px-3 py-2 border border-[var(--color-border)] rounded-lg focus:ring-2 focus:ring-blue-500'
               })
+            )
+          ),
+
+          (editingEvent?.type === 'performance' || editingEvent?.type === 'tech') && React.createElement(
+            'div',
+            { className: 'grid grid-cols-3 gap-3' },
+            React.createElement(
+              'div',
+              null,
+              React.createElement('label', { className: 'block text-sm font-medium mb-1' }, 'Call Time'),
+              React.createElement('input', {
+                type: 'time',
+                value: editingEvent?.callTime || '',
+                onChange: (e) => setEditingEvent({ ...editingEvent, callTime: e.target.value }),
+                className: 'w-full px-3 py-2 border border-[var(--color-border)] rounded-lg focus:ring-2 focus:ring-blue-500'
+              }),
+              React.createElement('p', { className: 'text-xs text-[var(--color-text-muted)] mt-1' }, 'When actors are called to the theatre')
+            ),
+            React.createElement(
+              'div',
+              null,
+              React.createElement('label', { className: 'block text-sm font-medium mb-1' }, 'Crew Call'),
+              React.createElement('input', {
+                type: 'time',
+                value: editingEvent?.crewCallTime || '',
+                onChange: (e) => setEditingEvent({ ...editingEvent, crewCallTime: e.target.value }),
+                className: 'w-full px-3 py-2 border border-[var(--color-border)] rounded-lg focus:ring-2 focus:ring-blue-500'
+              }),
+              React.createElement('p', { className: 'text-xs text-[var(--color-text-muted)] mt-1' }, 'When crew is called to the theatre')
+            ),
+            React.createElement(
+              'div',
+              null,
+              React.createElement('label', { className: 'block text-sm font-medium mb-1' }, 'Curtain'),
+              React.createElement('input', {
+                type: 'time',
+                value: editingEvent?.curtainTime || '',
+                onChange: (e) => setEditingEvent({ ...editingEvent, curtainTime: e.target.value }),
+                className: 'w-full px-3 py-2 border border-[var(--color-border)] rounded-lg focus:ring-2 focus:ring-blue-500'
+              }),
+              React.createElement('p', { className: 'text-xs text-[var(--color-text-muted)] mt-1' }, 'When the performance actually starts')
             )
           ),
 
