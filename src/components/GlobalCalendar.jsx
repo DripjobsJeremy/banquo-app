@@ -429,10 +429,13 @@ function GlobalCalendar() {
                           {ev.type && (
                             <span>{TYPE_LABELS[normalizeType(ev.type)] || ev.type}</span>
                           )}
-                          {(ev.startTime || ev.time) && (
+                          {formatEventTimeFromISO(ev.start) && (
                             <>
                               <span className="text-[var(--color-text-muted)]">·</span>
-                              <span>{ev.startTime || ev.time}</span>
+                              <span>
+                                {formatEventTimeFromISO(ev.start)}
+                                {formatEventTimeFromISO(ev.end) && ` - ${formatEventTimeFromISO(ev.end)}`}
+                              </span>
                             </>
                           )}
                           {ev.location && (
@@ -442,6 +445,15 @@ function GlobalCalendar() {
                             </>
                           )}
                         </div>
+                        {getCallTimeEntries(ev).length > 0 && (
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            {getCallTimeEntries(ev).map(ct => (
+                              <span key={ct.label} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+                                🕐 {ct.label}: {formatTime12(ct.time)}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
