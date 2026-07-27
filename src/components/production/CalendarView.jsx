@@ -775,36 +775,31 @@ function CalendarView({ production, onSave, userRole }) {
   };
   
   // Event management functions
-  const handleAddEvent = () => {
-    const defaultDate = currentDate.toISOString().split('T')[0];
-    const defaultStartTime = '19:00';
-    const defaultEndTime = '22:00';
+  const createNewEventSkeleton = (dateStr, startTime = '19:00', endTime = '22:00') => {
     const newEvent = {
       id: 'event_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
       title: '',
       type: 'rehearsal',
-      subtype: '', // NEW: event subtype
-      start: combineDateTimeLocal(defaultDate, defaultStartTime),
-      end: combineDateTimeLocal(defaultDate, defaultEndTime),
+      subtype: '',
+      start: combineDateTimeLocal(dateStr, startTime),
+      end: combineDateTimeLocal(dateStr, endTime),
       location: '',
       notes: '',
       status: 'scheduled',
-      
-      // Rehearsal-specific fields
       scenes: [],
       charactersNeeded: [],
       propsNeeded: [],
       costumesNeeded: [],
       attendees: [],
-      attendance: {}, // NEW: attendance tracking
-      
+      attendance: {},
       createdAt: new Date().toISOString()
     };
-    setEditingEvent(buildFormEvent(newEvent, {
-      date: defaultDate,
-      startTime: defaultStartTime,
-      endTime: defaultEndTime
-    }));
+    return buildFormEvent(newEvent, { date: dateStr, startTime, endTime });
+  };
+
+  const handleAddEvent = () => {
+    const defaultDate = currentDate.toISOString().split('T')[0];
+    setEditingEvent(createNewEventSkeleton(defaultDate));
     setRehearsalType('custom');
     setShowEventModal(true);
   };
@@ -1542,7 +1537,8 @@ function CalendarView({ production, onSave, userRole }) {
                       isToday ? 'bg-blue-50 border-blue-400 border-2 shadow-sm' : 'bg-[var(--color-bg-surface)] border-[var(--color-border)]'
                     }`,
                     onClick: () => {
-                      setEditingEvent({ date: date.toISOString().split('T')[0] });
+                      setEditingEvent(createNewEventSkeleton(date.toISOString().split('T')[0]));
+                      setRehearsalType('custom');
                       setShowEventModal(true);
                     }
                   },
@@ -1747,7 +1743,8 @@ function CalendarView({ production, onSave, userRole }) {
                     ? React.createElement('button', {
                       onClick: () => {
                         const dayStr = day.toISOString().split('T')[0];
-                        setEditingEvent(buildFormEvent({ date: dayStr }, { date: dayStr }));
+                        setEditingEvent(createNewEventSkeleton(dayStr));
+                        setRehearsalType('custom');
                         setShowEventModal(true);
                       },
                       className: 'w-full py-8 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-base)] rounded border-2 border-dashed border-[var(--color-border)] hover:border-[var(--color-border)]'
@@ -1807,7 +1804,8 @@ function CalendarView({ production, onSave, userRole }) {
                       React.createElement('button', {
                         onClick: () => {
                           const dayStr = day.toISOString().split('T')[0];
-                          setEditingEvent(buildFormEvent({ date: dayStr }, { date: dayStr }));
+                          setEditingEvent(createNewEventSkeleton(dayStr));
+                          setRehearsalType('custom');
                           setShowEventModal(true);
                         },
                         className: 'w-full py-2 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-elevated)] rounded mt-2'
@@ -2000,7 +1998,8 @@ function CalendarView({ production, onSave, userRole }) {
                       const dayStr = currentDate.toISOString().split('T')[0];
                       const endMinutes = Math.min(23 * 60, (parseInt(clickedTime.split(':')[0], 10) * 60) + parseInt(clickedTime.split(':')[1], 10) + 60);
                       const endTime = `${String(Math.floor(endMinutes / 60)).padStart(2, '0')}:${String(endMinutes % 60).padStart(2, '0')}`;
-                      setEditingEvent(buildFormEvent({ date: dayStr, startTime: clickedTime, endTime }, { date: dayStr, startTime: clickedTime, endTime }));
+                      setEditingEvent(createNewEventSkeleton(dayStr, clickedTime, endTime));
+                      setRehearsalType('custom');
                       setShowEventModal(true);
                     }
                   })
