@@ -840,7 +840,71 @@ function CalendarView({ production, onSave, userRole }) {
     setRehearsalType('custom');
     setShowEventModal(true);
   };
-  
+
+  const resolveAttendeeContactId = (name) => {
+    const managers = production.departmentManagers || {};
+    const managerMatch = Object.values(managers).find(m => m?.name === name);
+    if (managerMatch) return managerMatch.contactId;
+
+    const crewMatch = (production.crew || []).find(member => {
+      if (!member.contactId) return false;
+      const contact = window.contactsService?.getContactById?.(member.contactId);
+      const contactName = contact ? `${contact.firstName || ''} ${contact.lastName || ''}`.trim() : '';
+      return contactName === name;
+    });
+    if (crewMatch) return crewMatch.contactId;
+
+    const staff = window.contactsService?.getProductionStaff?.(production.id) || [];
+    const staffMatch = staff.find(c => `${c.firstName || ''} ${c.lastName || ''}`.trim() === name);
+    if (staffMatch) return staffMatch.id;
+
+    return null;
+  };
+
+  const notifyNewAttendees = (savedEvent, previousEvent) => {
+    if (!window.notificationsService) return;
+
+    const currentUser = window.authService?.getCurrentUser?.() || {};
+    const invitedByName = currentUser.name || 'Someone';
+    const invitedByRole = currentUser.role || userRole || 'admin';
+
+    const prevAttendeeNames = previousEvent?.attendees || [];
+    const newAttendeeNames = (savedEvent.attendees || []).filter(name => !prevAttendeeNames.includes(name));
+
+    newAttendeeNames.forEach(name => {
+      const contactId = resolveAttendeeContactId(name);
+      if (!contactId) return;
+      window.notificationsService.create({
+        contactId,
+        contactName: name,
+        eventId: savedEvent.id,
+        eventTitle: savedEvent.title,
+        eventDate: savedEvent.start,
+        productionId: production.id,
+        productionTitle: production.title,
+        invitedByName,
+        invitedByRole
+      });
+    });
+
+    const prevInvitedIds = (previousEvent?.invitedContacts || []).map(ic => ic.contactId);
+    const newInvited = (savedEvent.invitedContacts || []).filter(ic => !prevInvitedIds.includes(ic.contactId));
+
+    newInvited.forEach(ic => {
+      window.notificationsService.create({
+        contactId: ic.contactId,
+        contactName: ic.name,
+        eventId: savedEvent.id,
+        eventTitle: savedEvent.title,
+        eventDate: savedEvent.start,
+        productionId: production.id,
+        productionTitle: production.title,
+        invitedByName,
+        invitedByRole
+      });
+    });
+  };
+
   const handleSaveEvent = () => {
     if (!editingEvent || !editingEvent.title) {
       alert('Please enter an event title');
@@ -888,6 +952,7 @@ function CalendarView({ production, onSave, userRole }) {
     if (!updatedProduction.calendar) updatedProduction.calendar = [];
 
     const existingIndex = updatedProduction.calendar.findIndex(e => e.id === eventToSave.id);
+    const previousEvent = existingIndex >= 0 ? updatedProduction.calendar[existingIndex] : null;
     if (existingIndex >= 0) {
       updatedProduction.calendar = [
         ...updatedProduction.calendar.slice(0, existingIndex),
@@ -897,6 +962,8 @@ function CalendarView({ production, onSave, userRole }) {
     } else {
       updatedProduction.calendar = [...updatedProduction.calendar, eventToSave];
     }
+
+    notifyNewAttendees(eventToSave, previousEvent);
 
     console.log('✅ Calendar after save:', updatedProduction.calendar.length, 'events');
 
