@@ -2225,6 +2225,8 @@ function CalendarView({ production, onSave, userRole }) {
                     const allCharNames = allCharacters;
                     setEditingEvent({
                       ...editingEvent,
+                      title: editingEvent?.title || 'Full Run',
+                      subtype: 'run-through',
                       scenes: allSceneIds,
                       charactersNeeded: allCharNames,
                       propsNeeded: allPropIds,
@@ -2266,6 +2268,8 @@ function CalendarView({ production, onSave, userRole }) {
                     }
                     setEditingEvent({
                       ...editingEvent,
+                      title: editingEvent?.title || 'Act I Run-Through',
+                      subtype: 'act-run',
                       scenes: act1Ids,
                       charactersNeeded: Array.from(act1Chars),
                       propsNeeded: [],
@@ -2307,6 +2311,8 @@ function CalendarView({ production, onSave, userRole }) {
                     }
                     setEditingEvent({
                       ...editingEvent,
+                      title: editingEvent?.title || 'Act II Run-Through',
+                      subtype: 'act-run',
                       scenes: act2Ids,
                       charactersNeeded: Array.from(act2Chars),
                       propsNeeded: [],
@@ -2359,6 +2365,8 @@ function CalendarView({ production, onSave, userRole }) {
                     setRehearsalType('table-read');
                     setEditingEvent({
                       ...editingEvent,
+                      title: editingEvent?.title || 'Table Read',
+                      subtype: 'table-read',
                       scenes: allScenes.map(s => s.id),
                       charactersNeeded: allCharacters,
                       propsNeeded: [],
