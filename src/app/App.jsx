@@ -648,6 +648,11 @@ function App() {
   return (
     <div className="flex h-screen overflow-hidden bg-base">
 
+      {window.NotificationBell && React.createElement(window.NotificationBell, {
+        mode: userRole === 'actor' ? 'actor' : 'staff',
+        contactId: userRole === 'actor' ? (window.actorAuthService?.getCurrentActor()?.id || null) : null
+      })}
+
       {/* Admin escape banner — fixed at top when previewing actor portal */}
       {isAdminViewingActorPortal && (
         <div className="ap-admin-banner">
