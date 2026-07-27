@@ -223,6 +223,8 @@ function CalendarView({ production, onSave, userRole }) {
     'preview': 'Preview Performance'
   };
 
+  const DRESS_SUBTYPES = ['dress-rehearsal', 'dress-1', 'dress-2', 'dress-3', 'final-dress'];
+
   const milestoneTypes = {
     'auditions': 'Auditions',
     'callbacks': 'Callbacks',
@@ -587,7 +589,8 @@ function CalendarView({ production, onSave, userRole }) {
                 props.push({
                   id: prop.id || `prop_${Math.random()}`,
                   name: prop.name || prop.description || 'Unnamed Prop',
-                  scene: `${act.name || 'Act ' + (actIndex + 1)} - Scene ${scene.number || sceneIndex + 1}`
+                  scene: `${act.name || 'Act ' + (actIndex + 1)} - Scene ${scene.number || sceneIndex + 1}`,
+                  sceneId: `${actIndex}-${sceneIndex}`
                 });
               });
             }
@@ -610,7 +613,8 @@ function CalendarView({ production, onSave, userRole }) {
                   id: costume.id || `costume_${Math.random()}`,
                   name: costume.description || costume.name || 'Unnamed Costume',
                   character: costume.character,
-                  scene: `${act.name || 'Act ' + (actIndex + 1)} - Scene ${scene.number || sceneIndex + 1}`
+                  scene: `${act.name || 'Act ' + (actIndex + 1)} - Scene ${scene.number || sceneIndex + 1}`,
+                  sceneId: `${actIndex}-${sceneIndex}`
                 });
               });
             }
@@ -620,6 +624,9 @@ function CalendarView({ production, onSave, userRole }) {
     }
     return costumes;
   };
+
+  const propsForSceneIds = (sceneIds) => allProps.filter(p => sceneIds.includes(p.sceneId)).map(p => p.id);
+  const costumesForSceneIds = (sceneIds) => allCostumes.filter(c => sceneIds.includes(c.sceneId)).map(c => c.id);
 
   const getSceneLabel = (sceneId) => {
     const allScenes = getAllScenes();
@@ -2188,7 +2195,20 @@ function CalendarView({ production, onSave, userRole }) {
             React.createElement('label', { className: 'block text-sm font-medium mb-1' }, 'Tech Type'),
             React.createElement('select', {
               value: editingEvent?.subtype || '',
-              onChange: (e) => setEditingEvent({ ...editingEvent, subtype: e.target.value }),
+              onChange: (e) => {
+                const newSubtype = e.target.value;
+                const selectedScenes = editingEvent?.scenes || [];
+                if (DRESS_SUBTYPES.includes(newSubtype) && selectedScenes.length > 0) {
+                  setEditingEvent({
+                    ...editingEvent,
+                    subtype: newSubtype,
+                    propsNeeded: propsForSceneIds(selectedScenes),
+                    costumesNeeded: costumesForSceneIds(selectedScenes)
+                  });
+                } else {
+                  setEditingEvent({ ...editingEvent, subtype: newSubtype });
+                }
+              },
               className: 'w-full px-3 py-2 border border-[var(--color-border)] rounded-lg focus:ring-2 focus:ring-blue-500'
             },
               React.createElement('option', { value: '' }, '-- Select Type --'),
@@ -2293,8 +2313,8 @@ function CalendarView({ production, onSave, userRole }) {
                       subtype: 'act-run',
                       scenes: act1Ids,
                       charactersNeeded: Array.from(act1Chars),
-                      propsNeeded: [],
-                      costumesNeeded: [],
+                      propsNeeded: propsForSceneIds(act1Ids),
+                      costumesNeeded: costumesForSceneIds(act1Ids),
                       rehearsalType: 'act-1-run'
                     });
                   },
@@ -2346,8 +2366,8 @@ function CalendarView({ production, onSave, userRole }) {
                       subtype: 'act-run',
                       scenes: act2Ids,
                       charactersNeeded: Array.from(act2Chars),
-                      propsNeeded: [],
-                      costumesNeeded: [],
+                      propsNeeded: propsForSceneIds(act2Ids),
+                      costumesNeeded: costumesForSceneIds(act2Ids),
                       rehearsalType: 'act-2-run'
                     });
                   },
@@ -2649,11 +2669,18 @@ function CalendarView({ production, onSave, userRole }) {
                       checked: (editingEvent?.scenes || []).includes(scene.id),
                       onChange: (e) => {
                         const scenes = editingEvent?.scenes || [];
-                        if (e.target.checked) {
-                          setEditingEvent({ ...editingEvent, scenes: [...scenes, scene.id] });
-                        } else {
-                          setEditingEvent({ ...editingEvent, scenes: scenes.filter(s => s !== scene.id) });
-                        }
+                        const newScenes = e.target.checked
+                          ? [...scenes, scene.id]
+                          : scenes.filter(s => s !== scene.id);
+                        const isDress = editingEvent?.type === 'tech' && DRESS_SUBTYPES.includes(editingEvent?.subtype);
+                        setEditingEvent({
+                          ...editingEvent,
+                          scenes: newScenes,
+                          ...(isDress ? {
+                            propsNeeded: propsForSceneIds(newScenes),
+                            costumesNeeded: costumesForSceneIds(newScenes)
+                          } : {})
+                        });
                       },
                       className: 'rounded'
                     }),
