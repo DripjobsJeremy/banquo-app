@@ -56,6 +56,42 @@ const TYPE_LABELS = {
   other:     'Other',
 };
 
+const formatTime12 = (time24) => {
+  if (!time24) return '';
+  const [hoursStr, minutesStr] = time24.split(':');
+  const hours = parseInt(hoursStr, 10);
+  if (isNaN(hours)) return time24;
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const hours12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+  return `${hours12}:${minutesStr} ${ampm}`;
+};
+
+const formatEventTimeFromISO = (isoString) => {
+  if (!isoString || !isoString.includes('T')) return '';
+  return formatTime12(isoString.split('T')[1]?.substring(0, 5));
+};
+
+const getCallTimeEntries = (ev) => {
+  const entries = [];
+  if (ev.crewCallTime) entries.push({ label: 'Crew Call', time: ev.crewCallTime });
+  if (ev.callTime) entries.push({ label: 'Actor Call', time: ev.callTime });
+  if (ev.curtainTime) entries.push({ label: 'Curtain', time: ev.curtainTime });
+  return entries.sort((a, b) => a.time.localeCompare(b.time));
+};
+
+const getEventDetailText = (ev) => {
+  const lines = [`${ev.productionTitle}: ${ev.title || ev.type || 'Event'}`];
+  const startTimeFormatted = formatEventTimeFromISO(ev.start);
+  const endTimeFormatted = formatEventTimeFromISO(ev.end);
+  if (startTimeFormatted) {
+    lines.push(endTimeFormatted ? `${startTimeFormatted} - ${endTimeFormatted}` : startTimeFormatted);
+  }
+  getCallTimeEntries(ev).forEach(ct => lines.push(`${ct.label}: ${formatTime12(ct.time)}`));
+  if (ev.location) lines.push(ev.location);
+  if (ev.notes) lines.push(ev.notes);
+  return lines.join('\n');
+};
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 function GlobalCalendar() {
@@ -254,7 +290,7 @@ function GlobalCalendar() {
       {productions.length === 0 && (
         <div className="banquo-card bg-surface rounded-lg border border-[var(--color-border)] p-16 text-center">
           <div className="text-5xl mb-4">🎬</div>
-          <h3 className="text-xl font-semibold text-white mb-2">No Productions Yet</h3>
+          <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>No Productions Yet</h3>
           <p className="text-[var(--color-text-muted)] text-sm">Create productions and add calendar events to see them here.</p>
         </div>
       )}
@@ -322,8 +358,9 @@ function GlobalCalendar() {
                         {dayEvents.slice(0, 3).map((ev, j) => (
                           <div
                             key={j}
-                            title={`${ev.productionTitle}: ${ev.title || ev.type || 'Event'}`}
-                            className="truncate text-xs px-1 py-0.5 rounded text-white"
+                            title={getEventDetailText(ev)}
+                            onClick={() => alert(getEventDetailText(ev))}
+                            className="truncate text-xs px-1 py-0.5 rounded text-white cursor-pointer hover:opacity-80"
                             style={{ backgroundColor: ev.productionColor }}
                           >
                             {ev.title || ev.type || 'Event'}
@@ -375,13 +412,13 @@ function GlobalCalendar() {
                         <div className="text-xs text-[var(--color-text-muted)] uppercase">
                           {ev._date.toLocaleString('default', { month: 'short' })}
                         </div>
-                        <div className="text-xl font-bold text-white leading-tight">
+                        <div className="text-xl font-bold leading-tight" style={{ color: 'var(--color-text-primary)' }}>
                           {ev._date.getDate()}
                         </div>
                       </div>
                       {/* Event info */}
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-white text-sm truncate">
+                        <div className="font-medium text-sm truncate" style={{ color: 'var(--color-text-primary)' }}>
                           {ev.title || ev.type || 'Event'}
                         </div>
                         <div className="text-xs text-[var(--color-text-muted)] mt-0.5 flex flex-wrap gap-2">
