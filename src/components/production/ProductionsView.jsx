@@ -521,6 +521,20 @@ function EditProductionModal({ production, onSave, onClose }) {
               onUpdate: handleCastUpdate,
             })}
           </div>
+
+          <hr className="edit-modal-section-hr" />
+          <div className="edit-modal-section-label">
+            👷 Crew
+          </div>
+          <p className="edit-modal-section-hint">
+            Add backstage crew roles and assign them to contacts.
+          </p>
+          <div className="cast-list-scroll-wrapper">
+            {window.CrewList && React.createElement(window.CrewList, {
+              production: localProduction,
+              onUpdate: handleCastUpdate,
+            })}
+          </div>
         </div>
 
         <div className="flex gap-3 px-6 py-4 border-t border-gray-100">
