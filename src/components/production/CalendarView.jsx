@@ -603,16 +603,21 @@ function CalendarView({ production, onSave, userRole }) {
 
   const getAllCostumes = () => {
     const costumes = [];
+    const productionChars = production.characters || [];
     if (production.acts && Array.isArray(production.acts)) {
       production.acts.forEach((act, actIndex) => {
         if (act.scenes && Array.isArray(act.scenes)) {
           act.scenes.forEach((scene, sceneIndex) => {
-            if (scene.wardrobe && Array.isArray(scene.wardrobe)) {
-              scene.wardrobe.forEach(costume => {
+            const costumesByRole = scene.wardrobe?.costumes;
+            if (costumesByRole && typeof costumesByRole === 'object') {
+              Object.entries(costumesByRole).forEach(([roleId, costumeData]) => {
+                if (!costumeData || (!costumeData.description && !costumeData.notes)) return;
+                const char = productionChars.find(c => (c.id || c.name) === roleId);
+                const characterName = char?.name || roleId;
                 costumes.push({
-                  id: costume.id || `costume_${Math.random()}`,
-                  name: costume.description || costume.name || 'Unnamed Costume',
-                  character: costume.character,
+                  id: `${actIndex}-${sceneIndex}-${roleId}`,
+                  name: costumeData.description || `${characterName}'s Costume`,
+                  character: characterName,
                   scene: `${act.name || 'Act ' + (actIndex + 1)} - Scene ${scene.number || sceneIndex + 1}`,
                   sceneId: `${actIndex}-${sceneIndex}`
                 });
