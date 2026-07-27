@@ -145,6 +145,7 @@ function CharacterCastList({ production, onUpdate }) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="text-gray-500 hover:text-gray-700 transition-colors"
             title={isCollapsed ? 'Expand Cast List' : 'Collapse Cast List'}
@@ -160,6 +161,7 @@ function CharacterCastList({ production, onUpdate }) {
         </div>
         <div className="flex gap-2">
           <button
+            type="button"
             onClick={() => setShowActorModal(true)}
             className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
             title="Add new actor to contact database"
@@ -167,6 +169,7 @@ function CharacterCastList({ production, onUpdate }) {
             + Add Actor
           </button>
           <button
+            type="button"
             onClick={handleAddCharacter}
             className="px-4 py-2 bg-violet-600 text-white text-sm rounded-lg hover:bg-violet-700 transition-colors"
           >
@@ -244,6 +247,7 @@ function CharacterCastList({ production, onUpdate }) {
                   )}
 
                   <button
+                    type="button"
                     onClick={() => handleDeleteCharacter(char.id)}
                     title="Delete character"
                     className="cast-list-delete p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
@@ -324,12 +328,14 @@ function CharacterCastList({ production, onUpdate }) {
 
             <div className="flex gap-3 mt-6">
               <button
+                type="button"
                 onClick={() => setShowActorModal(false)}
                 className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleAddActor}
                 className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
