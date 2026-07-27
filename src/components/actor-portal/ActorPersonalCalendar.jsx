@@ -162,7 +162,10 @@ function ActorPersonalCalendar({ actor, onBack }) {
                   notes: calEvent.notes,
                   rehearsalType: calEvent.rehearsalType,
                   propsNeeded: calEvent.propsNeeded,
-                  costumesNeeded: calEvent.costumesNeeded
+                  costumesNeeded: calEvent.costumesNeeded,
+                  callTime: calEvent.callTime,
+                  crewCallTime: calEvent.crewCallTime,
+                  curtainTime: calEvent.curtainTime
                 });
               }
             }
@@ -311,6 +314,34 @@ function ActorPersonalCalendar({ actor, onBack }) {
     loadActorEvents();
   };
 
+  const formatTime12 = (time24) => {
+    if (!time24) return '';
+    const [hoursStr, minutesStr] = time24.split(':');
+    const hours = parseInt(hoursStr, 10);
+    if (isNaN(hours)) return time24;
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const hours12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    return `${hours12}:${minutesStr} ${ampm}`;
+  };
+
+  const getCallTimeEntries = (event) => {
+    const entries = [];
+    if (event.crewCallTime) entries.push({ label: 'Crew Call', time: event.crewCallTime });
+    if (event.callTime) entries.push({ label: 'Actor Call', time: event.callTime });
+    if (event.curtainTime) entries.push({ label: 'Curtain', time: event.curtainTime });
+    return entries.sort((a, b) => a.time.localeCompare(b.time));
+  };
+
+  const getEventDetailText = (event) => {
+    const lines = [event.title];
+    lines.push(event.startTime ? `${formatTime12(event.startTime)} - ${formatTime12(event.endTime)}` : 'All day');
+    getCallTimeEntries(event).forEach(ct => lines.push(`${ct.label}: ${formatTime12(ct.time)}`));
+    if (event.location) lines.push(event.location);
+    if (event.rehearsalType === 'full-run') lines.push('📦 All Props Required • 👗 All Costumes Required');
+    if (event.notes) lines.push(event.notes);
+    return lines.join('\n');
+  };
+
   const renderMonthView = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -365,8 +396,8 @@ function ActorPersonalCalendar({ actor, onBack }) {
                     color: event.color,
                     borderLeft: isFirstDay ? `3px solid ${event.color}` : 'none'
                   }}
-                  title={`${event.title}\n${event.startTime ? `${event.startTime} - ${event.endTime}` : 'All day'}\n${event.location || ''}`}
-                  onClick={() => alert(`${event.title}\n${event.startTime ? `${event.startTime} - ${event.endTime}` : 'All day'}\n${event.location || ''}${event.rehearsalType === 'full-run' ? '\n📦 All Props Required • 👗 All Costumes Required' : ''}${event.notes ? '\n' + event.notes : ''}`)}
+                  title={getEventDetailText(event)}
+                  onClick={() => alert(getEventDetailText(event))}
                 >
                   {isFirstDay && (
                     <>
@@ -443,7 +474,7 @@ function ActorPersonalCalendar({ actor, onBack }) {
                         )}
                       </span>
                       {event.startTime && !event.allDay && (
-                        <span>• {event.startTime} - {event.endTime}</span>
+                        <span>• {formatTime12(event.startTime)} - {formatTime12(event.endTime)}</span>
                       )}
                       {event.allDay && <span className="text-xs text-gray-500">• All Day</span>}
                     </div>
@@ -488,6 +519,16 @@ function ActorPersonalCalendar({ actor, onBack }) {
                             {event.rehearsalType === 'act-2-run' && '📖 Act II Run'}
                           </span>
                         )}
+                      </div>
+                    )}
+
+                    {getCallTimeEntries(event).length > 0 && (
+                      <div className="flex items-center gap-3 mt-1 flex-wrap">
+                        {getCallTimeEntries(event).map(ct => (
+                          <span key={ct.label} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+                            🕐 {ct.label}: {formatTime12(ct.time)}
+                          </span>
+                        ))}
                       </div>
                     )}
                   </div>
