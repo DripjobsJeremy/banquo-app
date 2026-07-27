@@ -628,6 +628,16 @@ function CalendarView({ production, onSave, userRole }) {
   const propsForSceneIds = (sceneIds) => allProps.filter(p => sceneIds.includes(p.sceneId)).map(p => p.id);
   const costumesForSceneIds = (sceneIds) => allCostumes.filter(c => sceneIds.includes(c.sceneId)).map(c => c.id);
 
+  const getProductionStaffAttendees = () => {
+    const staff = window.contactsService?.getProductionStaff?.(production.id) || [];
+    return staff.map(c => {
+      const name = `${c.firstName || ''} ${c.lastName || ''}`.trim();
+      const assignment = (c.staffProfile?.productions || []).find(p => p.productionId === production.id);
+      const roles = assignment?.roles?.length ? assignment.roles : (assignment?.role ? [assignment.role] : []);
+      return { name, roles };
+    }).filter(s => s.name);
+  };
+
   const getSceneLabel = (sceneId) => {
     const allScenes = getAllScenes();
     const scene = allScenes.find(s => s.id === sceneId);
@@ -638,6 +648,7 @@ function CalendarView({ production, onSave, userRole }) {
   const allCharacters = getAllCharacters();
   const allProps = getAllProps();
   const allCostumes = getAllCostumes();
+  const allStaffAttendees = getProductionStaffAttendees();
   
   // Conflict detection
   const detectConflicts = () => {
@@ -2845,20 +2856,70 @@ function CalendarView({ production, onSave, userRole }) {
               )
             ),
             
-            // Additional attendees (free-form)
+            // Additional attendees (from production staff, plus free-form overflow)
             React.createElement(
               'div',
               null,
-              React.createElement('label', { className: 'block text-sm font-medium mb-1' }, 'Additional Attendees'),
+              React.createElement(
+                'div',
+                { className: 'flex items-center justify-between mb-2' },
+                React.createElement('label', { className: 'block text-sm font-medium' }, 'Additional Attendees'),
+                allStaffAttendees.length > 0 && React.createElement(
+                  'label',
+                  { className: 'flex items-center gap-1 text-xs text-blue-600 cursor-pointer hover:text-blue-800' },
+                  React.createElement('input', {
+                    type: 'checkbox',
+                    checked: allStaffAttendees.every(s => (editingEvent?.attendees || []).includes(s.name)),
+                    onChange: (e) => {
+                      const others = (editingEvent?.attendees || []).filter(a => !allStaffAttendees.some(s => s.name === a));
+                      setEditingEvent({
+                        ...editingEvent,
+                        attendees: e.target.checked ? [...others, ...allStaffAttendees.map(s => s.name)] : others
+                      });
+                    },
+                    className: 'rounded'
+                  }),
+                  'Select All'
+                )
+              ),
+              React.createElement(
+                'div',
+                { className: 'max-h-32 overflow-y-auto border border-[var(--color-border)] rounded-lg p-2 bg-[var(--color-bg-surface)]' },
+                allStaffAttendees.length === 0 ? React.createElement('p', { className: 'text-sm text-[var(--color-text-muted)]' },
+                  'No staff assigned to this production yet. Assign staff in Contacts to see them here.'
+                ) : allStaffAttendees.map(staffMember =>
+                  React.createElement(
+                    'label',
+                    { key: staffMember.name, className: 'flex items-center gap-2 p-1 hover:bg-[var(--color-bg-base)] cursor-pointer' },
+                    React.createElement('input', {
+                      type: 'checkbox',
+                      checked: (editingEvent?.attendees || []).includes(staffMember.name),
+                      onChange: (e) => {
+                        const attendees = editingEvent?.attendees || [];
+                        if (e.target.checked) {
+                          setEditingEvent({ ...editingEvent, attendees: [...attendees, staffMember.name] });
+                        } else {
+                          setEditingEvent({ ...editingEvent, attendees: attendees.filter(a => a !== staffMember.name) });
+                        }
+                      },
+                      className: 'rounded'
+                    }),
+                    React.createElement('span', { className: 'text-sm' },
+                      staffMember.roles.length > 0 ? `${staffMember.name} (${staffMember.roles.join(', ')})` : staffMember.name
+                    )
+                  )
+                )
+              ),
               React.createElement('input', {
                 type: 'text',
-                value: (editingEvent?.attendees || []).join(', '),
+                value: (editingEvent?.attendees || []).filter(a => !allStaffAttendees.some(s => s.name === a)).join(', '),
                 onChange: (e) => {
-                  const attendeesList = e.target.value.split(',').map(a => a.trim()).filter(Boolean);
-                  setEditingEvent({ ...editingEvent, attendees: attendeesList });
+                  const otherNames = e.target.value.split(',').map(a => a.trim()).filter(Boolean);
+                  const staffNames = (editingEvent?.attendees || []).filter(a => allStaffAttendees.some(s => s.name === a));
+                  setEditingEvent({ ...editingEvent, attendees: [...staffNames, ...otherNames] });
                 },
-                className: 'w-full px-3 py-2 border border-[var(--color-border)] rounded-lg focus:ring-2 focus:ring-blue-500',
-                placeholder: 'e.g., Stage Manager, Director, Costume Designer (comma-separated)'
+                className: 'w-full px-3 py-2 border border-[var(--color-border)] rounded-lg focus:ring-2 focus:ring-blue-500 mt-2',
+                placeholder: 'Other attendees not listed above (comma-separated)'
               })
             )
           ),
