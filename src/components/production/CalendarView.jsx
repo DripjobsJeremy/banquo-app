@@ -547,15 +547,26 @@ function CalendarView({ production, onSave, userRole }) {
   const getAllCharacters = () => {
     const characters = new Set();
     const productionChars = production.characters || [];
+    const allCastNames = productionChars.map(c => c.name).filter(Boolean);
     if (production.acts && Array.isArray(production.acts)) {
       production.acts.forEach(act => {
         if (act.scenes && Array.isArray(act.scenes)) {
           act.scenes.forEach(scene => {
-            // Scenes store characterIds (array of IDs); look up names from production.characters
+            // Legacy path: scenes storing characterIds (array of IDs)
             if (scene.characterIds && Array.isArray(scene.characterIds)) {
               scene.characterIds.forEach(charId => {
                 const char = productionChars.find(c => c.id === charId);
                 if (char?.name) characters.add(char.name);
+              });
+            }
+            // Current path: Scene Builder's "Characters in Scene" cast-list flow stores names directly
+            if (scene.characters && Array.isArray(scene.characters)) {
+              scene.characters.forEach(name => {
+                if (name === 'Full Company') {
+                  allCastNames.forEach(n => characters.add(n));
+                } else if (name) {
+                  characters.add(name);
+                }
               });
             }
           });
@@ -2253,15 +2264,25 @@ function CalendarView({ production, onSave, userRole }) {
                     setRehearsalType('act-1-run');
                     const act1Scenes = allScenes.filter(s => s.actIndex === 0);
                     const act1Ids = act1Scenes.map(s => s.id);
-                    // Auto-extract characters from Act I scenes via characterIds
+                    // Auto-extract characters from Act I scenes (characterIds and/or characters name list)
                     const act1Chars = new Set();
                     const productionChars = production.characters || [];
+                    const act1CastNames = productionChars.map(c => c.name).filter(Boolean);
                     if (production.acts && production.acts[0]?.scenes) {
                       production.acts[0].scenes.forEach(sc => {
                         if (sc.characterIds && Array.isArray(sc.characterIds)) {
                           sc.characterIds.forEach(id => {
                             const char = productionChars.find(c => c.id === id);
                             if (char?.name) act1Chars.add(char.name);
+                          });
+                        }
+                        if (sc.characters && Array.isArray(sc.characters)) {
+                          sc.characters.forEach(name => {
+                            if (name === 'Full Company') {
+                              act1CastNames.forEach(n => act1Chars.add(n));
+                            } else if (name) {
+                              act1Chars.add(name);
+                            }
                           });
                         }
                       });
@@ -2296,15 +2317,25 @@ function CalendarView({ production, onSave, userRole }) {
                     setRehearsalType('act-2-run');
                     const act2Scenes = allScenes.filter(s => s.actIndex === 1);
                     const act2Ids = act2Scenes.map(s => s.id);
-                    // Auto-extract characters from Act II scenes via characterIds
+                    // Auto-extract characters from Act II scenes (characterIds and/or characters name list)
                     const act2Chars = new Set();
                     const productionChars2 = production.characters || [];
+                    const act2CastNames = productionChars2.map(c => c.name).filter(Boolean);
                     if (production.acts && production.acts[1]?.scenes) {
                       production.acts[1].scenes.forEach(sc => {
                         if (sc.characterIds && Array.isArray(sc.characterIds)) {
                           sc.characterIds.forEach(id => {
                             const char = productionChars2.find(c => c.id === id);
                             if (char?.name) act2Chars.add(char.name);
+                          });
+                        }
+                        if (sc.characters && Array.isArray(sc.characters)) {
+                          sc.characters.forEach(name => {
+                            if (name === 'Full Company') {
+                              act2CastNames.forEach(n => act2Chars.add(n));
+                            } else if (name) {
+                              act2Chars.add(name);
+                            }
                           });
                         }
                       });
