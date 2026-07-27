@@ -14,6 +14,10 @@ function DepartmentManagersPanel({ production, onUpdate }) {
   const [showAddPersonModal, setShowAddPersonModal] = useState(false);
   const [addingForDept, setAddingForDept] = useState(null);
   const [newPerson, setNewPerson] = useState({ firstName: '', lastName: '', email: '', phone: '' });
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('showsuite_dept_managers_collapsed');
+    return saved === 'true';
+  });
 
   const loadContacts = () => {
     const list = window.contactsService?.loadContacts?.() || [];
@@ -27,6 +31,10 @@ function DepartmentManagersPanel({ production, onUpdate }) {
   useEffect(() => {
     setManagers(production?.departmentManagers || {});
   }, [production?.departmentManagers]);
+
+  useEffect(() => {
+    localStorage.setItem('showsuite_dept_managers_collapsed', isCollapsed);
+  }, [isCollapsed]);
 
   const getContactName = (c) => {
     if (c.firstName || c.lastName) return `${c.firstName || ''} ${c.lastName || ''}`.trim();
@@ -99,8 +107,31 @@ function DepartmentManagersPanel({ production, onUpdate }) {
     alert(`✓ Added ${newContact.firstName} ${newContact.lastName} to Contacts`);
   };
 
+  const assignedCount = DEPARTMENTS.filter(d => managers[d.id]?.contactId).length;
+
   return (
-    <div className="space-y-2">
+    <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4 transition-all duration-200">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="text-gray-500 hover:text-gray-700 transition-colors"
+            title={isCollapsed ? 'Expand Department Managers' : 'Collapse Department Managers'}
+          >
+            {isCollapsed ? '▶' : '▼'}
+          </button>
+          <h3 className="text-lg font-semibold text-gray-900">🗂️ Department Managers</h3>
+          {isCollapsed && (
+            <span className="text-sm text-gray-600">
+              ({assignedCount} of {DEPARTMENTS.length} assigned)
+            </span>
+          )}
+        </div>
+      </div>
+
+      {!isCollapsed && (
+      <div className="space-y-2">
       {DEPARTMENTS.map(dept => {
         const assigned = managers[dept.id];
         return (
@@ -130,6 +161,8 @@ function DepartmentManagersPanel({ production, onUpdate }) {
           </div>
         );
       })}
+      </div>
+      )}
 
       {showAddPersonModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => { setShowAddPersonModal(false); setAddingForDept(null); }}>
