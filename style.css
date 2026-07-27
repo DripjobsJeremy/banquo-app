@@ -1427,6 +1427,8 @@ html[data-theme="light"] .prod-card-mode-btn--active {
 .cast-list-badge { flex-shrink: 0; white-space: nowrap; }
 .cast-list-delete { flex-shrink: 0; }
 .cast-list-actions-spacer { width: 100px; flex-shrink: 0; }
+.dept-manager-label-col { flex: 0 0 160px; min-width: 160px; }
+.dept-manager-select { flex: 1 1 auto; min-width: 180px; max-width: 320px; }
 .prod-card-btn {
   padding: 8px 4px; font-size: 12px; font-weight: 500; border-radius: 6px;
   cursor: pointer; white-space: nowrap; text-align: center; border: none;

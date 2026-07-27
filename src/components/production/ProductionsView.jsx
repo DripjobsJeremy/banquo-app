@@ -507,6 +507,20 @@ function EditProductionModal({ production, onSave, onClose }) {
               onUpdate: handleCastUpdate,
             })}
           </div>
+
+          <hr className="edit-modal-section-hr" />
+          <div className="edit-modal-section-label">
+            🗂️ Department Managers
+          </div>
+          <p className="edit-modal-section-hint">
+            Assign one manager per department. Choose from existing contacts or add a new person.
+          </p>
+          <div className="cast-list-scroll-wrapper">
+            {window.DepartmentManagersPanel && React.createElement(window.DepartmentManagersPanel, {
+              production: localProduction,
+              onUpdate: handleCastUpdate,
+            })}
+          </div>
         </div>
 
         <div className="flex gap-3 px-6 py-4 border-t border-gray-100">
