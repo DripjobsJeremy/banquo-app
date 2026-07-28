@@ -585,9 +585,9 @@ function CalendarView({ production, onSave, userRole }) {
         if (act.scenes && Array.isArray(act.scenes)) {
           act.scenes.forEach((scene, sceneIndex) => {
             if (scene.props && Array.isArray(scene.props)) {
-              scene.props.forEach(prop => {
+              scene.props.forEach((prop, propIndex) => {
                 props.push({
-                  id: prop.id || `prop_${Math.random()}`,
+                  id: prop.id || `${actIndex}-${sceneIndex}-${propIndex}`,
                   name: prop.name || prop.description || 'Unnamed Prop',
                   scene: `${act.name || 'Act ' + (actIndex + 1)} - Scene ${scene.number || sceneIndex + 1}`,
                   sceneId: `${actIndex}-${sceneIndex}`
@@ -2340,6 +2340,7 @@ function CalendarView({ production, onSave, userRole }) {
                     const allPropIds = allProps.map(p => p.id);
                     const allCostumeIds = allCostumes.map(c => c.id);
                     const allCharNames = allCharacters;
+                    const allStaffNames = allStaffAttendees.map(s => s.name);
                     setEditingEvent({
                       ...editingEvent,
                       title: editingEvent?.title || 'Full Run',
@@ -2348,6 +2349,7 @@ function CalendarView({ production, onSave, userRole }) {
                       charactersNeeded: allCharNames,
                       propsNeeded: allPropIds,
                       costumesNeeded: allCostumeIds,
+                      attendees: allStaffNames,
                       rehearsalType: 'full-run'
                     });
                   },
