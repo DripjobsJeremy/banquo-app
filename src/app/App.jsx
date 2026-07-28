@@ -409,6 +409,14 @@ function getNavigationTabs(userRole) {
     ];
   }
 
+  if (userRole === 'crew') {
+    return [
+      { id: 'productions', label: 'Productions', icon: '🎬', path: '/productions' },
+      { id: 'calendar',    label: 'Calendar',    icon: '📅', path: '/calendar' },
+      { id: 'messages',    label: 'Messages',    icon: '💬', path: '/messages' },
+    ];
+  }
+
   if (userRole === 'actor') {
     return [
       { id: 'actor-portal', label: 'Actor Portal', icon: '🎭', path: '/actor-portal' },
@@ -550,6 +558,7 @@ function App() {
     sound:              { label: 'Sound',          cls: 'bg-blue-800 text-blue-200' },
     props:              { label: 'Props',          cls: 'bg-orange-900 text-orange-300' },
     set:                { label: 'Set & Scenic',   cls: 'bg-teal-800 text-teal-300' },
+    crew:               { label: 'Crew',           cls: 'bg-red-900 text-red-300' },
   };
   const roleInfo = ROLE_DISPLAY[userRole] || { label: userRole, cls: 'bg-gray-700 text-gray-300' };
   const TEST_MANAGER_ID = '__test_manager__';
@@ -576,8 +585,8 @@ function App() {
     setUserRole(newRole);
     localStorage.setItem('showsuite_user_role', newRole);
 
-    // Super admin roles clear any staff-scoped contact association
-    const SUPER_ROLES = ['super_admin', 'venue_manager', 'admin', 'client_admin', 'board_member', 'accounting_manager'];
+    // Only these roles have no individual contact identity (org-wide view)
+    const SUPER_ROLES = ['super_admin', 'venue_manager', 'admin', 'client_admin', 'accounting_manager'];
     if (SUPER_ROLES.includes(newRole)) {
       setStaffContactId('');
       localStorage.removeItem('showsuite_staff_contact_id');
@@ -587,7 +596,7 @@ function App() {
     if (SUPER_ROLES.includes(newRole)) newPath = '/';
     else if (newRole === 'actor') newPath = '/actor-portal';
     else if (newRole === 'volunteer') newPath = '/volunteer-portal';
-    else if (['director', 'lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager'].includes(newRole)) {
+    else if (['director', 'lighting', 'sound', 'wardrobe', 'props', 'set', 'stage_manager', 'crew', 'board_member'].includes(newRole)) {
       // Clear previous staff selection — user must pick one for the new role
       setStaffContactId('');
       localStorage.removeItem('showsuite_staff_contact_id');
@@ -917,15 +926,18 @@ function App() {
                     <option value="props">Props Manager</option>
                     <option value="set">Set Designer</option>
                     <option value="stage_manager">Stage Manager</option>
+                    <option value="crew">Crew Member</option>
                     <option value="actor">Actor</option>
                     <option value="volunteer">Volunteer</option>
                   </select>
 
-                  {/* Staff contact picker — only for director/dept roles */}
-                  {['director','wardrobe','lighting','sound','props','set','stage_manager'].includes(userRole) && (() => {
+                  {/* Staff contact picker — director/dept roles, crew, and board members */}
+                  {['director','wardrobe','lighting','sound','props','set','stage_manager','crew','board_member'].includes(userRole) && (() => {
+                    const DEPT_NAV_ROLES = ['director','wardrobe','lighting','sound','props','set','stage_manager'];
                     const ROLE_LABEL_MAP = {
                       director: 'Director', wardrobe: 'Wardrobe Designer', lighting: 'Lighting Designer',
                       sound: 'Sound Designer', props: 'Props Master', set: 'Scenic Designer', stage_manager: 'Stage Manager',
+                      crew: 'Crew', board_member: 'Board Member',
                     };
                     const matchingStaff = (window.contactsService?.getStaffContacts?.() || [])
                       .filter(c => (c.staffProfile?.roles || []).includes(ROLE_LABEL_MAP[userRole]));
@@ -940,7 +952,7 @@ function App() {
                             setStaffContactId(id);
                             if (id) {
                               localStorage.setItem('showsuite_staff_contact_id', id);
-                              window.location.hash = '/dept-dashboard';
+                              window.location.hash = DEPT_NAV_ROLES.includes(userRole) ? '/dept-dashboard' : (userRole === 'crew' ? '/productions' : '/');
                             } else {
                               localStorage.removeItem('showsuite_staff_contact_id');
                             }
