@@ -634,13 +634,40 @@ function CalendarView({ production, onSave, userRole }) {
   const costumesForSceneIds = (sceneIds) => allCostumes.filter(c => sceneIds.includes(c.sceneId)).map(c => c.id);
 
   const getProductionStaffAttendees = () => {
+    const entries = [];
+    const nameIndex = new Map();
+
+    // Department managers / staff (via contactsService staff profiles)
     const staff = window.contactsService?.getProductionStaff?.(production.id) || [];
-    return staff.map(c => {
+    staff.forEach(c => {
       const name = `${c.firstName || ''} ${c.lastName || ''}`.trim();
+      if (!name) return;
       const assignment = (c.staffProfile?.productions || []).find(p => p.productionId === production.id);
       const roles = assignment?.roles?.length ? assignment.roles : (assignment?.role ? [assignment.role] : []);
-      return { name, roles };
-    }).filter(s => s.name);
+      const entry = { name, roles: [...roles] };
+      entries.push(entry);
+      nameIndex.set(name, entry);
+    });
+
+    // Crew members (production.crew stores { id, role, contactId } and resolves the name via contacts)
+    const allContacts = window.contactsService?.loadContacts?.() || [];
+    (production.crew || []).forEach(member => {
+      if (!member.contactId) return;
+      const contact = allContacts.find(c => c.id === member.contactId);
+      if (!contact) return;
+      const name = `${contact.firstName || ''} ${contact.lastName || ''}`.trim();
+      if (!name) return;
+      const existing = nameIndex.get(name);
+      if (existing) {
+        if (member.role && !existing.roles.includes(member.role)) existing.roles.push(member.role);
+      } else {
+        const entry = { name, roles: member.role ? [member.role] : [] };
+        entries.push(entry);
+        nameIndex.set(name, entry);
+      }
+    });
+
+    return entries;
   };
 
   const getSceneLabel = (sceneId) => {
