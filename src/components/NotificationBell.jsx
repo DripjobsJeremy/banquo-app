@@ -9,7 +9,7 @@ function NotificationBell({ mode, contactId }) {
 
   const loadNotifications = () => {
     if (!window.notificationsService) return;
-    if (mode === 'actor') {
+    if (mode === 'personal') {
       if (!contactId) { setNotifications([]); setUnreadCount(0); return; }
       const list = window.notificationsService.getForContact(contactId);
       setNotifications(list);
@@ -54,7 +54,7 @@ function NotificationBell({ mode, contactId }) {
   };
 
   const handleNotificationClick = (notification) => {
-    if (mode === 'actor' && !notification.read) {
+    if (mode === 'personal' && !notification.read) {
       window.notificationsService.markRead(notification.id);
       loadNotifications();
     }
@@ -118,7 +118,7 @@ function NotificationBell({ mode, contactId }) {
           boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
         }}>
           <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--color-border, #e5e7eb)', fontWeight: 600 }}>
-            {mode === 'actor' ? 'My Notifications' : 'Notifications'}
+            {mode === 'personal' ? 'My Notifications' : 'Notifications'}
           </div>
           {notifications.length === 0 ? (
             <div style={{ padding: '16px', fontSize: '13px', color: '#6b7280' }}>
@@ -131,8 +131,8 @@ function NotificationBell({ mode, contactId }) {
               style={{
                 padding: '10px 16px',
                 borderBottom: '1px solid var(--color-border, #f3f4f6)',
-                cursor: mode === 'actor' ? 'pointer' : 'default',
-                background: (mode === 'actor' && !n.read) ? 'rgba(139, 26, 43, 0.05)' : 'transparent'
+                cursor: mode === 'personal' ? 'pointer' : 'default',
+                background: (mode === 'personal' && !n.read) ? 'rgba(139, 26, 43, 0.05)' : 'transparent'
               }}
             >
               <div style={{ fontSize: '13px' }}>
