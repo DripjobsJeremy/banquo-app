@@ -288,6 +288,7 @@ const DepartmentDashboard = () => {
     : null;
 
   const itemWord = ['lighting', 'sound', 'stage_manager', 'director'].includes(deptKey) ? 'scenes' : 'items';
+  const headerCount = ['stage_manager', 'director'].includes(deptKey) ? allScenes.length : allItems.length;
 
   // ── helpers ────────────────────────────────────────────────────────────────
 
@@ -312,7 +313,7 @@ const DepartmentDashboard = () => {
           `${config.icon} ${config.label} Dashboard`
         ),
         React.createElement('p', { className: 'text-gray-400' },
-          `${assignedProductions.length} production${assignedProductions.length !== 1 ? 's' : ''} · ${allItems.length} ${itemWord} total`
+          `${assignedProductions.length} production${assignedProductions.length !== 1 ? 's' : ''} · ${headerCount} ${itemWord} total`
         )
       ),
       staffName && React.createElement('div', {
