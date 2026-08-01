@@ -1,5 +1,47 @@
 const { useState, useEffect } = React;
 
+const DASHBOARD_PANEL_STATE_KEY = 'showsuite_dashboard_panel_collapsed_v1';
+
+const DashboardPanel = ({ panelKey, title, children }) => {
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(DASHBOARD_PANEL_STATE_KEY) || '{}');
+      return !!saved[panelKey];
+    } catch (e) {
+      return false;
+    }
+  });
+
+  const toggleCollapsed = () => {
+    setCollapsed(prev => {
+      const next = !prev;
+      try {
+        const saved = JSON.parse(localStorage.getItem(DASHBOARD_PANEL_STATE_KEY) || '{}');
+        saved[panelKey] = next;
+        localStorage.setItem(DASHBOARD_PANEL_STATE_KEY, JSON.stringify(saved));
+      } catch (e) {}
+      return next;
+    });
+  };
+
+  return React.createElement('div', { className: 'bg-surface rounded-lg p-5 border border-gray-700 self-start' },
+    React.createElement('button', {
+      type: 'button',
+      onClick: toggleCollapsed,
+      className: 'w-full flex items-center justify-between mb-4 group',
+    },
+      React.createElement('h3', { className: 'text-lg font-semibold text-primary-color' }, title),
+      React.createElement('svg', {
+        className: `w-5 h-5 text-gray-400 transition-transform duration-200 group-hover:text-primary-color shrink-0 ml-2 ${collapsed ? '-rotate-90' : ''}`,
+        fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', strokeWidth: 2,
+      },
+        React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M19 9l-7 7-7-7' })
+      )
+    ),
+    !collapsed && React.createElement('div', null, children)
+  );
+};
+
 const DEPT_CONFIG = {
   wardrobe: {
     label: 'Wardrobe Department',
@@ -281,12 +323,11 @@ const DepartmentDashboard = () => {
     ),
 
     // Main grid
-    React.createElement('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-6' },
+    React.createElement('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-6 items-start' },
 
       // ── Budget panel (only when budgetField is configured) ──
       config.budgetField
-        ? React.createElement('div', { className: 'bg-surface rounded-lg p-5 border border-gray-700' },
-            React.createElement('h3', { className: 'text-lg font-semibold text-primary-color mb-4' }, '💰 Budget'),
+        ? React.createElement(DashboardPanel, { panelKey: 'budget', title: '💰 Budget' },
             totalAllocated === 0
               ? React.createElement('p', { className: 'text-gray-500 text-sm italic' }, 'No budget allocated yet')
               : React.createElement('div', { className: 'space-y-3' },
@@ -331,10 +372,10 @@ const DepartmentDashboard = () => {
         : null,
 
       // ── Alerts ──
-      React.createElement('div', { className: 'bg-surface rounded-lg p-5 border border-gray-700' },
-        React.createElement('h3', { className: 'text-lg font-semibold text-primary-color mb-4' },
-          `🔔 Alerts${budgetAlerts.length + overdueItems.length > 0 ? ` (${budgetAlerts.length + overdueItems.length})` : ''}`
-        ),
+      React.createElement(DashboardPanel, {
+        panelKey: 'alerts',
+        title: `🔔 Alerts${budgetAlerts.length + overdueItems.length > 0 ? ` (${budgetAlerts.length + overdueItems.length})` : ''}`
+      },
         budgetAlerts.length === 0 && overdueItems.length === 0
           ? React.createElement('p', { className: 'text-gray-500 text-sm italic' }, '✓ No alerts — everything looks good')
           : React.createElement('div', { className: 'space-y-2' },
@@ -377,8 +418,7 @@ const DepartmentDashboard = () => {
       ),
 
       // ── Upcoming Events ──
-      React.createElement('div', { className: 'bg-surface rounded-lg p-5 border border-gray-700' },
-        React.createElement('h3', { className: 'text-lg font-semibold text-primary-color mb-4' }, '📅 Upcoming Events'),
+      React.createElement(DashboardPanel, { panelKey: 'upcomingEvents', title: '📅 Upcoming Events' },
         upcomingEvents.length === 0
           ? React.createElement('p', { className: 'text-gray-500 text-sm italic' }, 'No upcoming events')
           : React.createElement('div', { className: 'space-y-1' },
@@ -412,8 +452,7 @@ const DepartmentDashboard = () => {
       ),
 
       // ── My Productions ──
-      React.createElement('div', { className: 'bg-surface rounded-lg p-5 border border-gray-700' },
-        React.createElement('h3', { className: 'text-lg font-semibold text-primary-color mb-4' }, '🎭 My Productions'),
+      React.createElement(DashboardPanel, { panelKey: 'myProductions', title: '🎭 My Productions' },
         assignedProductions.length === 0
           ? React.createElement('div', { className: 'text-center py-6' },
               React.createElement('p', { className: 'text-gray-500 text-sm' }, 'No productions assigned yet'),
