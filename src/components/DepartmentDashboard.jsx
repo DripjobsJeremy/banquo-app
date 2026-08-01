@@ -132,13 +132,13 @@ const DEPT_CONFIG = {
 };
 
 const DEPT_EVENT_TYPES = {
-  wardrobe:      ['costume-fitting','wardrobe-call','deadline','rehearsal','show'],
-  props:         ['props-pull','props-return','deadline','rehearsal','show'],
-  lighting:      ['focus-call','hang-focus','deadline','rehearsal','show'],
-  sound:         ['sound-check','load-in','deadline','rehearsal','show'],
-  set:           ['load-in','deadline','rehearsal','show'],
-  stage_manager: ['rehearsal','show','technical','meeting','deadline'],
-  director:      ['rehearsal','show','technical','audition','meeting'],
+  wardrobe:      ['costume-fitting','deadline','rehearsal','performance'],
+  props:         ['deadline','rehearsal','performance'],
+  lighting:      ['deadline','rehearsal','performance'],
+  sound:         ['deadline','rehearsal','performance'],
+  set:           ['build','deadline','rehearsal','performance'],
+  stage_manager: ['rehearsal','performance','tech','meeting','deadline'],
+  director:      ['rehearsal','performance','tech','meeting','deadline'],
 };
 
 const SUPER_ROLES = ['super_admin', 'venue_manager', 'admin', 'client_admin'];

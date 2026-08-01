@@ -31,7 +31,7 @@ function DepartmentCalendar() {
   };
 
   // Types always visible to everyone (production-wide events)
-  const ALWAYS_VISIBLE = ['rehearsal', 'tech-rehearsal', 'performance', 'show', 'opening-night'];
+  const ALWAYS_VISIBLE = ['rehearsal', 'tech', 'performance'];
 
   const isEventVisible = (event) => {
     if (FULL_ACCESS_ROLES.includes(effectiveRole)) return true;
@@ -59,32 +59,16 @@ function DepartmentCalendar() {
     return allProductions.filter(p => assignedIds.has(p.id));
   }, [staffContactId, userRole]);
 
-  // Load + aggregate events from all assigned productions
+  // Load + aggregate events from each assigned production's own calendar field (the real, live-saved data)
   const allEvents = React.useMemo(() => {
     const events = [];
     assignedProductions.forEach(prod => {
-      try {
-        const raw = localStorage.getItem(`calendar_events_${prod.id}`);
-        if (!raw) return;
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return;
-        parsed.forEach(evt => {
-          if (!evt) return;
-          // Normalise start field
-          let start = evt.start;
-          if (!start && evt.date) {
-            const dateStr = typeof evt.date === 'string' ? evt.date : new Date(evt.date).toISOString().split('T')[0];
-            const timeStr = evt.startTime || evt.time || '00:00';
-            start = `${dateStr}T${timeStr}:00`;
-          }
-          if (!start) return;
-          if (isEventVisible(evt)) {
-            events.push({ ...evt, start, productionId: prod.id, productionTitle: prod.title || prod.name || 'Production' });
-          }
-        });
-      } catch (e) {
-        console.warn('DepartmentCalendar: failed to parse events for', prod.id, e);
-      }
+      (prod.calendar || []).forEach(evt => {
+        if (!evt || !evt.start) return;
+        if (isEventVisible(evt)) {
+          events.push({ ...evt, productionId: prod.id, productionTitle: prod.title || prod.name || 'Production' });
+        }
+      });
     });
     // Sort by start date ascending
     events.sort((a, b) => new Date(a.start) - new Date(b.start));
@@ -98,10 +82,8 @@ function DepartmentCalendar() {
   // ─── Event type styling ──────────────────────────────────────────────────
   const EVENT_COLORS = {
     rehearsal:       'bg-blue-100 text-blue-800 border-blue-200',
-    'tech-rehearsal':'bg-purple-100 text-purple-800 border-purple-200',
+    tech:            'bg-purple-100 text-purple-800 border-purple-200',
     performance:     'bg-green-100 text-green-800 border-green-200',
-    show:            'bg-green-100 text-green-800 border-green-200',
-    'opening-night': 'bg-yellow-100 text-yellow-800 border-yellow-200',
     meeting:         'bg-orange-100 text-orange-800 border-orange-200',
     deadline:        'bg-red-100 text-red-800 border-red-200',
     build:           'bg-amber-100 text-amber-800 border-amber-200',
