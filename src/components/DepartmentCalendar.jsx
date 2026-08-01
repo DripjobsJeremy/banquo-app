@@ -79,6 +79,37 @@ function DepartmentCalendar() {
   const [currentDate, setCurrentDate] = React.useState(new Date());
   const [selectedEvent, setSelectedEvent] = React.useState(null);
 
+  const [filterProduction, setFilterProduction] = React.useState('all');
+  const [filterType, setFilterType] = React.useState('all');
+
+  const normalizeType = (t) => {
+    if (!t) return 'other';
+    const s = String(t).toLowerCase();
+    if (s.includes('audition')) return 'audition';
+    if (s.includes('performance') || s.includes('show')) return 'show';
+    if (s.includes('rehearsal')) return 'rehearsal';
+    if (s.includes('technical') || s.includes('tech')) return 'technical';
+    if (s.includes('board')) return 'board';
+    if (s.includes('meeting')) return 'meeting';
+    return 'other';
+  };
+
+  const TYPE_LABELS = {
+    audition:  'Auditions',
+    rehearsal: 'Rehearsals',
+    show:      'Shows / Performances',
+    technical: 'Tech Rehearsals',
+    board:     'Board Meetings',
+    meeting:   'Meetings',
+    other:     'Other',
+  };
+
+  const filteredEvents = allEvents.filter(ev => {
+    if (filterProduction !== 'all' && ev.productionId !== filterProduction) return false;
+    if (filterType !== 'all' && normalizeType(ev.type) !== filterType) return false;
+    return true;
+  });
+
   // ─── Event type styling ──────────────────────────────────────────────────
   const EVENT_COLORS = {
     rehearsal:       'bg-blue-100 text-blue-800 border-blue-200',
@@ -110,7 +141,7 @@ function DepartmentCalendar() {
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
   const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
 
-  const eventsOnDate = (dateStr) => allEvents.filter(e => e.start?.startsWith(dateStr));
+  const eventsOnDate = (dateStr) => filteredEvents.filter(e => e.start?.startsWith(dateStr));
 
   const monthYear = currentDate.toLocaleDateString([], { month: 'long', year: 'numeric' });
   const year = currentDate.getFullYear();
@@ -132,7 +163,7 @@ function DepartmentCalendar() {
   // ─── List view: upcoming events ──────────────────────────────────────────
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const upcomingEvents = allEvents.filter(e => new Date(e.start) >= today);
+  const upcomingEvents = filteredEvents.filter(e => new Date(e.start) >= today);
 
   // ─── Empty state ──────────────────────────────────────────────────────────
   if (!assignedProductions.length) {
@@ -242,6 +273,57 @@ function DepartmentCalendar() {
           >
             List
           </button>
+        </div>
+      </div>
+
+      {/* Filters bar */}
+      <div className="flex flex-wrap gap-4 mb-4 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)' }}>
+        <div>
+          <label className="block text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>Production</label>
+          <select
+            title="Filter by production"
+            value={filterProduction}
+            onChange={e => setFilterProduction(e.target.value)}
+            className="px-3 py-1.5 rounded border text-sm"
+            style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }}
+          >
+            <option value="all">All Productions</option>
+            {assignedProductions.map(p => (
+              <option key={p.id} value={p.id}>{p.title || p.name}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>Event Type</label>
+          <select
+            title="Filter by event type"
+            value={filterType}
+            onChange={e => setFilterType(e.target.value)}
+            className="px-3 py-1.5 rounded border text-sm"
+            style={{ backgroundColor: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)', borderColor: 'var(--color-border)' }}
+          >
+            <option value="all">All Types</option>
+            {Object.entries(TYPE_LABELS).map(([key, label]) => (
+              <option key={key} value={key}>{label}</option>
+            ))}
+          </select>
+        </div>
+        {(filterProduction !== 'all' || filterType !== 'all') && (
+          <div className="flex items-end">
+            <button
+              type="button"
+              onClick={() => { setFilterProduction('all'); setFilterType('all'); }}
+              className="text-xs text-violet-500 hover:text-violet-600 underline pb-2"
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
+        <div className="flex items-end ml-auto">
+          <span className="text-xs pb-2" style={{ color: 'var(--color-text-muted)' }}>
+            {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
+            {(filterProduction !== 'all' || filterType !== 'all') ? ' matching' : ''}
+          </span>
         </div>
       </div>
 
