@@ -219,9 +219,14 @@ const DepartmentDashboard = () => {
   const deptKey = DEPT_CONFIG[userRole] ? userRole : 'director';
   const config = DEPT_CONFIG[deptKey];
 
+  // Scenes live nested under acts (production.acts[].scenes[]), not on a flat
+  // production.scenes array. Flatten consistently with SceneBuilder/CueSheetBuilder.
+  const getProdScenes = (prod) =>
+    (prod.acts || []).flatMap(act => act.scenes || []);
+
   // Aggregate dept items across all assigned productions
   const allItems = assignedProductions.flatMap(prod =>
-    (prod.scenes || []).flatMap(scene =>
+    getProdScenes(prod).flatMap(scene =>
       config.getItems(scene).map(item => ({
         ...item,
         productionTitle: prod.title,
@@ -232,13 +237,13 @@ const DepartmentDashboard = () => {
   );
 
   const allScenes = assignedProductions.flatMap(prod =>
-    (prod.scenes || []).map(scene => ({ ...scene, productionTitle: prod.title, productionId: prod.id }))
+    getProdScenes(prod).map(scene => ({ ...scene, productionTitle: prod.title, productionId: prod.id }))
   );
 
   // Budget aggregation
   const budgetData = config.budgetField ? assignedProductions.map(prod => {
     const allocated = parseFloat(prod[config.budgetField]) || 0;
-    const items = (prod.scenes || []).flatMap(scene => config.getItems(scene));
+    const items = getProdScenes(prod).flatMap(scene => config.getItems(scene));
     const spent = items.reduce((sum, item) => sum + (parseFloat(item.cost) || 0), 0);
     return { production: prod, allocated, spent, variance: allocated - spent };
   }) : [];
@@ -460,7 +465,7 @@ const DepartmentDashboard = () => {
             )
           : React.createElement('div', { className: 'space-y-2' },
               ...assignedProductions.map(prod => {
-                const prodItems = (prod.scenes || []).flatMap(s => config.getItems(s));
+                const prodItems = getProdScenes(prod).flatMap(s => config.getItems(s));
                 const readyCount = config.readyStatus
                   ? prodItems.filter(i => i.status === config.readyStatus).length
                   : 0;
