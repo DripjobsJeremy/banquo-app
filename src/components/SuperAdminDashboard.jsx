@@ -1,5 +1,49 @@
 const { useState, useEffect, useMemo } = React;
 
+const DASHBOARD_PANEL_STATE_KEY = 'showsuite_dashboard_panel_collapsed_v1';
+
+function AdminDashboardPanel({ panelKey, title, icon, children }) {
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(DASHBOARD_PANEL_STATE_KEY) || '{}');
+      return !!saved[panelKey];
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleCollapsed = () => {
+    setCollapsed(prev => {
+      const next = !prev;
+      try {
+        const saved = JSON.parse(localStorage.getItem(DASHBOARD_PANEL_STATE_KEY) || '{}');
+        saved[panelKey] = next;
+        localStorage.setItem(DASHBOARD_PANEL_STATE_KEY, JSON.stringify(saved));
+      } catch {}
+      return next;
+    });
+  };
+
+  return (
+    <div className="rounded-lg shadow-sm border p-6 self-start" style={{ backgroundColor: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+      <button type="button" onClick={toggleCollapsed} className="w-full flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>{title}</h2>
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">{icon}</span>
+          <svg
+            className="w-5 h-5 transition-transform duration-200"
+            style={{ color: 'var(--color-text-muted)', transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </button>
+      {!collapsed && children}
+    </div>
+  );
+}
+
 function SuperAdminDashboard({ userRole = 'admin' }) {
   const [productions, setProductions] = useState([]);
   const [donations, setDonations] = useState([]);
@@ -398,13 +442,9 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
       </div>
 
       {/* Upcoming Events + Recent Donations */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         {/* Upcoming Events */}
-        <div key={`events-${refreshKey}`} className="rounded-lg shadow-sm border p-6" style={{ backgroundColor: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Upcoming Events</h2>
-            <span className="text-2xl">📅</span>
-          </div>
+        <AdminDashboardPanel key={`events-${refreshKey}`} panelKey="upcomingEvents" title="Upcoming Events" icon="📅">
           {upcomingEvents.length > 0 ? (
             <div className="space-y-3">
               {upcomingEvents.map((event, idx) => {
@@ -441,14 +481,10 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
               <p>No events scheduled — <a href="#/calendar" className="text-red-800 hover:underline font-medium">Add one in Calendar →</a></p>
             </div>
           )}
-        </div>
+        </AdminDashboardPanel>
 
         {/* Recent Donations */}
-        <div key={`donations-${refreshKey}`} className="rounded-lg shadow-sm border p-6" style={{ backgroundColor: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Recent Donations</h2>
-            <span className="text-2xl">💵</span>
-          </div>
+        <AdminDashboardPanel key={`donations-${refreshKey}`} panelKey="recentDonations" title="Recent Donations" icon="💵">
           {metrics.recentDonations.length > 0 ? (
             <>
               <div className="space-y-3">
@@ -484,7 +520,7 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
               <p>No donations recorded yet</p>
             </div>
           )}
-        </div>
+        </AdminDashboardPanel>
       </div>
 
       {/* Budget Overview Widget */}
