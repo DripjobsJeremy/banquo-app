@@ -1432,9 +1432,10 @@ html[data-theme="light"] .prod-card-mode-btn--active {
 .crew-list-role-col { flex: 1 1 140px; max-width: 200px; min-width: 0; overflow: hidden; }
 .crew-list-contact-col { flex-shrink: 0; min-width: 140px; max-width: 200px; }
 .prod-card-btn {
-  padding: 8px 4px; font-size: 12px; font-weight: 500; border-radius: 6px;
+  padding: 10px 6px; min-height: 40px; font-size: 12px; font-weight: 500; border-radius: 6px;
   cursor: pointer; white-space: nowrap; text-align: center; border: none;
-  display: block; text-decoration: none; line-height: 1.4; transition: background 0.12s;
+  display: flex; align-items: center; justify-content: center; text-decoration: none;
+  line-height: 1.4; transition: background 0.12s;
 }
 .prod-card-btn--ghost { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
 .prod-card-btn--ghost:hover { background: #e5e7eb; }
@@ -1462,10 +1463,10 @@ html[data-theme="light"] .prod-card-btn--primary:hover {
 .prod-poster-placeholder { width: 100%; aspect-ratio: 2/3; display: flex; align-items: center; justify-content: center; font-size: 64px; background: linear-gradient(135deg, #2d1b69 0%, #1a1a2e 100%); }
 .prod-poster-overlay {
   position: absolute; bottom: 0; left: 0; right: 0;
-  background: linear-gradient(transparent, rgba(0,0,0,0.85));
-  padding: 32px 14px 12px; display: flex; flex-direction: column; gap: 4px;
+  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0.92) 100%);
+  padding: 48px 14px 12px; display: flex; flex-direction: column; gap: 4px;
 }
-.prod-poster-title { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; }
+.prod-poster-title { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
 .prod-poster-active-badge { font-size: 10px; font-weight: 700; color: var(--legacy-purple-border); letter-spacing: 0.05em; }
 .prod-poster-card .prod-card-actions { border-top: 1px solid #f3f4f6; }
 
@@ -1791,14 +1792,14 @@ body.bg-gray-50 {
 }
 
 .prod-status-badge--planning {
-  background: rgba(201, 161, 74, 0.12);
-  color: #e6c87a;
-  border-color: rgba(201, 161, 74, 0.32);
+  background: rgba(90, 155, 213, 0.18);
+  color: #a8cdf0;
+  border-color: rgba(90, 155, 213, 0.4);
 }
 .prod-status-badge--rehearsal {
-  background: rgba(201, 161, 74, 0.18);
+  background: rgba(201, 161, 74, 0.22);
   color: #f5d97c;
-  border-color: rgba(201, 161, 74, 0.45);
+  border-color: rgba(201, 161, 74, 0.5);
 }
 .prod-status-badge--active {
   background: rgba(122, 31, 36, 0.28);
@@ -1807,9 +1808,9 @@ body.bg-gray-50 {
   box-shadow: 0 0 12px rgba(201, 161, 74, 0.18);
 }
 .prod-status-badge--completed {
-  background: rgba(244, 237, 226, 0.08);
-  color: #cfc4b0;
-  border-color: rgba(244, 237, 226, 0.18);
+  background: rgba(93, 168, 116, 0.18);
+  color: #a8e0bb;
+  border-color: rgba(93, 168, 116, 0.4);
 }
 .prod-status-badge--archived {
   background: rgba(244, 237, 226, 0.04);
@@ -1819,10 +1820,10 @@ body.bg-gray-50 {
 
 /* Status badges sitting on a light surface (thumbnail card footer is a white
    card body) need slightly stronger color so they read without the ink context. */
-.prod-thumb-card .prod-status-badge--planning   { color: #8a6b1f; background: rgba(201, 161, 74, 0.18); }
+.prod-thumb-card .prod-status-badge--planning   { color: #2f6ba8; background: rgba(90, 155, 213, 0.16); border-color: rgba(90, 155, 213, 0.4); }
 .prod-thumb-card .prod-status-badge--rehearsal  { color: #7a5a14; background: rgba(201, 161, 74, 0.26); }
 .prod-thumb-card .prod-status-badge--active     { color: #7a1f24; background: rgba(122, 31, 36, 0.14); border-color: rgba(122, 31, 36, 0.35); }
-.prod-thumb-card .prod-status-badge--completed  { color: #4b4336; background: rgba(10, 7, 6, 0.06); border-color: rgba(10, 7, 6, 0.14); }
+.prod-thumb-card .prod-status-badge--completed  { color: #2e7a48; background: rgba(93, 168, 116, 0.16); border-color: rgba(93, 168, 116, 0.4); }
 .prod-thumb-card .prod-status-badge--archived   { color: #6b6357; background: rgba(10, 7, 6, 0.04); border-color: rgba(10, 7, 6, 0.10); }
 
 /* -- Active-card button readability -----------------------------------
