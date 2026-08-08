@@ -212,8 +212,6 @@ const BudgetService = (() => {
     };
 
     const syncDepartmentCosts = (productionId) => {
-        console.log('🔄 Syncing department costs for production:', productionId);
-
         const productions = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
         const production = productions.find(p => p.id === productionId);
 
@@ -224,40 +222,34 @@ const BudgetService = (() => {
         }
 
         if (!production) {
-            console.log('❌ No production found, returning default budget');
             return budgets[productionId];
         }
 
         if (!production.scenes || production.scenes.length === 0) {
-            console.log('⚠️ No scenes found, returning budget without sync');
             return budgets[productionId];
         }
 
         const departmentCosts = { lighting: 0, sound: 0, wardrobe: 0, props: 0, set: 0 };
 
-        console.log('📊 Processing', production.scenes.length, 'scenes');
-
         production.scenes.forEach((scene, idx) => {
-            console.log('Scene', idx + 1, ':', scene.title);
-
             // Lighting costs
             if (scene.lighting) {
                 if (Array.isArray(scene.lighting.fixtures)) {
                     scene.lighting.fixtures.forEach(f => {
                         const cost = parseFloat(f.cost) || 0;
-                        if (cost > 0) { console.log('  💡 Lighting fixture:', f.type, '$' + cost); departmentCosts.lighting += cost; }
+                        if (cost > 0) { departmentCosts.lighting += cost; }
                     });
                 }
                 if (Array.isArray(scene.lighting.gels)) {
                     scene.lighting.gels.forEach(g => {
                         const cost = parseFloat(g.cost) || 0;
-                        if (cost > 0) { console.log('  💡 Lighting gel:', g.color, '$' + cost); departmentCosts.lighting += cost; }
+                        if (cost > 0) { departmentCosts.lighting += cost; }
                     });
                 }
                 if (Array.isArray(scene.lighting.cues)) {
                     scene.lighting.cues.forEach(c => {
                         const cost = parseFloat(c.cost) || 0;
-                        if (cost > 0) { console.log('  💡 Lighting cue:', c.name, '$' + cost); departmentCosts.lighting += cost; }
+                        if (cost > 0) { departmentCosts.lighting += cost; }
                     });
                 }
             }
@@ -267,19 +259,19 @@ const BudgetService = (() => {
                 if (Array.isArray(scene.sound.cues)) {
                     scene.sound.cues.forEach(c => {
                         const cost = parseFloat(c.cost) || 0;
-                        if (cost > 0) { console.log('  🔊 Sound cue:', c.name, '$' + cost); departmentCosts.sound += cost; }
+                        if (cost > 0) { departmentCosts.sound += cost; }
                     });
                 }
                 if (Array.isArray(scene.sound.music)) {
                     scene.sound.music.forEach(t => {
                         const cost = parseFloat(t.cost) || 0;
-                        if (cost > 0) { console.log('  🔊 Music track:', t.title, '$' + cost); departmentCosts.sound += cost; }
+                        if (cost > 0) { departmentCosts.sound += cost; }
                     });
                 }
                 if (Array.isArray(scene.sound.equipment)) {
                     scene.sound.equipment.forEach(e => {
                         const cost = parseFloat(e.cost) || 0;
-                        if (cost > 0) { console.log('  🔊 Sound equipment:', e.name, '$' + cost); departmentCosts.sound += cost; }
+                        if (cost > 0) { departmentCosts.sound += cost; }
                     });
                 }
             }
@@ -289,13 +281,13 @@ const BudgetService = (() => {
                 if (Array.isArray(scene.wardrobe.costumes)) {
                     scene.wardrobe.costumes.forEach(c => {
                         const cost = parseFloat(c.cost) || 0;
-                        if (cost > 0) { console.log('  👔 Wardrobe costume:', c.character, '$' + cost); departmentCosts.wardrobe += cost; }
+                        if (cost > 0) { departmentCosts.wardrobe += cost; }
                     });
                 }
                 if (Array.isArray(scene.wardrobe.items)) {
                     scene.wardrobe.items.forEach(i => {
                         const cost = parseFloat(i.cost) || 0;
-                        if (cost > 0) { console.log('  👔 Wardrobe item:', i.name, '$' + cost); departmentCosts.wardrobe += cost; }
+                        if (cost > 0) { departmentCosts.wardrobe += cost; }
                     });
                 }
             }
@@ -305,7 +297,7 @@ const BudgetService = (() => {
                 if (Array.isArray(scene.props.items)) {
                     scene.props.items.forEach(p => {
                         const cost = parseFloat(p.cost) || parseFloat(p.Cost) || 0;
-                        if (cost > 0) { console.log('  🎭 Prop:', p.name || p['Prop Name'], '$' + cost); departmentCosts.props += cost; }
+                        if (cost > 0) { departmentCosts.props += cost; }
                     });
                 }
             }
@@ -315,19 +307,17 @@ const BudgetService = (() => {
                 if (Array.isArray(scene.set.pieces)) {
                     scene.set.pieces.forEach(p => {
                         const cost = parseFloat(p.cost) || 0;
-                        if (cost > 0) { console.log('  🎨 Set piece:', p.name, '$' + cost); departmentCosts.set += cost; }
+                        if (cost > 0) { departmentCosts.set += cost; }
                     });
                 }
                 if (Array.isArray(scene.set.elements)) {
                     scene.set.elements.forEach(e => {
                         const cost = parseFloat(e.cost) || 0;
-                        if (cost > 0) { console.log('  🎨 Set element:', e.name, '$' + cost); departmentCosts.set += cost; }
+                        if (cost > 0) { departmentCosts.set += cost; }
                     });
                 }
             }
         });
-
-        console.log('💰 Calculated department costs:', departmentCosts);
 
         // Update spent amounts from scene data
         Object.entries(departmentCosts).forEach(([dept, cost]) => {
@@ -337,10 +327,8 @@ const BudgetService = (() => {
 
                 if (!budgets[productionId].departments[dept].items?.length) {
                     budgets[productionId].departments[dept].spent = cost;
-                    console.log(`  ✅ ${dept}: Set spent to $${cost} from scene data`);
                 } else {
                     budgets[productionId].departments[dept].spent = existingItemsCost + cost;
-                    console.log(`  ✅ ${dept}: Combined items ($${existingItemsCost}) + scene data ($${cost}) = $${existingItemsCost + cost}`);
                 }
             }
         });
@@ -348,7 +336,6 @@ const BudgetService = (() => {
         budgets[productionId].lastUpdated = new Date().toISOString();
         saveBudgets(budgets);
 
-        console.log('✅ Sync complete');
         return budgets[productionId];
     };
 
@@ -369,5 +356,3 @@ const BudgetService = (() => {
 })();
 
 window.budgetService = BudgetService;
-
-console.log('✅ Budget Service loaded');

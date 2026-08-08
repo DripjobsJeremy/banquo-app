@@ -1,6 +1,4 @@
 function ProductionBudgetManager({ production, onClose, onSave }) {
-    console.log('🎬 ProductionBudgetManager rendering for:', production?.id, production?.title);
-
     const [budget, setBudget] = React.useState(null);
     const [activeTab, setActiveTab] = React.useState('overview');
 
@@ -39,6 +37,8 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
     });
     const [royaltiesExpanded, setRoyaltiesExpanded] = React.useState(false);
     const [ctOpen, setCtOpen] = React.useState(false);
+    const [ctSearch, setCtSearch] = React.useState('');
+    const [justSaved, setJustSaved] = React.useState(false);
 
     const saveRoyalties = (updates) => {
         const updated = { ...royalties, ...updates };
@@ -50,6 +50,9 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                 prods[idx] = { ...prods[idx], royalties: updated };
                 localStorage.setItem('showsuite_productions', JSON.stringify(prods));
             }
+            setJustSaved(true);
+            window.clearTimeout(window.__royaltiesSavedTimeout);
+            window.__royaltiesSavedTimeout = window.setTimeout(() => setJustSaved(false), 1500);
         } catch {}
     };
 
@@ -58,12 +61,9 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
     }, [production.id]);
 
     const loadBudget = () => {
-        console.log('📊 Loading budget for production:', production.id, production.title);
-
         try {
             // Try to sync department costs from scene data
             const synced = window.budgetService.syncDepartmentCosts(production.id);
-            console.log('✅ Budget synced:', synced);
             setBudget(synced);
         } catch (error) {
             console.warn('⚠️ Sync failed, loading budget without sync:', error.message);
@@ -248,7 +248,7 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                                     : 'border-transparent text-gray-600 hover:text-gray-900'
                             }`}
                         >
-                            {tab.id === 'ghost_light' ? <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }} title="Get assistance from GhostLight AI"><img src="assets/ghostlight/ghostlight-logo.png" alt="GhostLight AI" style={{ height: '36px', width: '36px', objectFit: 'contain' }} /></span> : tab.label}
+                            {tab.id === 'ghost_light' ? <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: '6px' }} title="Get assistance from GhostLight AI"><img src="assets/ghostlight/ghostlight-logo.png" alt="" style={{ height: '24px', width: '24px', objectFit: 'contain' }} /><span>Ghost Light</span></span> : tab.label}
                         </button>
                     ))}
                 </div>
@@ -352,7 +352,7 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                                             <button
                                                 type="button"
                                                 disabled={!canEditBudget}
-                                                onClick={() => canEditBudget && setCtOpen(o => !o)}
+                                                onClick={() => { if (canEditBudget) { setCtOpen(o => !o); setCtSearch(''); } }}
                                                 className="w-full min-h-[56px] px-5 py-3 bg-[var(--color-bg-base)] border border-[var(--color-border)] rounded-[20px] text-left flex items-center justify-between gap-4 focus:border-[var(--color-accent-gold)] focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <div>
@@ -363,7 +363,20 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                                             </button>
                                             {ctOpen && (
                                                 <div className="absolute z-20 left-0 right-0 mt-2 bg-[var(--color-bg-panel)] border border-[var(--color-border)] rounded-[20px] overflow-hidden rl-dropdown-list">
-                                                    {Object.entries(CONTRACT_TYPES).map(([val, info]) => (
+                                                    <div className="p-2 border-b border-[var(--color-border)]">
+                                                        <input
+                                                            type="text"
+                                                            autoFocus
+                                                            value={ctSearch}
+                                                            onChange={e => setCtSearch(e.target.value)}
+                                                            onClick={e => e.stopPropagation()}
+                                                            placeholder="Search contract types..."
+                                                            className="w-full px-3 py-2 text-sm bg-[var(--color-bg-base)] border border-[var(--color-border)] rounded-[14px] focus:border-[var(--color-accent-gold)] focus:outline-none text-[var(--color-text)]"
+                                                        />
+                                                    </div>
+                                                    {Object.entries(CONTRACT_TYPES).filter(([, info]) =>
+                                                        info.name.toLowerCase().includes(ctSearch.toLowerCase())
+                                                    ).map(([val, info]) => (
                                                         <button
                                                             key={val}
                                                             type="button"
@@ -739,13 +752,15 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
 
                                     {canEditBudget && (
                                         <div className="flex flex-col gap-2">
-                                            <button
-                                                type="button"
-                                                disabled
-                                                className="bg-accent-crimson px-4 py-3 rounded-[20px] font-medium opacity-60 cursor-default text-white"
+                                            <div
+                                                className="px-4 py-3 rounded-[20px] font-medium text-center text-sm transition-opacity duration-300"
+                                                style={{
+                                                    color: 'var(--color-text-muted)',
+                                                    opacity: justSaved ? 1 : 0.5,
+                                                }}
                                             >
-                                                Saved
-                                            </button>
+                                                {justSaved ? '✓ Saved' : 'Changes save automatically'}
+                                            </div>
                                             <button
                                                 type="button"
                                                 onClick={() => saveRoyalties(ROYALTY_DEFAULTS)}
@@ -832,5 +847,3 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
 }
 
 window.ProductionBudgetManager = ProductionBudgetManager;
-
-console.log('✅ ProductionBudgetManager component loaded - VERSION 2');
