@@ -4,6 +4,8 @@ function BudgetOverview({ budget, summary, canEditBudget = true, onUpdateTotalBu
     const totalPlannedSpend = summary.totalAllocated + royaltiesTotal;
     const isOverPlannedBudget = budget.totalBudget > 0 && totalPlannedSpend > budget.totalBudget;
     const overBy = totalPlannedSpend - budget.totalBudget;
+    const trueRemaining = budget.totalBudget - totalPlannedSpend;
+    const truePercentUsed = budget.totalBudget > 0 ? (totalPlannedSpend / budget.totalBudget) * 100 : 0;
 
     return (
         <div className="space-y-6">
@@ -66,8 +68,8 @@ function BudgetOverview({ budget, summary, canEditBudget = true, onUpdateTotalBu
                         )}
                         <div className="flex justify-between items-center pt-3 border-t border-gray-200">
                             <span className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>Remaining:</span>
-                            <span className={`font-bold text-lg ${summary.remaining < 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                ${summary.remaining.toLocaleString()}
+                            <span className={`font-bold text-lg ${trueRemaining < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                ${trueRemaining.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                             </span>
                         </div>
                         {royaltiesTotal > 0 && (
@@ -101,25 +103,25 @@ function BudgetOverview({ budget, summary, canEditBudget = true, onUpdateTotalBu
                     <div className="mt-4">
                         <div className="flex justify-between text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>
                             <span>Budget Used</span>
-                            <span>{summary.percentUsed.toFixed(1)}%</span>
+                            <span>{truePercentUsed.toFixed(1)}%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                             <div
                                 className={`h-full transition-all duration-300 ${
-                                    summary.percentUsed > 100 ? 'bg-red-500' :
-                                    summary.percentUsed > 90 ? 'bg-yellow-500' :
+                                    truePercentUsed > 100 ? 'bg-red-500' :
+                                    truePercentUsed > 90 ? 'bg-yellow-500' :
                                     'bg-green-500'
                                 }`}
-                                style={{ width: `${Math.min(summary.percentUsed, 100)}%` }}
+                                style={{ width: `${Math.min(truePercentUsed, 100)}%` }}
                             />
                         </div>
                     </div>
                     <div style={{ marginTop: '24px' }}>
                         {window.BudgetHealthDoughnut && (
                             <window.BudgetHealthDoughnut
-                                spent={summary.totalSpent}
-                                remaining={summary.remaining}
-                                isOverBudget={summary.isOverBudget}
+                                spent={totalPlannedSpend}
+                                remaining={trueRemaining}
+                                isOverBudget={isOverPlannedBudget}
                                 totalBudget={budget.totalBudget}
                             />
                         )}
@@ -150,6 +152,28 @@ function BudgetOverview({ budget, summary, canEditBudget = true, onUpdateTotalBu
                             ⚠️ Production is currently operating at a loss
                         </div>
                     )}
+
+                    <div style={{ marginTop: '24px' }}>
+                        {window.Chart && (() => {
+                            const revenue = summary.totalRevenue || 0;
+                            const goal = budget.totalBudget || 0;
+                            const pct = goal > 0 ? Math.min((revenue / goal) * 100, 100) : 0;
+                            return (
+                                <div>
+                                    <div className="flex justify-between text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>
+                                        <span>Revenue vs. Budget Goal</span>
+                                        <span>{pct.toFixed(1)}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                        <div
+                                            className="h-full transition-all duration-300 bg-blue-500"
+                                            style={{ width: `${pct}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })()}
+                    </div>
                 </div>
             </div>
 

@@ -169,6 +169,8 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
     if (!budget) return <div className="p-6">Loading budget...</div>;
 
     const summary = window.budgetService.calculateBudgetSummary(production.id);
+    const headerTotalPlannedSpend = summary.totalAllocated + (royaltyCalc?.total || 0);
+    const headerTrueRemaining = budget.totalBudget - headerTotalPlannedSpend;
 
     const DEPARTMENTS = [
         { id: 'lighting', name: 'Lighting', icon: '💡' },
@@ -220,8 +222,8 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                         </div>
                         <div className="bg-white bg-opacity-10 rounded-lg p-3">
                             <div className="text-xs opacity-75">Remaining</div>
-                            <div className={`text-xl font-bold ${summary.remaining < 0 ? 'text-red-300' : ''}`}>
-                                ${summary.remaining.toLocaleString()}
+                            <div className={`text-xl font-bold ${headerTrueRemaining < 0 ? 'text-red-300' : ''}`}>
+                                ${headerTrueRemaining.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                             </div>
                         </div>
                     </div>
