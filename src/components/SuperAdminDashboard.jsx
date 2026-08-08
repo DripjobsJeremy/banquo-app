@@ -553,9 +553,9 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
           ];
           return (
             <div style={{ background: '#1a1a2e', borderRadius: '0 0 12px 12px', padding: '32px', position: 'relative', overflow: 'hidden', marginTop: '-1px' }}>
-              <img src="assets/ghostlight/ghostlight-brand.png" alt="" style={{ position: 'absolute', right: '24px', bottom: '24px', height: '40px', objectFit: 'contain', opacity: 0.25, pointerEvents: 'none' }} />
+              <GhostLightLogo size={40} opacity={0.25} style={{ position: 'absolute', right: '24px', bottom: '24px', pointerEvents: 'none' }} />
               <div style={{ marginBottom: '32px' }}>
-                <img src="assets/ghostlight/ghostlight-brand.png" alt="GhostLight" style={{ height: '56px', objectFit: 'contain', marginBottom: '8px' }} />
+                <GhostLightLogo size={56} withWordmark style={{ marginBottom: '8px' }} />
                 <p style={{ color: '#9b8fa8', fontSize: '14px', margin: '0' }}>AI-powered tools for theatre professionals — coming soon</p>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
@@ -564,7 +564,7 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
                     <h3 style={{ fontSize: '15px', fontWeight: '600', color: '#f5f0e8', marginBottom: '8px', marginTop: '0', paddingRight: '32px' }}>{feature.title}</h3>
                     <p style={{ fontSize: '13px', color: '#9b8fa8', lineHeight: '1.5', marginBottom: '16px', marginTop: '0' }}>{feature.desc}</p>
                     <span style={{ display: 'inline-block', padding: '3px 10px', background: 'rgba(147,97,255,0.15)', border: '1px solid rgba(147,97,255,0.35)', borderRadius: '20px', fontSize: '11px', fontWeight: '500', color: '#b78aff', letterSpacing: '0.5px' }}>Coming Soon</span>
-                    <img src="assets/ghostlight/ghostlight-brand.png" alt="" style={{ position: 'absolute', bottom: '10px', right: '10px', height: '28px', objectFit: 'contain', opacity: 0.25 }} />
+                    <GhostLightLogo size={28} opacity={0.25} style={{ position: 'absolute', bottom: '10px', right: '10px' }} />
                   </div>
                 ))}
               </div>
