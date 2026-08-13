@@ -6,6 +6,7 @@ const BoardDashboard = () => {
   const productions = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
   const donations   = window.donationsService?.loadDonations?.() || [];
   const contacts    = window.contactsService?.loadContacts?.()   || [];
+  const atRiskProductions = window.breakEvenService?.getAllAtRisk?.() || [];
 
   // Financial summary
   const currentYear  = new Date().getFullYear();
@@ -180,6 +181,28 @@ const BoardDashboard = () => {
     ),
 
     runwayCard,
+
+    atRiskProductions.length > 0 && React.createElement('div', {
+      className: 'rounded-lg p-6 border-2 border-red-600 bg-red-950/40 banquo-card'
+    },
+      React.createElement('div', { className: 'text-sm font-semibold uppercase tracking-wide mb-3', style: { color: 'var(--color-text-secondary)' } }, '⚠️ Productions at Risk'),
+      React.createElement('div', { className: 'space-y-2' },
+        ...atRiskProductions.map(p =>
+          React.createElement('div', {
+            key: p.productionId,
+            className: 'flex items-center justify-between p-3 bg-gray-750 rounded border border-gray-600 cursor-pointer hover:border-red-500 transition-colors banquo-card--flat',
+            onClick: () => { window.location.hash = `#/productions/${p.productionId}`; }
+          },
+            React.createElement('div', { className: 'font-medium', style: { color: 'var(--color-text-primary)' } }, p.productionTitle),
+            React.createElement('div', { className: 'text-xs text-red-400 font-semibold' },
+              p.current.breakEvenWeeks === Infinity
+                ? 'Won\'t recoup costs'
+                : `Breaks even in ${Math.round(p.current.breakEvenWeeks)} wks (run is ${p.weeksInRun} wks)`
+            )
+          )
+        )
+      )
+    ),
 
     // KPI row
     React.createElement('div', { className: 'grid grid-cols-2 lg:grid-cols-4 gap-4' },
