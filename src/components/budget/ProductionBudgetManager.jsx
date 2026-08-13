@@ -40,6 +40,33 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
     const [ctSearch, setCtSearch] = React.useState('');
     const [justSaved, setJustSaved] = React.useState(false);
 
+    const [breakEvenForm, setBreakEvenForm] = React.useState(() => {
+        const settings = window.breakEvenService.getSettings(production);
+        const derivedWeeks = window.breakEvenService.deriveWeeksFromDates(production.startDate, production.endDate);
+        return {
+            weeklyRunningCost: settings.weeklyRunningCost,
+            weeksInRunOverride: settings.weeksInRunOverride,
+            weeksInRunDerived: derivedWeeks,
+            capitalizationOverride: settings.capitalizationOverride
+        };
+    });
+    const [beJustSaved, setBeJustSaved] = React.useState(false);
+
+    const saveBreakEvenSettings = (updates) => {
+        const merged = { ...breakEvenForm, ...updates };
+        setBreakEvenForm(merged);
+        const saved = window.breakEvenService.saveSettings(production.id, {
+            weeklyRunningCost: parseFloat(merged.weeklyRunningCost) || 0,
+            weeksInRunOverride: merged.weeksInRunOverride != null ? parseFloat(merged.weeksInRunOverride) : null,
+            capitalizationOverride: merged.capitalizationOverride != null ? parseFloat(merged.capitalizationOverride) : null
+        });
+        if (saved) {
+            setBeJustSaved(true);
+            window.clearTimeout(window.__breakEvenSavedTimeout);
+            window.__breakEvenSavedTimeout = window.setTimeout(() => setBeJustSaved(false), 1500);
+        }
+    };
+
     const saveRoyalties = (updates) => {
         const updated = { ...royalties, ...updates };
         setRoyalties(updated);
@@ -166,6 +193,24 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
         return { base, perPerfSubtotal, grossBasis, discountAmount, subtotalBeforeCap, capAdjustment, total, capTriggered, seatsUsed };
     }, [royalties]);
 
+    const breakEvenResult = React.useMemo(() => {
+        const weeksInRun = breakEvenForm.weeksInRunOverride != null
+            ? breakEvenForm.weeksInRunOverride
+            : (breakEvenForm.weeksInRunDerived || 0);
+        const capitalization = breakEvenForm.capitalizationOverride != null
+            ? breakEvenForm.capitalizationOverride
+            : (budget?.totalBudget || 0);
+        return window.breakEvenService.compute({
+            seatingCapacity: royalties.seatingCapacity,
+            numberOfPerformances: royalties.numberOfPerformances,
+            avgTicketPrice: royalties.avgTicketPrice,
+            attendancePct: royalties.attendancePct,
+            weeklyRunningCost: breakEvenForm.weeklyRunningCost,
+            weeksInRun,
+            capitalization
+        });
+    }, [royalties, breakEvenForm, budget]);
+
     if (!budget) return <div className="p-6">Loading budget...</div>;
 
     const summary = window.budgetService.calculateBudgetSummary(production.id);
@@ -235,6 +280,7 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                         { id: 'overview', label: 'Overview' },
                         { id: 'departments', label: 'Departments' },
                         { id: 'royalties', label: 'Royalties & Licensing' },
+                        { id: 'breakeven', label: 'Break-Even' },
                         { id: 'revenue', label: 'Revenue' },
                         { id: 'ghost_light', label: '🕯️ Ghost Light' }
                     ].map(tab => (
@@ -773,6 +819,133 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                                         </div>
                                     )}
                                 </div>
+                            </div>
+                        );
+                    })()}
+
+                    {activeTab === 'breakeven' && (() => {
+                        const STATUS_INFO = {
+                            critical: { label: 'Critical — this run may not recoup its costs', color: 'text-red-500', border: 'border-red-600', bg: 'bg-red-950/20' },
+                            caution:  { label: 'Caution — break-even falls late in the run', color: 'text-amber-500', border: 'border-amber-600', bg: 'bg-amber-950/20' },
+                            healthy:  { label: 'Healthy — break-even falls comfortably within the run', color: 'text-green-500', border: 'border-green-600', bg: 'bg-green-950/20' },
+                            unknown:  { label: 'Add your numbers to see break-even', color: 'text-[var(--color-text-muted)]', border: 'border-[var(--color-border)]', bg: '' }
+                        };
+                        const info = STATUS_INFO[breakEvenResult.status] || STATUS_INFO.unknown;
+
+                        const fmt = (n) => (n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        const sectionCls = 'bg-[var(--color-bg-panel)] border border-[var(--color-border)] rounded-[20px] p-6';
+                        const inputCls = 'rl-number-input w-full min-h-[48px] px-4 text-lg bg-[var(--color-bg-base)] border border-[var(--color-border)] rounded-[20px] focus:border-[var(--color-accent-gold)] focus:outline-none text-[var(--color-text)]';
+                        const lbl = 'text-xs uppercase tracking-wide text-[var(--color-text-muted)]';
+
+                        const beWeeksInRun = breakEvenForm.weeksInRunOverride != null ? breakEvenForm.weeksInRunOverride : (breakEvenForm.weeksInRunDerived || 0);
+                        const beCapitalization = breakEvenForm.capitalizationOverride != null ? breakEvenForm.capitalizationOverride : (budget?.totalBudget || 0);
+
+                        return (
+                            <div className="flex flex-col gap-6">
+                                {/* Show details (read-only, from Royalties & Licensing) */}
+                                <div className={sectionCls}>
+                                    <div className="flex items-center justify-between mb-1">
+                                        <h3 className="font-fraunces text-xl text-[var(--color-text)]">Show Details</h3>
+                                        <button type="button" onClick={() => setActiveTab('royalties')} className="text-xs text-[var(--color-accent-gold)] hover:underline">
+                                            Edit in Royalties & Licensing →
+                                        </button>
+                                    </div>
+                                    <p className="text-sm text-[var(--color-text-muted)] mb-4">Pulled from the Royalties & Licensing tab so these numbers never drift out of sync.</p>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <div><div className={lbl}>Seats</div><div className="text-lg font-semibold text-[var(--color-text)]">{royalties.seatingCapacity || 0}</div></div>
+                                        <div><div className={lbl}>Performances</div><div className="text-lg font-semibold text-[var(--color-text)]">{royalties.numberOfPerformances || 0}</div></div>
+                                        <div><div className={lbl}>Avg Ticket Price</div><div className="text-lg font-semibold text-[var(--color-text)]">${fmt(royalties.avgTicketPrice)}</div></div>
+                                        <div><div className={lbl}>Attendance %</div><div className="text-lg font-semibold text-[var(--color-text)]">{royalties.attendancePct || 0}%</div></div>
+                                    </div>
+                                </div>
+
+                                {/* Running costs & capitalization */}
+                                <div className={sectionCls}>
+                                    <h3 className="font-fraunces text-xl text-[var(--color-text)] mb-1">Running Costs &amp; Capitalization</h3>
+                                    <p className="text-sm text-[var(--color-text-muted)] mb-5">The fixed weekly cost of running the show, and the amount that needs to be recouped.</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div>
+                                            <div className={lbl + ' mb-2'}>Weekly Running Cost</div>
+                                            <input type="number" step="0.01" min="0" disabled={!canEditBudget} className={inputCls}
+                                                value={breakEvenForm.weeklyRunningCost || ''} placeholder="0.00"
+                                                onChange={e => saveBreakEvenSettings({ weeklyRunningCost: parseFloat(e.target.value) || 0 })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <div className={lbl + ' mb-2'}>Weeks in Run</div>
+                                            <input type="number" step="1" min="0" disabled={!canEditBudget} className={inputCls}
+                                                value={beWeeksInRun || ''} placeholder="0"
+                                                onChange={e => saveBreakEvenSettings({ weeksInRunOverride: parseFloat(e.target.value) || 0 })}
+                                            />
+                                            {breakEvenForm.weeksInRunDerived != null && breakEvenForm.weeksInRunOverride != null && (
+                                                <button type="button" onClick={() => saveBreakEvenSettings({ weeksInRunOverride: null })} className="text-xs text-[var(--color-accent-gold)] hover:underline mt-1">
+                                                    Use production dates ({breakEvenForm.weeksInRunDerived} wks)
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <div className={lbl + ' mb-2'}>Capitalization to Recoup</div>
+                                            <input type="number" step="0.01" min="0" disabled={!canEditBudget} className={inputCls}
+                                                value={beCapitalization || ''} placeholder="0.00"
+                                                onChange={e => saveBreakEvenSettings({ capitalizationOverride: parseFloat(e.target.value) || 0 })}
+                                            />
+                                            {breakEvenForm.capitalizationOverride != null && (
+                                                <button type="button" onClick={() => saveBreakEvenSettings({ capitalizationOverride: null })} className="text-xs text-[var(--color-accent-gold)] hover:underline mt-1">
+                                                    Use production budget (${fmt(budget?.totalBudget)})
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {beJustSaved && <div className="text-xs text-[var(--color-accent-gold)] mt-3">Saved</div>}
+                                </div>
+
+                                {/* Result */}
+                                <div className={`rounded-[20px] p-6 border-2 ${info.border} ${info.bg}`}>
+                                    <div className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-1">Weeks to Break Even</div>
+                                    {!breakEvenResult.hasData ? (
+                                        <div className="text-xl font-bold text-[var(--color-text)]">{info.label}</div>
+                                    ) : (
+                                        <>
+                                            <div className={`text-4xl font-bold ${info.color}`}>
+                                                {breakEvenResult.current.breakEvenWeeks === Infinity ? 'Never recoups' : `${Math.round(breakEvenResult.current.breakEvenWeeks)} weeks`}
+                                            </div>
+                                            <div className="text-sm mt-1 text-[var(--color-text-muted)]">
+                                                {info.label} · Run length: {breakEvenResult.weeksInRun} weeks
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Scenarios */}
+                                {breakEvenResult.hasData && (
+                                    <div className={sectionCls}>
+                                        <h3 className="font-fraunces text-xl text-[var(--color-text)] mb-4">Break-Even at Different Occupancy</h3>
+                                        <div className="hub-table-wrap overflow-x-auto">
+                                            <table className="hub-table w-full">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="text-left">Occupancy</th>
+                                                        <th className="right">Weekly Gross</th>
+                                                        <th className="right">Weekly Margin</th>
+                                                        <th className="right">Break-Even</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {breakEvenResult.scenarios.map(s => (
+                                                        <tr key={s.occupancyPct}>
+                                                            <td>{s.occupancyPct}%</td>
+                                                            <td className="right">${fmt(s.weeklyGross)}</td>
+                                                            <td className={`right ${s.weeklyMargin < 0 ? 'text-red-500' : ''}`}>${fmt(s.weeklyMargin)}</td>
+                                                            <td className={`right ${s.breakEvenWeeks === Infinity || s.breakEvenWeeks > breakEvenResult.weeksInRun ? 'text-red-500 font-semibold' : ''}`}>
+                                                                {s.breakEvenWeeks === Infinity ? 'Never' : `${Math.round(s.breakEvenWeeks)} wks`}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         );
                     })()}

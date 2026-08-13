@@ -109,19 +109,24 @@ function ProductionBudgetsFinancialView({ userRole }) {
                                             </span>
                                         </td>
                                         <td>
-                                            {summary.isOverBudget ? (
-                                                <span className="whitespace-nowrap px-2 py-1 bg-red-100 text-red-700 text-xs rounded">
-                                                    Over Budget
-                                                </span>
-                                            ) : summary.percentUsed > 90 ? (
-                                                <span className="whitespace-nowrap px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">
-                                                    Warning
-                                                </span>
-                                            ) : (
-                                                <span className="whitespace-nowrap px-2 py-1 bg-green-100 text-green-700 text-xs rounded">
-                                                    On Track
-                                                </span>
-                                            )}
+                                            <span className="inline-flex items-center gap-1.5">
+                                                {summary.isOverBudget ? (
+                                                    <span className="whitespace-nowrap px-2 py-1 bg-red-100 text-red-700 text-xs rounded">
+                                                        Over Budget
+                                                    </span>
+                                                ) : summary.percentUsed > 90 ? (
+                                                    <span className="whitespace-nowrap px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">
+                                                        Warning
+                                                    </span>
+                                                ) : (
+                                                    <span className="whitespace-nowrap px-2 py-1 bg-green-100 text-green-700 text-xs rounded">
+                                                        On Track
+                                                    </span>
+                                                )}
+                                                {window.breakEvenService && window.breakEvenService.getStatusForProduction(summary.productionId).status === 'critical' && (
+                                                    <span title="Break-even at risk — this run may not recoup its costs. See the Break-Even tab." className="text-red-600 text-sm cursor-help">⚠️</span>
+                                                )}
+                                            </span>
                                         </td>
                                         <td className="right nowrap">
                                             <button
