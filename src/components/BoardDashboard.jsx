@@ -1,4 +1,8 @@
 const BoardDashboard = () => {
+  const [runwaySettings, setRunwaySettings] = React.useState(() => window.runwayService?.loadSettings?.() || { cashOnHand: 0, monthlyOperatingExpense: 0, monthlyContributedIncome: 0, lastUpdated: null });
+  const [isEditingRunway, setIsEditingRunway] = React.useState(false);
+  const [runwayForm, setRunwayForm] = React.useState(runwaySettings);
+
   const productions = JSON.parse(localStorage.getItem('showsuite_productions') || '[]');
   const donations   = window.donationsService?.loadDonations?.() || [];
   const contacts    = window.contactsService?.loadContacts?.()   || [];
@@ -48,6 +52,120 @@ const BoardDashboard = () => {
     { label: 'Board Members',       value: boardMembers.length,  icon: '👥' },
   ];
 
+  const runway = window.runwayService?.computeRunway?.(runwaySettings) || { hasData: false, status: 'unknown', weeksOfRunway: null, monthsOfRunway: null, weeklyBurn: 0, cashOnHand: 0 };
+
+  const RUNWAY_STATUS_STYLES = {
+    critical: { border: 'border-red-600',    bg: 'bg-red-950/40',    text: 'text-red-400',    label: 'Critical — under 3 months' },
+    caution:  { border: 'border-amber-600',  bg: 'bg-amber-950/30',  text: 'text-amber-400',  label: 'Caution — under 6 months' },
+    healthy:  { border: 'border-green-600',  bg: 'bg-green-950/30',  text: 'text-green-400',  label: 'Healthy' },
+    unknown:  { border: 'border-gray-700',   bg: 'bg-gray-800/40',   text: 'text-gray-400',   label: 'No data yet' }
+  };
+  const runwayStyle = RUNWAY_STATUS_STYLES[runway.status] || RUNWAY_STATUS_STYLES.unknown;
+
+  const handleRunwayFieldChange = (field, value) => {
+    setRunwayForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleRunwaySave = () => {
+    const saved = window.runwayService?.saveSettings?.({
+      cashOnHand: parseFloat(runwayForm.cashOnHand) || 0,
+      monthlyOperatingExpense: parseFloat(runwayForm.monthlyOperatingExpense) || 0,
+      monthlyContributedIncome: parseFloat(runwayForm.monthlyContributedIncome) || 0
+    });
+    if (saved) setRunwaySettings(saved);
+    setIsEditingRunway(false);
+  };
+
+  const handleRunwayCancel = () => {
+    setRunwayForm(runwaySettings);
+    setIsEditingRunway(false);
+  };
+
+  const runwayCard = React.createElement('div', {
+    className: `rounded-lg p-6 border-2 ${runwayStyle.border} ${runwayStyle.bg} banquo-card`
+  },
+    React.createElement('div', { className: 'flex items-start justify-between gap-4 flex-wrap' },
+      React.createElement('div', null,
+        React.createElement('div', { className: 'text-sm font-semibold uppercase tracking-wide mb-1', style: { color: 'var(--color-text-secondary)' } }, 'Weeks of Runway'),
+        !runway.hasData
+          ? React.createElement('div', { className: 'text-xl font-bold', style: { color: 'var(--color-text-primary)' } }, 'Add your numbers to see your runway')
+          : React.createElement('div', { className: `text-4xl font-bold ${runwayStyle.text}` },
+              runway.weeksOfRunway === Infinity
+                ? 'Income covers expenses'
+                : `${Math.max(0, Math.round(runway.weeksOfRunway))} weeks`
+            ),
+        runway.hasData && runway.weeksOfRunway !== Infinity && React.createElement('div', { className: 'text-sm mt-1', style: { color: 'var(--color-text-secondary)' } },
+          `About ${runway.monthsOfRunway.toFixed(1)} months · ${runwayStyle.label}`
+        ),
+        runway.hasData && React.createElement('div', { className: 'text-xs mt-2', style: { color: 'var(--color-text-secondary)' } },
+          `${fmt(runway.cashOnHand)} cash on hand · ${fmt(Math.max(0, runway.weeklyBurn))}/week net burn`
+        ),
+        !runway.hasData && React.createElement('div', { className: 'text-sm mt-1', style: { color: 'var(--color-text-secondary)' } },
+          'How many weeks could you operate if ticket and donation income stopped tomorrow?'
+        )
+      ),
+      React.createElement('button', {
+        type: 'button',
+        onClick: () => setIsEditingRunway(v => !v),
+        className: 'text-xs px-3 py-1.5 rounded border banquo-card--flat shrink-0',
+        style: { color: 'var(--color-text-primary)', borderColor: 'var(--color-border, #374151)' }
+      }, isEditingRunway ? 'Cancel' : (runway.hasData ? 'Update numbers' : 'Add numbers'))
+    ),
+
+    isEditingRunway && React.createElement('div', { className: 'mt-4 pt-4 border-t border-gray-700 grid grid-cols-1 md:grid-cols-3 gap-4' },
+      React.createElement('div', null,
+        React.createElement('label', { className: 'block text-xs font-medium mb-1', style: { color: 'var(--color-text-secondary)' } }, 'Cash on Hand'),
+        React.createElement('input', {
+          type: 'number',
+          value: runwayForm.cashOnHand,
+          onChange: (e) => handleRunwayFieldChange('cashOnHand', e.target.value),
+          className: 'w-full px-3 py-2 border border-gray-600 rounded bg-transparent',
+          style: { color: 'var(--color-text-primary)' },
+          placeholder: '0.00',
+          step: '0.01'
+        })
+      ),
+      React.createElement('div', null,
+        React.createElement('label', { className: 'block text-xs font-medium mb-1', style: { color: 'var(--color-text-secondary)' } }, 'Monthly Operating Expenses'),
+        React.createElement('input', {
+          type: 'number',
+          value: runwayForm.monthlyOperatingExpense,
+          onChange: (e) => handleRunwayFieldChange('monthlyOperatingExpense', e.target.value),
+          className: 'w-full px-3 py-2 border border-gray-600 rounded bg-transparent',
+          style: { color: 'var(--color-text-primary)' },
+          placeholder: '0.00',
+          step: '0.01'
+        })
+      ),
+      React.createElement('div', null,
+        React.createElement('label', { className: 'block text-xs font-medium mb-1', style: { color: 'var(--color-text-secondary)' } }, 'Monthly Contributed / Earned Income'),
+        React.createElement('input', {
+          type: 'number',
+          value: runwayForm.monthlyContributedIncome,
+          onChange: (e) => handleRunwayFieldChange('monthlyContributedIncome', e.target.value),
+          className: 'w-full px-3 py-2 border border-gray-600 rounded bg-transparent',
+          style: { color: 'var(--color-text-primary)' },
+          placeholder: '0.00',
+          step: '0.01'
+        })
+      ),
+      React.createElement('div', { className: 'md:col-span-3 flex gap-2' },
+        React.createElement('button', {
+          type: 'button',
+          onClick: handleRunwaySave,
+          className: 'px-4 py-2 rounded font-medium text-sm',
+          style: { backgroundColor: 'var(--btn-primary-bg, #7a1f24)', color: 'var(--btn-primary-text, #f4ede2)' }
+        }, 'Save'),
+        React.createElement('button', {
+          type: 'button',
+          onClick: handleRunwayCancel,
+          className: 'px-4 py-2 rounded font-medium text-sm border border-gray-600',
+          style: { color: 'var(--color-text-primary)' }
+        }, 'Cancel')
+      )
+    )
+  );
+
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
 
   return React.createElement('div', { className: 'bg-base min-h-screen' },
@@ -60,6 +178,8 @@ const BoardDashboard = () => {
         new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
       )
     ),
+
+    runwayCard,
 
     // KPI row
     React.createElement('div', { className: 'grid grid-cols-2 lg:grid-cols-4 gap-4' },
