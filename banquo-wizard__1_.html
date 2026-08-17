@@ -2234,7 +2234,7 @@
 
     <div class="form-actions">
       <span class="form-fine">We'll only email you about Banquo. Unsubscribe in one click.</span>
-      <button type="submit" class="btn">Save my seat <span class="btn-arrow">›</span></button>
+      <button type="submit" class="btn" id="submit-btn-org">Save my seat <span class="btn-arrow">›</span></button>
     </div>
   </form>
 </section>
@@ -2320,7 +2320,7 @@
 
     <div class="form-actions">
       <span class="form-fine">We'll only email you about Banquo. Unsubscribe in one click.</span>
-      <button type="submit" class="btn">Save my seat <span class="btn-arrow">›</span></button>
+      <button type="submit" class="btn" id="submit-btn-artist">Save my seat <span class="btn-arrow">›</span></button>
     </div>
   </form>
 </section>
@@ -3134,7 +3134,7 @@
   }
 
   // =========== Form submit ===========
-  function submitForm(type) {
+  async function submitForm(type) {
     const errorEl = document.getElementById('error-' + type);
     errorEl.classList.remove('show');
 
@@ -3153,19 +3153,62 @@
     state.email     = fd.get('email')     || '';
     state.artistLocation = fd.get('artistLocation') || '';
 
-    // Show/hide the "Continue building your profile" block on Act IV
-    const continueBlock = document.getElementById('continue-profile-block');
     if (type === 'artist') {
       const geoCheckbox = document.getElementById('geo-opt-in');
       state.geoOptIn = geoCheckbox ? geoCheckbox.checked : true;
-      continueBlock.style.display = 'block';
-      seedPortal();
-    } else {
-      continueBlock.style.display = 'none';
     }
 
-    // In production, this would POST to /api/waitlist
-    goToAct(4);
+    const payload = {
+      type: type,
+      firstName: state.firstName,
+      lastName: state.lastName,
+      email: state.email
+    };
+
+    if (type === 'org') {
+      payload.orgType = fd.get('orgType') || '';
+      payload.orgName = fd.get('orgName') || '';
+      payload.orgLocation = fd.get('orgLocation') || '';
+      payload.season = fd.get('season') || '';
+    } else {
+      payload.roles = Array.from(state.roles).join(', ');
+      payload.artistLocation = state.artistLocation;
+      payload.geoOptIn = state.geoOptIn ? 'yes' : 'no';
+    }
+
+    const submitBtn = document.getElementById('submit-btn-' + type);
+    const originalBtnHTML = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Saving your seat&hellip;';
+
+    try {
+      const response = await fetch('https://formspree.io/f/mnpagopq', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Submission failed');
+      }
+
+      const continueBlock = document.getElementById('continue-profile-block');
+      if (type === 'artist') {
+        continueBlock.style.display = 'block';
+        seedPortal();
+      } else {
+        continueBlock.style.display = 'none';
+      }
+
+      goToAct(4);
+    } catch (err) {
+      errorEl.textContent = 'Something went wrong saving your seat. Please try again, or email us directly if it keeps happening.';
+      errorEl.classList.add('show');
+      errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnHTML;
+    }
   }
 
   // Seed the portal with data captured from the artist form
