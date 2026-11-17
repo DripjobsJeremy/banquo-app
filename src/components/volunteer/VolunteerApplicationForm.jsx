@@ -620,7 +620,7 @@ window.VolunteerApplicationForm = ({ isModal = false, prefill = null, onClose, o
         <div className={`bg-white rounded-lg shadow-xl ${isModal ? 'max-w-md' : 'max-w-4xl mx-auto'} w-full p-8`}>
           <div className="text-center">
             <div className="text-green-500 text-6xl mb-4">✓</div>
-            <h2 className="text-2xl font-bold mb-2">Application Submitted!</h2>
+            <h2 className="text-2xl font-bold mb-2">Application Submitted</h2>
             <p className="text-gray-600 mb-6">
               Thank you for your interest in volunteering. We'll review your application and be in touch soon.
             </p>

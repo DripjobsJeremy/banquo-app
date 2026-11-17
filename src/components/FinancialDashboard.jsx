@@ -26,8 +26,8 @@
           'div',
           { className: 'max-w-2xl mx-auto mt-16 p-8 bg-gray-800 rounded-lg border border-red-700 text-center' },
           React.createElement('div', { className: 'text-5xl mb-4' }, '⚠️'),
-          React.createElement('h2', { className: 'text-xl font-bold text-white mb-2' }, 'Something went wrong in the Financial Dashboard'),
-          React.createElement('p', { className: 'mb-6', style: { color: 'var(--color-text-muted)' } }, 'An unexpected error occurred while loading this section. Your data is safe.'),
+          React.createElement('h2', { className: 'text-xl font-bold text-white mb-2' }, 'The Financial Dashboard didn’t load'),
+          React.createElement('p', { className: 'mb-6', style: { color: 'var(--color-text-muted)' } }, 'This section hit an error while loading. Your data is unchanged. Reload the page to try again.'),
           React.createElement('p', { className: 'text-red-400 text-sm font-mono mb-6 bg-gray-900 p-3 rounded text-left' }, this.state.error?.message || 'Unknown error'),
           React.createElement(
             'div',
@@ -146,7 +146,7 @@
         setCurrentUser(user);
       } catch (e) {
         console.error('Permission check failed:', e);
-        alert('An error occurred while checking permissions.');
+        alert('Couldn’t check your permissions. Reload the page and try again.');
         window.location.hash = '#/dashboard';
       }
     };

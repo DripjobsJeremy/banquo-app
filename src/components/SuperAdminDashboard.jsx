@@ -549,14 +549,14 @@ function SuperAdminDashboard({ userRole = 'admin' }) {
           const features = [
             { title: '✍️ Grant Writing Assistant', desc: 'Generate grant applications tailored to your organization\'s mission and financials' },
             { title: '📄 Document Generator', desc: 'Create board reports, donor impact statements, and funding proposals' },
-            { title: '🔎 Donor Intelligence', desc: 'AI-powered insights on donor giving patterns and retention risk' }
+            { title: '🔎 Donor Intelligence', desc: 'Planned: flag donors whose giving is dropping or who haven’t given this season. Not available yet.' }
           ];
           return (
             <div style={{ background: '#1a1a2e', borderRadius: '0 0 12px 12px', padding: '32px', position: 'relative', overflow: 'hidden', marginTop: '-1px' }}>
               <GhostLightLogo size={40} opacity={0.25} style={{ position: 'absolute', right: '24px', bottom: '24px', pointerEvents: 'none' }} />
               <div style={{ marginBottom: '32px' }}>
                 <GhostLightLogo size={56} withWordmark style={{ marginBottom: '8px' }} />
-                <p style={{ color: '#9b8fa8', fontSize: '14px', margin: '0' }}>AI-powered tools for theatre professionals — coming soon</p>
+                <p style={{ color: '#9b8fa8', fontSize: '14px', margin: '0' }}>Planned GhostLight tools for fundraising and board reporting. Not available yet.</p>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
                 {features.map((feature, i) => (

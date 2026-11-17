@@ -67,7 +67,7 @@ function DonationAllocationManager({ productionId, productionTitle, onClose }) {
             setSelectedDonationId('');
             setAllocateAmount('');
             load();
-            if (window.showToast) window.showToast('✅ Donation allocated successfully', 'success');
+            if (window.showToast) window.showToast('✅ Donation allocated', 'success');
         } catch (err) {
             setAllocateError(err.message || 'Failed to allocate donation.');
         } finally {

@@ -197,7 +197,7 @@ function VenuesSettings() {
         <div className="text-center py-16 bg-gray-50 rounded-lg border border-dashed border-gray-300">
           <div className="text-5xl mb-3">📍</div>
           <p className="text-gray-500 font-medium">No venues yet</p>
-          <p className="text-gray-400 text-sm mt-1">Click "+ Add Venue" to get started</p>
+          <p className="text-gray-400 text-sm mt-1">Add a venue to assign it to productions and calendar events.</p>
         </div>
       ) : (
         <div className="grid gap-3">

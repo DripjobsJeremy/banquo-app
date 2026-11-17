@@ -400,7 +400,7 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
     React.createElement(window.GhostLightLogo, { size: 40, opacity: 0.25, style: { position: 'absolute', right: '24px', bottom: '24px', pointerEvents: 'none' } }),
     React.createElement('div', { style: { marginBottom: '32px' } },
       React.createElement(window.GhostLightLogo, { size: 56, withWordmark: true, style: { marginBottom: '8px' } }),
-      React.createElement('p', { style: { color: 'var(--color-text-muted)', fontSize: '14px', margin: '0' } }, 'AI-powered tools for theatre professionals — coming soon')
+      React.createElement('p', { style: { color: 'var(--color-text-muted)', fontSize: '14px', margin: '0' } }, 'Planned GhostLight tools for this department. Not available yet.')
     ),
     React.createElement(
       'div',
@@ -456,7 +456,7 @@ function SoundDepartmentView({ production, onUpdateScene, userRole }) {
           },
           React.createElement('span', {
             style: { position: 'relative', display: 'inline-flex', alignItems: 'center' },
-            title: 'Get assistance from GhostLight AI'
+            title: 'Planned GhostLight tools for this department'
           },
             React.createElement(window.GhostLightLogo, { size: 36 })
           )

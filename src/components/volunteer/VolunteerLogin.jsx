@@ -158,7 +158,7 @@ window.VolunteerLogin = ({ isModal = false, onClose, onSuccess }) => {
         }
       } catch (err) {
         console.error('Lookup error:', err);
-        setError('An error occurred during lookup. Please try again.');
+        setError('Couldn’t look up that volunteer. Try again.');
       } finally {
         setLoading(false);
       }
@@ -233,7 +233,7 @@ window.VolunteerLogin = ({ isModal = false, onClose, onSuccess }) => {
         }
       } catch (err) {
         console.error('Lookup error:', err);
-        setError('An error occurred during lookup. Please try again.');
+        setError('Couldn’t look up that volunteer. Try again.');
       } finally {
         setLoading(false);
       }
@@ -285,7 +285,7 @@ window.VolunteerLogin = ({ isModal = false, onClose, onSuccess }) => {
         }
       } catch (err) {
         console.error('Link generation error:', err);
-        setError('An error occurred. Please try again.');
+        setError('Couldn’t create a sign-in link. Try again.');
       } finally {
         setLoading(false);
       }
@@ -295,7 +295,7 @@ window.VolunteerLogin = ({ isModal = false, onClose, onSuccess }) => {
   // Copy to clipboard
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
-      setSuccess('Copied to clipboard!');
+      setSuccess('Copied to clipboard.');
       setTimeout(() => setSuccess(''), 2000);
     }).catch(() => {
       setError('Failed to copy. Please select and copy manually.');

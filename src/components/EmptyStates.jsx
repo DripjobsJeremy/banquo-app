@@ -38,7 +38,7 @@ const EmptyShifts = ({ onCreateShift, onLoadTestData }) => (
   <EmptyStateBase
     icon="📅"
     title="No Shifts Scheduled"
-    description="Get started by creating your first volunteer shift or load test data to explore features."
+    description="Create a shift, or load test data to see how scheduling works."
     action={onCreateShift}
     actionLabel="Create First Shift"
     secondaryAction={onLoadTestData}
@@ -62,7 +62,7 @@ const EmptyVolunteers = ({ onViewApplications, onInviteVolunteers }) => (
   <EmptyStateBase
     icon="👥"
     title="No Volunteers Found"
-    description="Start building your volunteer base by reviewing applications or inviting new volunteers."
+    description="Review pending applications or invite volunteers to add them here."
     action={onViewApplications}
     actionLabel="Review Applications"
     secondaryAction={onInviteVolunteers}
@@ -75,7 +75,7 @@ const EmptyApplications = ({ onShareLink }) => (
   <EmptyStateBase
     icon="📋"
     title="No Applications Yet"
-    description="Share your volunteer application link to start receiving applications from interested volunteers."
+    description="Applications show up here once people fill out your volunteer form. Share the link to start collecting them."
     action={onShareLink}
     actionLabel="Share Application Link"
   />
@@ -97,7 +97,7 @@ const NoUpcomingShifts = ({ onScheduleShift }) => (
   <EmptyStateBase
     icon="🗓️"
     title="No Upcoming Shifts"
-    description="There are no shifts scheduled in the near future. Schedule new shifts to keep volunteers engaged."
+    description="Nothing on the schedule yet. Add a shift so volunteers can sign up."
     action={onScheduleShift}
     actionLabel="Schedule Shifts"
   />
@@ -116,8 +116,8 @@ const NoActivity = () => (
 const AllCaughtUp = () => (
   <EmptyStateBase
     icon="✅"
-    title="All Caught Up!"
-    description="You're all set! There are no pending actions or alerts at this time."
+    title="Nothing Pending"
+    description="No pending actions or alerts."
   />
 );
 
@@ -126,7 +126,7 @@ const NoMessages = ({ onComposeMessage }) => (
   <EmptyStateBase
     icon="✉️"
     title="No Messages"
-    description="Start engaging with your volunteers by composing your first message."
+    description="No messages sent yet. Compose one to reach your volunteers."
     action={onComposeMessage}
     actionLabel="Compose Message"
   />
@@ -137,7 +137,7 @@ const NoTemplates = ({ onCreateTemplate }) => (
   <EmptyStateBase
     icon="📝"
     title="No Templates Saved"
-    description="Create reusable email templates to streamline your volunteer communications."
+    description="Save an email you send often, like a shift reminder, as a template."
     action={onCreateTemplate}
     actionLabel="Create Template"
   />

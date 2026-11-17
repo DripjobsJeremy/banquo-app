@@ -334,11 +334,11 @@ const VolunteerSelfDashboard = () => {
         sessionStorage.setItem('volunteerSession', JSON.stringify({ ...session, volunteer: { ...volunteer, ...editedProfile } }));
       }
 
-      window.toast?.success('Profile updated!');
+      window.toast?.success('Profile updated.');
       setEditProfileModal(false);
     } catch(e) {
       console.error('Profile update error:', e);
-      window.toast?.error('Failed to update profile.');
+      window.toast?.error('Couldn’t update your profile. Try again.');
     }
   }
 
@@ -474,7 +474,7 @@ const VolunteerSelfDashboard = () => {
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📅</div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">You don't have any upcoming shifts.</h3>
-              <p className="text-gray-600 mb-6">Browse available shifts below to sign up!</p>
+              <p className="text-gray-600 mb-6">Open shifts are listed below.</p>
               <button
                 onClick={() => scrollToSection('available-shifts')}
                 className="px-6 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors"
@@ -807,8 +807,8 @@ const VolunteerSelfDashboard = () => {
             ) : (
               <div className="mt-6 p-4 bg-gradient-to-r from-violet-50 to-purple-50 rounded-lg text-center">
                 <div className="text-2xl mb-2">🎉</div>
-                <div className="font-semibold text-violet-700">You've earned all milestones!</div>
-                <div className="text-sm text-gray-600 mt-1">Keep up the amazing work!</div>
+                <div className="font-semibold text-violet-700">All milestones earned</div>
+                <div className="text-sm text-gray-600 mt-1">Your hours keep counting toward your total.</div>
               </div>
             )}
           </div>
@@ -856,9 +856,9 @@ const VolunteerSelfDashboard = () => {
         {/* Section 5: Impact Message */}
         <section className="bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-lg shadow-md p-8 text-center">
           <div className="text-5xl mb-4">❤️</div>
-          <h2 className="text-2xl font-bold mb-4">Thank You for Your Service!</h2>
-          <p className="text-lg mb-2">Thank you for contributing {stats.totalHours} hours to our organization!</p>
-          <p className="text-violet-100">Your support makes a real difference in our community.</p>
+          <h2 className="text-2xl font-bold mb-4">Thank You</h2>
+          <p className="text-lg mb-2">You’ve contributed {stats.totalHours} hours to our organization.</p>
+          <p className="text-violet-100">Our shows don’t happen without volunteers like you.</p>
         </section>
 
         {/* Dashboard Footer */}

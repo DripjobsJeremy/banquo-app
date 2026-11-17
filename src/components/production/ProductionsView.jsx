@@ -429,7 +429,7 @@ const ProductionsView = () => {
         onSave: () => {
           setShowBudgetManager(false);
           setBudgetProduction(null);
-          if (window.showToast) window.showToast('✅ Budget saved successfully', 'success');
+          if (window.showToast) window.showToast('✅ Budget saved', 'success');
         }
       })
     : null;

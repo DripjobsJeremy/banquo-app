@@ -409,7 +409,7 @@
         svc.createMappingPreset(name, description, fieldMapping);
         const presets = svc.loadMappingPresets();
         setAvailablePresets(presets);
-        alert('Preset saved successfully!');
+        alert('Preset saved.');
       } catch (error) {
         alert('Failed to save preset: ' + error.message);
       }
@@ -471,7 +471,7 @@
             if (imported && imported.mapping) {
               setFieldMapping(imported.mapping);
               validateFieldMapping(imported.mapping);
-              alert('Mapping imported successfully');
+              alert('Mapping imported.');
             } else {
               alert('Invalid mapping file');
             }
@@ -1405,7 +1405,7 @@
             React.createElement('div', { className: 'success-animation mb-4' },
               React.createElement('div', { className: 'text-6xl mb-4' }, '✓'),
               React.createElement('h3', { className: 'text-2xl font-bold text-green-600 mb-2' },
-                'Import Complete!'
+                'Import Complete'
               )
             ),
 

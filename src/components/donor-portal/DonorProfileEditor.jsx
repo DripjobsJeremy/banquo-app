@@ -62,7 +62,7 @@ function DonorProfileEditor({ donor, onUpdate }) {
             console.log('✅ Contact updated successfully');
 
             if (window.showToast) {
-                window.showToast('✅ Profile updated successfully', 'success');
+                window.showToast('✅ Profile updated', 'success');
             }
 
             if (onUpdate) onUpdate();
