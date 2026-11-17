@@ -364,7 +364,7 @@
       if (confirmed) {
         donorCalculationService.recalculateAllDonorProfiles();
         setHasChanges(false);
-        alert('All donor levels have been recalculated!');
+        alert('All donor levels recalculated.');
         loadLevels(); // Reload to show updated counts
       }
     };
@@ -445,7 +445,7 @@
                   React.createElement('td', {
                     colSpan: '7',
                     className: 'text-center py-8 text-gray-600'
-                  }, 'No donor levels configured. Click "Add New Level" to get started.')
+                  }, 'No donor levels yet. Add one to group donors by giving amount.')
                 )
               : levels.map((level, index) =>
                   React.createElement(LevelRow, {

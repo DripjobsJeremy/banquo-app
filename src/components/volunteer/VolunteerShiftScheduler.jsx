@@ -224,7 +224,7 @@ const VolunteerShiftScheduler = ({ userRole = 'Admin', onNavigate = () => {}, de
     
     // Show success notification
     const isNew = !editId;
-    window.toast?.success(isNew ? 'Shift created successfully!' : 'Shift updated successfully!');
+    window.toast?.success(isNew ? 'Shift created.' : 'Shift updated.');
     
     setCreateOpen(false);
     setRefreshToken(t=>t+1);

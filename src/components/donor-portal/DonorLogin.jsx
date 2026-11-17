@@ -36,7 +36,7 @@ function DonorLogin({ onLoginSuccess }) {
             window.donorAuthService.loginWithEmail(email, code);
 
             if (window.showToast) {
-                window.showToast('✅ Login successful!', 'success');
+                window.showToast('✅ Signed in', 'success');
             }
 
             if (onLoginSuccess) {

@@ -469,7 +469,7 @@ function ActorImportCSV({ onImportComplete }) {
                       'Password: ' + a.tempPassword + '\n'
                     ).join('\n');
                     navigator.clipboard.writeText(text).then(() => {
-                      alert('Credentials copied to clipboard!');
+                      alert('Credentials copied to clipboard.');
                     }).catch(() => {
                       alert('Could not copy to clipboard. Please copy manually.');
                     });

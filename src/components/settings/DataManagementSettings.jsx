@@ -98,7 +98,7 @@ const DataManagementSettings = () => {
       localStorage.setItem('showsuite_last_backup', new Date().toISOString());
       setLastBackup(new Date().toISOString());
       
-      alert('✓ Backup created successfully!');
+      alert('✓ Backup created.');
     } catch (error) {
       console.error('Error creating backup:', error);
       alert('Failed to create backup. Please try again.');
@@ -168,7 +168,7 @@ const DataManagementSettings = () => {
           localStorage.setItem('showsuite_productions', JSON.stringify(data.productions));
         }
         
-        alert('Backup restored successfully! The page will now reload.');
+        alert('Backup restored. The page will reload now.');
         window.location.reload();
         
       } catch (error) {
@@ -353,7 +353,7 @@ const DataManagementSettings = () => {
         if (window.donorCalculationService) {
           window.donorCalculationService.recalculateAllDonorProfiles();
           loadStats();
-          alert('✓ All donor profiles have been recalculated!');
+          alert('✓ All donor profiles recalculated.');
         } else {
           alert('Donor calculation service not available');
         }
@@ -404,7 +404,7 @@ const DataManagementSettings = () => {
       }
       
       if (issues.length === 0) {
-        alert('✓ Data integrity check complete. No issues found!');
+        alert('✓ Data integrity check complete. No issues found.');
       } else {
         const message = `Found ${issues.length} issue(s):\n\n${issues.join('\n')}`;
         alert(message);
@@ -508,7 +508,7 @@ const DataManagementSettings = () => {
     
     if (confirmation === 'DELETE ALL DATA') {
       const doubleCheck = confirm(
-        'Are you ABSOLUTELY SURE? This cannot be undone!'
+        'Last check: this permanently deletes all data and can’t be undone. Continue?'
       );
       
       if (doubleCheck) {
@@ -759,7 +759,7 @@ const DataManagementSettings = () => {
         { className: 'warning-banner mb-4 p-4 bg-amber-50 border-l-4 border-amber-500 rounded text-amber-900 text-sm' },
         React.createElement('p', null,
           React.createElement('strong', null, '⚠️ Warning: '),
-          'Importing data will overwrite existing records. Make sure to create a backup first!'
+          'Importing data will overwrite existing records. Create a backup first.'
         ),
         React.createElement(
           'label',

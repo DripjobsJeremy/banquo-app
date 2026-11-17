@@ -386,7 +386,7 @@ const VolunteerPortalHome = () => {
                 /* Confirmation screen */
                 <div className="text-center py-8">
                   <div className="text-5xl mb-4">🎭</div>
-                  <h3 className="text-xl font-bold mb-2">Application Submitted!</h3>
+                  <h3 className="text-xl font-bold mb-2">Application Submitted</h3>
                   <p className="text-gray-600 mb-6">
                     Thanks {applyForm.name} — we'll be in touch at <span className="font-medium">{applyForm.email}</span>.
                   </p>

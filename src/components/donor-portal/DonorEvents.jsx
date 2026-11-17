@@ -59,7 +59,7 @@ function DonorEvents({ events }) {
                     <div className="text-center py-12 text-gray-400">
                         <div className="text-6xl mb-4">🎭</div>
                         <p className="text-lg">No upcoming events</p>
-                        <p className="text-sm mt-2">Check back soon for new show announcements!</p>
+                        <p className="text-sm mt-2">New shows will appear here when they’re announced.</p>
                     </div>
                 )}
             </div>

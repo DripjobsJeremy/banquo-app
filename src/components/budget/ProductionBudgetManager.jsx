@@ -296,7 +296,7 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                                     : 'border-transparent text-gray-600 hover:text-gray-900'
                             }`}
                         >
-                            {tab.id === 'ghost_light' ? <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: '6px' }} title="Get assistance from GhostLight AI"><GhostLightLogo size={24} /><span>Ghost Light</span></span> : tab.label}
+                            {tab.id === 'ghost_light' ? <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: '6px' }} title="Planned GhostLight tools for this budget"><GhostLightLogo size={24} /><span>Ghost Light</span></span> : tab.label}
                         </button>
                     ))}
                 </div>
@@ -972,7 +972,7 @@ function ProductionBudgetManager({ production, onClose, onSave }) {
                                 <GhostLightLogo size={40} opacity={0.25} style={{ position: 'absolute', right: '24px', bottom: '24px', pointerEvents: 'none' }} />
                                 <div style={{ marginBottom: '32px' }}>
                                     <GhostLightLogo size={56} withWordmark style={{ marginBottom: '8px' }} />
-                                    <p style={{ color: 'var(--color-text-muted)', fontSize: '14px', margin: '0' }}>AI-powered tools for theatre professionals — coming soon</p>
+                                    <p style={{ color: 'var(--color-text-muted)', fontSize: '14px', margin: '0' }}>Planned GhostLight tools for this production’s budget. Not available yet.</p>
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
                                     {features.map((feature, i) => (

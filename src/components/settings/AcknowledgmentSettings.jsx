@@ -158,7 +158,7 @@
           acknowledgmentService.saveTemplates(templates);
           acknowledgmentService.saveOrgInfo(orgInfo);
           setHasChanges(false);
-          alert('Templates saved successfully!');
+          alert('Templates saved.');
         }
       } catch (error) {
         console.error('Error saving templates:', error);

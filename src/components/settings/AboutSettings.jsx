@@ -94,7 +94,7 @@
     };
 
     const handleOpenSupport = () => {
-      alert('Support resources are being developed. Check back soon!');
+      alert('Support docs aren’t available yet.');
     };
 
     const handleReportIssue = () => {

@@ -30,7 +30,7 @@ function UsersSettings() {
                 );
             }
         } catch (error) {
-            alert('Error: ' + error.message);
+            alert('Couldn’t save this user: ' + error.message);
         }
     };
 
@@ -45,7 +45,7 @@ function UsersSettings() {
                 window.showToast('✅ User removed', 'success');
             }
         } catch (error) {
-            alert('Error: ' + error.message);
+            alert('Couldn’t remove this user: ' + error.message);
         }
     };
 

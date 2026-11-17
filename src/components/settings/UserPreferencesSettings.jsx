@@ -136,7 +136,7 @@ const UserPreferencesSettings = () => {
     try {
       window.preferencesService.savePreferences(preferences);
       setHasChanges(false);
-      alert('✓ Preferences saved successfully!');
+      alert('✓ Preferences saved.');
     } catch (error) {
       console.error('Error saving preferences:', error);
       alert('Failed to save preferences. Please try again.');

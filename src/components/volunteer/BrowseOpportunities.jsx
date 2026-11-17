@@ -329,7 +329,7 @@ window.BrowseOpportunities = ({ onSelectOpportunity }) => {
               <div className="bg-white rounded-lg shadow-sm p-12 text-center">
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">No opportunities match your search</h3>
-                <p className="text-gray-600 mb-6">Try different filters or check back soon!</p>
+                <p className="text-gray-600 mb-6">Try different filters.</p>
                 <button
                   onClick={clearFilters}
                   className="px-6 py-3 bg-violet-600 text-white rounded-lg font-semibold hover:bg-violet-700"
@@ -344,7 +344,7 @@ window.BrowseOpportunities = ({ onSelectOpportunity }) => {
               <div className="bg-white rounded-lg shadow-sm p-12 text-center">
                 <div className="text-6xl mb-4">📋</div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">No volunteer opportunities available</h3>
-                <p className="text-gray-600">Check back soon for new opportunities!</p>
+                <p className="text-gray-600">New opportunities will appear here when they’re posted.</p>
               </div>
             )}
 

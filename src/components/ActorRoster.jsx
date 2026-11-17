@@ -506,8 +506,8 @@ function ActorRoster({ onViewActor, onAddActor }) {
           <p className="text-gray-500 text-lg mb-2">No actors found</p>
           <p className="text-gray-400 text-sm">
             {actors.length === 0
-              ? 'Click "+ Add Actor" to get started'
-              : 'Try adjusting your search or filters'}
+              ? 'No actors yet. Add one to start the cast list.'
+              : 'No actors match this search. Clear filters to see the full roster.'}
           </p>
         </div>
       ) : viewMode === 'cards' ? (
